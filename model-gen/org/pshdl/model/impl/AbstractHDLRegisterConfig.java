@@ -177,8 +177,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	}
 
 	protected HDLExpression validateClk(HDLExpression clk) {
-		if (clk == null)
+		if (clk == null) {
 			throw new IllegalArgumentException("The field clk can not be null!");
+		}
 		return clk;
 	}
 
@@ -195,8 +196,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	}
 
 	protected HDLExpression validateRst(HDLExpression rst) {
-		if (rst == null)
+		if (rst == null) {
 			throw new IllegalArgumentException("The field rst can not be null!");
+		}
 		return rst;
 	}
 
@@ -309,8 +311,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	}
 
 	protected HDLExpression validateResetValue(HDLExpression resetValue) {
-		if (resetValue == null)
+		if (resetValue == null) {
 			throw new IllegalArgumentException("The field resetValue can not be null!");
+		}
 		return resetValue;
 	}
 
@@ -383,10 +386,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLRegisterConfig} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLRegisterConfig} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -398,10 +399,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getClk()}.
 	 *
 	 * @param clk
-	 *            sets the new clk of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated clk
-	 *         field.
+	 *            sets the new clk of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated clk field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setClk(@Nonnull HDLExpression clk) {
@@ -415,10 +414,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getRst()}.
 	 *
 	 * @param rst
-	 *            sets the new rst of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated rst
-	 *         field.
+	 *            sets the new rst of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated rst field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setRst(@Nonnull HDLExpression rst) {
@@ -432,10 +429,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getUnresolvedClockType()}.
 	 *
 	 * @param unresolvedClockType
-	 *            sets the new unresolvedClockType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         unresolvedClockType field.
+	 *            sets the new unresolvedClockType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated unresolvedClockType field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setUnresolvedClockType(@Nullable HDLExpression unresolvedClockType) {
@@ -449,10 +444,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getUnresolvedResetType()}.
 	 *
 	 * @param unresolvedResetType
-	 *            sets the new unresolvedResetType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         unresolvedResetType field.
+	 *            sets the new unresolvedResetType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated unresolvedResetType field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setUnresolvedResetType(@Nullable HDLExpression unresolvedResetType) {
@@ -466,10 +459,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getUnresolvedSyncType()}.
 	 *
 	 * @param unresolvedSyncType
-	 *            sets the new unresolvedSyncType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         unresolvedSyncType field.
+	 *            sets the new unresolvedSyncType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated unresolvedSyncType field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setUnresolvedSyncType(@Nullable HDLExpression unresolvedSyncType) {
@@ -483,10 +474,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getClockType()}.
 	 *
 	 * @param clockType
-	 *            sets the new clockType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         clockType field.
+	 *            sets the new clockType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated clockType field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setClockType(@Nullable HDLRegClockType clockType) {
@@ -500,10 +489,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getResetType()}.
 	 *
 	 * @param resetType
-	 *            sets the new resetType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         resetType field.
+	 *            sets the new resetType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated resetType field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setResetType(@Nullable HDLRegResetActiveType resetType) {
@@ -517,10 +504,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getSyncType()}.
 	 *
 	 * @param syncType
-	 *            sets the new syncType of this object. Can be <code>null</code>
-	 *            .
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         syncType field.
+	 *            sets the new syncType of this object. Can be <code>null</code> .
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated syncType field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setSyncType(@Nullable HDLRegSyncType syncType) {
@@ -534,10 +519,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * Setter for the field {@link #getResetValue()}.
 	 *
 	 * @param resetValue
-	 *            sets the new resetValue of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         resetValue field.
+	 *            sets the new resetValue of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated resetValue field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setResetValue(@Nonnull HDLExpression resetValue) {
@@ -552,8 +535,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 *
 	 * @param delay
 	 *            sets the new delay of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLRegisterConfig} with the updated
-	 *         delay field.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated delay field.
 	 */
 	@Nonnull
 	public HDLRegisterConfig setDelay(@Nullable HDLExpression delay) {
@@ -565,65 +547,89 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLRegisterConfig))
+		}
+		if (!(obj instanceof AbstractHDLRegisterConfig)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
 		if (clk == null) {
-			if (other.clk != null)
+			if (other.clk != null) {
 				return false;
-		} else if (!clk.equals(other.clk))
+			}
+		} else if (!clk.equals(other.clk)) {
 			return false;
+		}
 		if (rst == null) {
-			if (other.rst != null)
+			if (other.rst != null) {
 				return false;
-		} else if (!rst.equals(other.rst))
+			}
+		} else if (!rst.equals(other.rst)) {
 			return false;
+		}
 		if (unresolvedClockType == null) {
-			if (other.unresolvedClockType != null)
+			if (other.unresolvedClockType != null) {
 				return false;
-		} else if (!unresolvedClockType.equals(other.unresolvedClockType))
+			}
+		} else if (!unresolvedClockType.equals(other.unresolvedClockType)) {
 			return false;
+		}
 		if (unresolvedResetType == null) {
-			if (other.unresolvedResetType != null)
+			if (other.unresolvedResetType != null) {
 				return false;
-		} else if (!unresolvedResetType.equals(other.unresolvedResetType))
+			}
+		} else if (!unresolvedResetType.equals(other.unresolvedResetType)) {
 			return false;
+		}
 		if (unresolvedSyncType == null) {
-			if (other.unresolvedSyncType != null)
+			if (other.unresolvedSyncType != null) {
 				return false;
-		} else if (!unresolvedSyncType.equals(other.unresolvedSyncType))
+			}
+		} else if (!unresolvedSyncType.equals(other.unresolvedSyncType)) {
 			return false;
+		}
 		if (clockType == null) {
-			if (other.clockType != null)
+			if (other.clockType != null) {
 				return false;
-		} else if (!clockType.equals(other.clockType))
+			}
+		} else if (!clockType.equals(other.clockType)) {
 			return false;
+		}
 		if (resetType == null) {
-			if (other.resetType != null)
+			if (other.resetType != null) {
 				return false;
-		} else if (!resetType.equals(other.resetType))
+			}
+		} else if (!resetType.equals(other.resetType)) {
 			return false;
+		}
 		if (syncType == null) {
-			if (other.syncType != null)
+			if (other.syncType != null) {
 				return false;
-		} else if (!syncType.equals(other.syncType))
+			}
+		} else if (!syncType.equals(other.syncType)) {
 			return false;
+		}
 		if (resetValue == null) {
-			if (other.resetValue != null)
+			if (other.resetValue != null) {
 				return false;
-		} else if (!resetValue.equals(other.resetValue))
+			}
+		} else if (!resetValue.equals(other.resetValue)) {
 			return false;
+		}
 		if (delay == null) {
-			if (other.delay != null)
+			if (other.delay != null) {
 				return false;
-		} else if (!delay.equals(other.delay))
+			}
+		} else if (!delay.equals(other.delay)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -631,8 +637,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((clk == null) ? 0 : clk.hashCode());

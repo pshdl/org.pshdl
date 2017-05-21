@@ -194,8 +194,9 @@ public class TestbenchRecordingInterpreter implements IHDLBigInterpreter {
 
 	private String toBinString(BigInteger lit, String name) {
 		final Integer widthInt = widths.get(name);
-		if (widthInt == 1)
+		if (widthInt == 1) {
 			return "'" + lit.toString(2) + "'";
+		}
 		StringBuilder sb = new StringBuilder(widthInt);
 		if (lit.signum() < 0) {
 			final BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
@@ -293,8 +294,9 @@ public class TestbenchRecordingInterpreter implements IHDLBigInterpreter {
 	@Override
 	public String getName(int idx) {
 		String name = idxName.get(idx);
-		if (name != null)
+		if (name != null) {
 			return name;
+		}
 		name = interpreter.getName(idx);
 		idxName.put(idx, name);
 		return name;

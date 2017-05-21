@@ -63,8 +63,7 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 */
 		autoInterface,
 		/**
-		 * Exported signal, the assigned signal is to be exported. This is an
-		 * internal annotation
+		 * Exported signal, the assigned signal is to be exported. This is an internal annotation
 		 */
 		exportedSignal,
 		/**
@@ -80,37 +79,30 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 */
 		reset,
 		/**
-		 * Indicates a range of values that are allowed for this variable. The
-		 * value are the lower bound separated by a semicolon and the upper
-		 * bound. For example: -1;6 indicates that the variable can have a value
-		 * of either -1,0,1,2,3,4,5,6
+		 * Indicates a range of values that are allowed for this variable. The value are the lower bound separated by a semicolon and the
+		 * upper bound. For example: -1;6 indicates that the variable can have a value of either -1,0,1,2,3,4,5,6
 		 */
 		range,
 		/**
-		 * Combine multiple variables to multiple read write ports. Those ports
-		 * need to have the same memory id
+		 * Combine multiple variables to multiple read write ports. Those ports need to have the same memory id
 		 */
 		memory,
 		/**
-		 * The name of the type that should be used instead of an automatically
-		 * created type during VHDL code generation. The name should start with
-		 * VHDL.
+		 * The name of the type that should be used instead of an automatically created type during VHDL code generation. The name should
+		 * start with VHDL.
 		 */
 		VHDLType,
 		/**
-		 * Indicates that this interface should be instantiated as component
-		 * rather entity.
+		 * Indicates that this interface should be instantiated as component rather entity.
 		 */
 		VHDLComponent,
 		/**
-		 * This annotation causes the default initialization to 0 to be omitted.
-		 * This MAY cause a latch to be created.
+		 * This annotation causes the default initialization to 0 to be omitted. This MAY cause a latch to be created.
 		 */
 		VHDLLatchable,
 		/**
-		 * This annotation causes the reset value of a register to be assigned
-		 * as default in the value in the declaration, instead of describing a
-		 * reset behaviour.
+		 * This annotation causes the reset value of a register to be assigned as default in the value in the declaration, instead of
+		 * describing a reset behaviour.
 		 */
 		VHDLNoExplicitReset,
 		/**
@@ -141,16 +133,19 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case exportedSignal:
 			case reset:
 			case clock:
-				if (value != null)
+				if (value != null) {
 					return this + " does not expect any arguments";
+				}
 				break;
 			case VHDLComponent:
-				if (!((value == null) || "declare".equals(value) || "import".equals(value)))
+				if (!((value == null) || "declare".equals(value) || "import".equals(value))) {
 					return this + " only accepts 'declare' or 'import' as parameter. If no parameter is supplied import is assumed.";
+				}
 				break;
 			case range:
-				if (value == null)
+				if (value == null) {
 					return this + " expects an argument with the expected range of the variable. The format is from;to";
+				}
 				final Set<Problem> problems = Sets.newHashSet();
 				checkRangeAnnotation(annotation, problems);
 				if (problems.isEmpty()) {
@@ -163,16 +158,19 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 				}
 				break;
 			case VHDLType:
-				if (value == null)
+				if (value == null) {
 					return this + " expects an argument with the name of the VHDL entity to use.";
+				}
 				break;
 			case portGroup:
-				if (value == null)
+				if (value == null) {
 					return this + " expects an argument with the name of group to use.";
+				}
 				break;
 			case memory:
-				if (value == null)
+				if (value == null) {
 					return this + " expects an argument with the name of memory to use.";
+				}
 				break;
 			}
 			return null;
@@ -180,8 +178,9 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 
 		public static Optional<Range<BigInteger>> checkRangeAnnotation(HDLAnnotation range, Set<Problem> problems) {
 			if (range != null) {
-				if (!range.getName().equals(HDLBuiltInAnnotations.range.toString()))
+				if (!range.getName().equals(HDLBuiltInAnnotations.range.toString())) {
 					throw new IllegalArgumentException("This is for range annotations only");
+				}
 				try {
 					HDLExpression lowerBoundExpr = null;
 					HDLExpression upperBoundExpr = null;
@@ -236,41 +235,48 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case greater:
 				if (lowerRangeOpt.isPresent()) {
 					final Range<BigInteger> lowerRange = lowerRangeOpt.get();
-					if (lowerRange.hasLowerBound())
+					if (lowerRange.hasLowerBound()) {
 						return Optional.of(enclosingRange.intersection(Range.atLeast(lowerRange.lowerEndpoint().add(BigInteger.ONE))));
+					}
 				}
 				break;
 			case greater_equal:
 				if (lowerRangeOpt.isPresent()) {
 					final Range<BigInteger> lowerRange = lowerRangeOpt.get();
-					if (lowerRange.hasLowerBound())
+					if (lowerRange.hasLowerBound()) {
 						return Optional.of(enclosingRange.intersection(Range.atLeast(lowerRange.lowerEndpoint())));
+					}
 				}
 				break;
 			case less:
 				if (upperRangeOpt.isPresent()) {
 					final Range<BigInteger> upperRange = upperRangeOpt.get();
-					if (upperRange.hasUpperBound())
+					if (upperRange.hasUpperBound()) {
 						return Optional.of(enclosingRange.intersection(Range.atMost(upperRange.upperEndpoint().subtract(BigInteger.ONE))));
+					}
 				}
 				break;
 			case less_equal:
 				if (upperRangeOpt.isPresent()) {
 					final Range<BigInteger> upperRange = upperRangeOpt.get();
-					if (upperRange.hasUpperBound())
+					if (upperRange.hasUpperBound()) {
 						return Optional.of(enclosingRange.intersection(Range.atMost(upperRange.upperEndpoint())));
+					}
 				}
 				break;
 			case exact:
 				if (lowerRangeOpt.isPresent() && upperRangeOpt.isPresent()) {
 					final Range<BigInteger> lowerRange = lowerRangeOpt.get();
 					final Range<BigInteger> upperRange = upperRangeOpt.get();
-					if (lowerRange.hasLowerBound() && upperRange.hasUpperBound())
+					if (lowerRange.hasLowerBound() && upperRange.hasUpperBound()) {
 						return Optional.of(enclosingRange.intersection(RangeTool.createRange(lowerRange.lowerEndpoint(), upperRange.upperEndpoint())));
-					if (!lowerRange.hasLowerBound() && !upperRange.hasUpperBound())
+					}
+					if (!lowerRange.hasLowerBound() && !upperRange.hasUpperBound()) {
 						return Optional.of(enclosingRange);
-					if (!lowerRange.hasLowerBound())
+					}
+					if (!lowerRange.hasLowerBound()) {
 						return Optional.of(enclosingRange.intersection(Range.atMost(upperRange.upperEndpoint())));
+					}
 					return Optional.of(enclosingRange.intersection(Range.atLeast(lowerRange.lowerEndpoint())));
 				}
 			}

@@ -62,7 +62,6 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -105,8 +104,9 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		@Nullable
 		public static HDLPrimitiveType getOp(String op) {
 			for (final HDLPrimitiveType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -125,15 +125,17 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLPrimitiveType getValue(HDLPrimitive obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLPrimitive setValue(HDLPrimitive obj, HDLPrimitiveType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
@@ -144,33 +146,38 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLPrimitive obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getWidth();
 		}
 
 		@Override
 		public HDLPrimitive setValue(HDLPrimitive obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setWidth(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (type == obj)
+		if (type == obj) {
 			return fType;
-		if (width == obj)
+		}
+		if (width == obj) {
 			return fWidth;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
 	@Override
 	protected String validateName(String name) {
-		if (this.name == null)
+		if (this.name == null) {
 			return "#primitive";
+		}
 		return super.validateName(name);
 	}
 
@@ -225,23 +232,30 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLPrimitive))
+		}
+		if (!(obj instanceof AbstractHDLPrimitive)) {
 			return false;
+		}
 		final AbstractHDLPrimitive other = (AbstractHDLPrimitive) obj;
 		if (type == null) {
-			if (other.getType() != null)
+			if (other.getType() != null) {
 				return false;
-		} else if (!type.equals(other.getType()))
+			}
+		} else if (!type.equals(other.getType())) {
 			return false;
+		}
 		if (width == null) {
-			if (other.getWidth() != null)
+			if (other.getWidth() != null) {
 				return false;
-		} else if (!width.equals(other.getWidth()))
+			}
+		} else if (!width.equals(other.getWidth())) {
 			return false;
+		}
 		return true;
 	}
 

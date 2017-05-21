@@ -33,19 +33,16 @@ import java.nio.charset.StandardCharsets;
 import com.google.common.io.ByteStreams;
 
 /**
- * Side files are used for transporting additional generated content into the
- * output of the compiler.
+ * Side files are used for transporting additional generated content into the output of the compiler.
  */
 public class AuxiliaryContent {
 	/**
-	 * This singleton can be used to indicate that the resulting VHDL (or other
-	 * output) of the PSHDL should be placed at this given location. This can be
-	 * useful for ip core directory structures.
+	 * This singleton can be used to indicate that the resulting VHDL (or other output) of the PSHDL should be placed at this given
+	 * location. This can be useful for ip core directory structures.
 	 */
 	public static final byte[] THIS = new byte[] { 'T', 'H', 'I', 'S' };
 	/**
-	 * The directory to which the contents should be written. This will always
-	 * be below the general output folder
+	 * The directory to which the contents should be written. This will always be below the general output folder
 	 */
 	public final String relPath;
 	public final byte[] contents;
@@ -61,8 +58,9 @@ public class AuxiliaryContent {
 
 	public AuxiliaryContent(String relPath, byte[] contents, boolean isString) {
 		super();
-		if (contents == null)
+		if (contents == null) {
 			throw new IllegalArgumentException("Contents can not be null");
+		}
 		this.relPath = relPath;
 		this.contents = contents;
 		this.isString = isString;
@@ -78,18 +76,23 @@ public class AuxiliaryContent {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final AuxiliaryContent other = (AuxiliaryContent) obj;
 		if (relPath == null) {
-			if (other.relPath != null)
+			if (other.relPath != null) {
 				return false;
-		} else if (!relPath.equals(other.relPath))
+			}
+		} else if (!relPath.equals(other.relPath)) {
 			return false;
+		}
 		return true;
 	}
 

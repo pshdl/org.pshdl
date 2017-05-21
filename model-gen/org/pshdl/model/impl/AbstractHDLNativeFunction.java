@@ -94,8 +94,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	}
 
 	protected Boolean validateSimOnly(Boolean simOnly) {
-		if (simOnly == null)
+		if (simOnly == null) {
 			throw new IllegalArgumentException("The field simOnly can not be null!");
+		}
 		return simOnly;
 	}
 
@@ -146,10 +147,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLNativeFunction} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLNativeFunction} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -161,10 +160,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -178,16 +175,15 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLNativeFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
@@ -198,16 +194,15 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLNativeFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
@@ -218,10 +213,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLNativeFunction removeAnnotations(int idx) {
@@ -235,10 +228,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLNativeFunction} with the updated name
-	 *         field.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated name field.
 	 */
 	@Override
 	@Nonnull
@@ -253,8 +244,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 *
 	 * @param args
 	 *            sets the new args of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLNativeFunction} with the updated args
-	 *         field.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
@@ -269,14 +259,14 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 *
 	 * @param newArgs
 	 *            the value that should be added to the field {@link #getArgs()}
-	 * @return a new instance of {@link HDLNativeFunction} with the updated args
-	 *         field.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
 	public HDLNativeFunction addArgs(@Nullable HDLFunctionParameter newArgs) {
-		if (newArgs == null)
+		if (newArgs == null) {
 			throw new IllegalArgumentException("Element of args can not be null!");
+		}
 		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.add(newArgs);
 		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
@@ -287,16 +277,15 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getArgs()}.
 	 *
 	 * @param newArgs
-	 *            the value that should be removed from the field
-	 *            {@link #getArgs()}
-	 * @return a new instance of {@link HDLNativeFunction} with the updated args
-	 *         field.
+	 *            the value that should be removed from the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
 	public HDLNativeFunction removeArgs(@Nullable HDLFunctionParameter newArgs) {
-		if (newArgs == null)
+		if (newArgs == null) {
 			throw new IllegalArgumentException("Removed element of args can not be null!");
+		}
 		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(newArgs);
 		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
@@ -307,10 +296,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getArgs()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getArgs()}
-	 * @return a new instance of {@link HDLNativeFunction} with the updated args
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args field.
 	 */
 	@Nonnull
 	public HDLNativeFunction removeArgs(int idx) {
@@ -324,10 +311,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Setter for the field {@link #getReturnType()}.
 	 *
 	 * @param returnType
-	 *            sets the new returnType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         returnType field.
+	 *            sets the new returnType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated returnType field.
 	 */
 	@Override
 	@Nonnull
@@ -341,10 +326,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Setter for the field {@link #getSimOnly()}.
 	 *
 	 * @param simOnly
-	 *            sets the new simOnly of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         simOnly field.
+	 *            sets the new simOnly of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated simOnly field.
 	 */
 	@Nonnull
 	public HDLNativeFunction setSimOnly(@Nonnull Boolean simOnly) {
@@ -357,10 +340,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * Setter for the field {@link #getSimOnly()}.
 	 *
 	 * @param simOnly
-	 *            sets the new simOnly of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLNativeFunction} with the updated
-	 *         simOnly field.
+	 *            sets the new simOnly of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated simOnly field.
 	 */
 	@Nonnull
 	public HDLNativeFunction setSimOnly(boolean simOnly) {
@@ -371,20 +352,26 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLNativeFunction))
+		}
+		if (!(obj instanceof AbstractHDLNativeFunction)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLNativeFunction other = (AbstractHDLNativeFunction) obj;
 		if (simOnly == null) {
-			if (other.simOnly != null)
+			if (other.simOnly != null) {
 				return false;
-		} else if (!simOnly.equals(other.simOnly))
+			}
+		} else if (!simOnly.equals(other.simOnly)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -392,8 +379,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((simOnly == null) ? 0 : simOnly.hashCode());

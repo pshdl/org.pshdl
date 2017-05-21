@@ -99,8 +99,9 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	}
 
 	protected HDLExpression validateExpr(HDLExpression expr) {
-		if (expr == null)
+		if (expr == null) {
 			throw new IllegalArgumentException("The field expr can not be null!");
+		}
 		return expr;
 	}
 
@@ -151,10 +152,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLInlineFunction} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLInlineFunction} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -166,10 +165,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInlineFunction} with the updated
-	 *         annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLInlineFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -183,16 +180,15 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInlineFunction} with the updated
-	 *         annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInlineFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInlineFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
@@ -203,16 +199,15 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInlineFunction} with the updated
-	 *         annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInlineFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInlineFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
@@ -223,10 +218,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInlineFunction} with the updated
-	 *         annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInlineFunction} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLInlineFunction removeAnnotations(int idx) {
@@ -240,10 +233,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInlineFunction} with the updated name
-	 *         field.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLInlineFunction} with the updated name field.
 	 */
 	@Override
 	@Nonnull
@@ -258,8 +249,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 *
 	 * @param args
 	 *            sets the new args of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLInlineFunction} with the updated args
-	 *         field.
+	 * @return a new instance of {@link HDLInlineFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
@@ -274,14 +264,14 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 *
 	 * @param newArgs
 	 *            the value that should be added to the field {@link #getArgs()}
-	 * @return a new instance of {@link HDLInlineFunction} with the updated args
-	 *         field.
+	 * @return a new instance of {@link HDLInlineFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInlineFunction addArgs(@Nullable HDLFunctionParameter newArgs) {
-		if (newArgs == null)
+		if (newArgs == null) {
 			throw new IllegalArgumentException("Element of args can not be null!");
+		}
 		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.add(newArgs);
 		final HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
@@ -292,16 +282,15 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getArgs()}.
 	 *
 	 * @param newArgs
-	 *            the value that should be removed from the field
-	 *            {@link #getArgs()}
-	 * @return a new instance of {@link HDLInlineFunction} with the updated args
-	 *         field.
+	 *            the value that should be removed from the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLInlineFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInlineFunction removeArgs(@Nullable HDLFunctionParameter newArgs) {
-		if (newArgs == null)
+		if (newArgs == null) {
 			throw new IllegalArgumentException("Removed element of args can not be null!");
+		}
 		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(newArgs);
 		final HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
@@ -312,10 +301,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getArgs()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getArgs()}
-	 * @return a new instance of {@link HDLInlineFunction} with the updated args
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLInlineFunction} with the updated args field.
 	 */
 	@Nonnull
 	public HDLInlineFunction removeArgs(int idx) {
@@ -329,10 +316,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Setter for the field {@link #getReturnType()}.
 	 *
 	 * @param returnType
-	 *            sets the new returnType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInlineFunction} with the updated
-	 *         returnType field.
+	 *            sets the new returnType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLInlineFunction} with the updated returnType field.
 	 */
 	@Override
 	@Nonnull
@@ -346,10 +331,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * Setter for the field {@link #getExpr()}.
 	 *
 	 * @param expr
-	 *            sets the new expr of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInlineFunction} with the updated expr
-	 *         field.
+	 *            sets the new expr of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLInlineFunction} with the updated expr field.
 	 */
 	@Nonnull
 	public HDLInlineFunction setExpr(@Nonnull HDLExpression expr) {
@@ -360,20 +343,26 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLInlineFunction))
+		}
+		if (!(obj instanceof AbstractHDLInlineFunction)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLInlineFunction other = (AbstractHDLInlineFunction) obj;
 		if (expr == null) {
-			if (other.expr != null)
+			if (other.expr != null) {
 				return false;
-		} else if (!expr.equals(other.expr))
+			}
+		} else if (!expr.equals(other.expr)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -381,8 +370,9 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((expr == null) ? 0 : expr.hashCode());

@@ -64,7 +64,7 @@ public class Definition implements NamedElement {
 		r, rw, w, constant;
 	}
 
-	public List<Integer> dimensions = new LinkedList<Integer>();
+	public List<Integer> dimensions = new LinkedList<>();
 
 	public String name = "fill";
 
@@ -101,29 +101,39 @@ public class Definition implements NamedElement {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final Definition other = (Definition) obj;
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
-		if (register != other.register)
+		}
+		if (register != other.register) {
 			return false;
+		}
 		if (rw == null) {
-			if (other.rw != null)
+			if (other.rw != null) {
 				return false;
-		} else if (!rw.equals(other.rw))
+			}
+		} else if (!rw.equals(other.rw)) {
 			return false;
-		if (type != other.type)
+		}
+		if (type != other.type) {
 			return false;
-		if (width != other.width)
+		}
+		if (width != other.width) {
 			return false;
+		}
 		return true;
 	}
 
@@ -133,8 +143,9 @@ public class Definition implements NamedElement {
 	}
 
 	public String getName(Row row) {
-		if (row.isHidden())
+		if (row.isHidden()) {
 			return name;
+		}
 		return row.getSimpleName() + '_' + name;
 	}
 
@@ -160,11 +171,13 @@ public class Definition implements NamedElement {
 		final String w = width != -1 ? "<" + width + ">" : "";
 		final String lowerCase = type.name().toLowerCase();
 		final String rwString = rw != null ? rw + " " : "";
-		if (type == Type.UNUSED)
+		if (type == Type.UNUSED) {
 			return name + w + ";";
+		}
 		String mod = "";
-		if (modFlag)
+		if (modFlag) {
 			mod = " writtenFlag";
+		}
 		return rwString + reg + lowerCase + w + " " + name + sb + " " + warn + mod + ";";
 	}
 

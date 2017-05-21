@@ -32,7 +32,7 @@ import org.antlr.v4.runtime.Token;
 
 public class Alias implements NamedElement {
 	public String name;
-	public LinkedList<NamedElement> definitions = new LinkedList<NamedElement>();
+	public LinkedList<NamedElement> definitions = new LinkedList<>();
 
 	public Alias(String name, NamedElement... definitions) {
 		super();

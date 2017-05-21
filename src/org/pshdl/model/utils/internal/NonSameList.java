@@ -79,7 +79,7 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public NonSameList<T> clone() {
-		return new NonSameList<T>(this);
+		return new NonSameList<>(this);
 	}
 
 	@Override

@@ -38,11 +38,9 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLSubstituteFunction contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.</li>
  * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLStatement&gt; stmnts. Can be <code>null</code>.</li>
  * </ul>
@@ -53,7 +51,6 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -87,30 +84,32 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	}
 
 	/**
-	 * The accessor for the field stmnts which is of type
-	 * ArrayList&lt;HDLStatement&gt;.
+	 * The accessor for the field stmnts which is of type ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>> fStmnts = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>>("stmnts",
 			HDLStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLSubstituteFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getStmnts();
 		}
 
 		@Override
 		public HDLSubstituteFunction setValue(HDLSubstituteFunction obj, ArrayList<HDLStatement> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setStmnts(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (stmnts.contains(obj))
+		if (stmnts.contains(obj)) {
 			return fStmnts;
+		}
 		return super.getContainingFeature(obj);
 	}
 

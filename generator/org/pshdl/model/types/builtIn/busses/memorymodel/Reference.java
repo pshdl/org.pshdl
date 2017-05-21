@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.Token;
 
 public class Reference implements NamedElement {
 	public String name;
-	public List<Integer> dimensions = new LinkedList<Integer>();
+	public List<Integer> dimensions = new LinkedList<>();
 
 	public Reference(String name, Integer... dimensions) {
 		super();

@@ -39,8 +39,7 @@ public interface IInsulinParticitant {
 	public String getName();
 
 	/**
-	 * This is called before anything is done with the package within
-	 * {@link Insulin}
+	 * This is called before anything is done with the package within {@link Insulin}
 	 *
 	 * @param hdlPackage
 	 *            the package that will be Insulated

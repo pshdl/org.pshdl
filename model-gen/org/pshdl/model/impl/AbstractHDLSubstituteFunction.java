@@ -74,7 +74,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 		if (validate) {
 			stmnts = validateStmnts(stmnts);
 		}
-		this.stmnts = new ArrayList<HDLStatement>();
+		this.stmnts = new ArrayList<>();
 		if (stmnts != null) {
 			for (final HDLStatement newValue : stmnts) {
 				this.stmnts.add(newValue);
@@ -84,7 +84,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 
 	public AbstractHDLSubstituteFunction() {
 		super();
-		this.stmnts = new ArrayList<HDLStatement>();
+		this.stmnts = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLStatement> stmnts;
@@ -100,8 +100,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	}
 
 	protected Iterable<HDLStatement> validateStmnts(Iterable<HDLStatement> stmnts) {
-		if (stmnts == null)
-			return new ArrayList<HDLStatement>();
+		if (stmnts == null) {
+			return new ArrayList<>();
+		}
 		return stmnts;
 	}
 
@@ -152,10 +153,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLSubstituteFunction} with the
-	 *         updated container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLSubstituteFunction} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -167,10 +166,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -184,16 +181,15 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
@@ -204,16 +200,15 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
@@ -224,10 +219,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeAnnotations(int idx) {
@@ -241,10 +234,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         name field.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated name field.
 	 */
 	@Override
 	@Nonnull
@@ -259,8 +250,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 *
 	 * @param args
 	 *            sets the new args of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         args field.
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
@@ -275,14 +265,14 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 *
 	 * @param newArgs
 	 *            the value that should be added to the field {@link #getArgs()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         args field.
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction addArgs(@Nullable HDLFunctionParameter newArgs) {
-		if (newArgs == null)
+		if (newArgs == null) {
 			throw new IllegalArgumentException("Element of args can not be null!");
+		}
 		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.add(newArgs);
 		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
@@ -293,16 +283,15 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getArgs()}.
 	 *
 	 * @param newArgs
-	 *            the value that should be removed from the field
-	 *            {@link #getArgs()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         args field.
+	 *            the value that should be removed from the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated args field.
 	 */
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction removeArgs(@Nullable HDLFunctionParameter newArgs) {
-		if (newArgs == null)
+		if (newArgs == null) {
 			throw new IllegalArgumentException("Removed element of args can not be null!");
+		}
 		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(newArgs);
 		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
@@ -313,10 +302,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getArgs()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getArgs()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         args field.
+	 *            the index of the value that should be removed from the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated args field.
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeArgs(int idx) {
@@ -330,10 +317,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Setter for the field {@link #getReturnType()}.
 	 *
 	 * @param returnType
-	 *            sets the new returnType of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         returnType field.
+	 *            sets the new returnType of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated returnType field.
 	 */
 	@Override
 	@Nonnull
@@ -348,8 +333,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 *
 	 * @param stmnts
 	 *            sets the new stmnts of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         stmnts field.
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated stmnts field.
 	 */
 	@Nonnull
 	public HDLSubstituteFunction setStmnts(@Nullable Iterable<HDLStatement> stmnts) {
@@ -362,15 +346,14 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Adds a new value to the field {@link #getStmnts()}.
 	 *
 	 * @param newStmnts
-	 *            the value that should be added to the field
-	 *            {@link #getStmnts()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         stmnts field.
+	 *            the value that should be added to the field {@link #getStmnts()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated stmnts field.
 	 */
 	@Nonnull
 	public HDLSubstituteFunction addStmnts(@Nullable HDLStatement newStmnts) {
-		if (newStmnts == null)
+		if (newStmnts == null) {
 			throw new IllegalArgumentException("Element of stmnts can not be null!");
+		}
 		final ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
 		stmnts.add(newStmnts);
 		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
@@ -381,15 +364,14 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getStmnts()}.
 	 *
 	 * @param newStmnts
-	 *            the value that should be removed from the field
-	 *            {@link #getStmnts()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         stmnts field.
+	 *            the value that should be removed from the field {@link #getStmnts()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated stmnts field.
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeStmnts(@Nullable HDLStatement newStmnts) {
-		if (newStmnts == null)
+		if (newStmnts == null) {
 			throw new IllegalArgumentException("Removed element of stmnts can not be null!");
+		}
 		final ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
 		stmnts.remove(newStmnts);
 		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
@@ -400,10 +382,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * Removes a value from the field {@link #getStmnts()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getStmnts()}
-	 * @return a new instance of {@link HDLSubstituteFunction} with the updated
-	 *         stmnts field.
+	 *            the index of the value that should be removed from the field {@link #getStmnts()}
+	 * @return a new instance of {@link HDLSubstituteFunction} with the updated stmnts field.
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeStmnts(int idx) {
@@ -415,20 +395,26 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLSubstituteFunction))
+		}
+		if (!(obj instanceof AbstractHDLSubstituteFunction)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLSubstituteFunction other = (AbstractHDLSubstituteFunction) obj;
 		if (stmnts == null) {
-			if (other.stmnts != null)
+			if (other.stmnts != null) {
 				return false;
-		} else if (!stmnts.equals(other.stmnts))
+			}
+		} else if (!stmnts.equals(other.stmnts)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -436,8 +422,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((stmnts == null) ? 0 : stmnts.hashCode());

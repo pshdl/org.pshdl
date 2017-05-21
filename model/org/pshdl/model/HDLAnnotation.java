@@ -46,7 +46,6 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -78,15 +77,17 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLAnnotation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 
 		@Override
 		public HDLAnnotation setValue(HDLAnnotation obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setName(value);
 		}
 	};
@@ -96,25 +97,29 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>("value", String.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public String getValue(HDLAnnotation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getValue();
 		}
 
 		@Override
 		public HDLAnnotation setValue(HDLAnnotation obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setValue(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (name == obj)
+		if (name == obj) {
 			return fName;
-		if (value == obj)
+		}
+		if (value == obj) {
 			return fValue;
+		}
 		return super.getContainingFeature(obj);
 	}
 
@@ -122,10 +127,12 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	@Override
 	protected String validateName(String name) {
 		final String validateName = super.validateName(name);
-		if (validateName.isEmpty())
+		if (validateName.isEmpty()) {
 			throw new IllegalArgumentException("The empty string is not a valid annotation name");
-		if (validateName.charAt(0) != '@')
+		}
+		if (validateName.charAt(0) != '@') {
 			throw new IllegalArgumentException("Annotation names have to start with an '@'");
+		}
 		return validateName;
 	}
 

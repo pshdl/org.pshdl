@@ -75,7 +75,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		if (validate) {
 			args = validateArgs(args);
 		}
-		this.args = new ArrayList<HDLFunctionParameter>();
+		this.args = new ArrayList<>();
 		if (args != null) {
 			for (final HDLFunctionParameter newValue : args) {
 				this.args.add(newValue);
@@ -94,7 +94,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	public AbstractHDLFunction() {
 		super();
 		this.name = null;
-		this.args = new ArrayList<HDLFunctionParameter>();
+		this.args = new ArrayList<>();
 		this.returnType = null;
 	}
 
@@ -111,8 +111,9 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	}
 
 	protected String validateName(String name) {
-		if (name == null)
+		if (name == null) {
 			throw new IllegalArgumentException("The field name can not be null!");
+		}
 		return name;
 	}
 
@@ -129,8 +130,9 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	}
 
 	protected Iterable<HDLFunctionParameter> validateArgs(Iterable<HDLFunctionParameter> args) {
-		if (args == null)
-			return new ArrayList<HDLFunctionParameter>();
+		if (args == null) {
+			return new ArrayList<>();
+		}
 		return args;
 	}
 
@@ -194,30 +196,40 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLFunction))
+		}
+		if (!(obj instanceof AbstractHDLFunction)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLFunction other = (AbstractHDLFunction) obj;
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (args == null) {
-			if (other.args != null)
+			if (other.args != null) {
 				return false;
-		} else if (!args.equals(other.args))
+			}
+		} else if (!args.equals(other.args)) {
 			return false;
+		}
 		if (returnType == null) {
-			if (other.returnType != null)
+			if (other.returnType != null) {
 				return false;
-		} else if (!returnType.equals(other.returnType))
+			}
+		} else if (!returnType.equals(other.returnType)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -225,8 +237,9 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());

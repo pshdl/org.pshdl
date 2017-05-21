@@ -38,8 +38,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLConcat contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLExpression&gt; cats. Can <b>not</b> be <code>null</code>,
- * additionally the collection must contain at least one element.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; cats. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one
+ * element.</li>
  * </ul>
  */
 public class HDLConcat extends AbstractHDLConcat {
@@ -48,12 +48,10 @@ public class HDLConcat extends AbstractHDLConcat {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param cats
-	 *            the value for cats. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for cats. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
@@ -74,30 +72,32 @@ public class HDLConcat extends AbstractHDLConcat {
 	}
 
 	/**
-	 * The accessor for the field cats which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field cats which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>("cats", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLConcat obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getCats();
 		}
 
 		@Override
 		public HDLConcat setValue(HDLConcat obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setCats(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (cats.contains(obj))
+		if (cats.contains(obj)) {
 			return fCats;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

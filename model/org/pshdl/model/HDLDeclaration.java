@@ -37,8 +37,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * </ul>
  */
 public abstract class HDLDeclaration extends AbstractHDLDeclaration {
@@ -47,7 +46,6 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -72,30 +70,32 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	}
 
 	/**
-	 * The accessor for the field annotations which is of type
-	 * ArrayList&lt;HDLAnnotation&gt;.
+	 * The accessor for the field annotations which is of type ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLDeclaration, ArrayList<HDLAnnotation>>("annotations",
 			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getAnnotations();
 		}
 
 		@Override
 		public HDLDeclaration setValue(HDLDeclaration obj, ArrayList<HDLAnnotation> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setAnnotations(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (annotations.contains(obj))
+		if (annotations.contains(obj)) {
 			return fAnnotations;
+		}
 		return super.getContainingFeature(obj);
 	}
 
@@ -105,9 +105,11 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	}
 
 	public HDLAnnotation getAnnotation(String name) {
-		for (final HDLAnnotation anno : getAnnotations())
-			if (anno.getName().equals(name))
+		for (final HDLAnnotation anno : getAnnotations()) {
+			if (anno.getName().equals(name)) {
 				return anno;
+			}
+		}
 		return null;
 	}
 	// $CONTENT-END$

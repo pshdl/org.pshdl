@@ -46,19 +46,22 @@ public class HDLAnnotations {
 		for (final IHDLAnnotation anno : sp.getAllAnnotations()) {
 			annotations.put(anno.name(), anno);
 			final AnnotationInformation annoInfo = anno.getAnnotationInformation();
-			if (annoInfo == null)
+			if (annoInfo == null) {
 				throw new IllegalArgumentException(anno.name() + " does not provide annotation info!");
+			}
 			info.registeredAnnotations.put(anno.name(), annoInfo);
 		}
 	}
 
 	public static Problem[] validate(HDLAnnotation hdlAnnotation) {
 		final IHDLAnnotation iAnno = annotations.get(hdlAnnotation.getName().substring(1));
-		if (iAnno == null)
+		if (iAnno == null) {
 			return new Problem[] { new Problem(ErrorCode.ANNOTATION_UNKNOWN, hdlAnnotation) };
+		}
 		final String valid = iAnno.validate(hdlAnnotation);
-		if (valid != null)
+		if (valid != null) {
 			return new Problem[] { new Problem(ErrorCode.ANNOTATION_INVALID, hdlAnnotation, valid) };
+		}
 		return new Problem[0];
 	}
 

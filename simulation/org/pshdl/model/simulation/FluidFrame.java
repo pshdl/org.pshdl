@@ -67,8 +67,9 @@ public class FluidFrame {
 			this.instruction = instruction;
 			if (args != null) {
 				for (final String string : args) {
-					if (string == null)
+					if (string == null) {
 						throw new IllegalArgumentException("Null is not a valid argument");
+					}
 				}
 			}
 			this.args = args;
@@ -232,7 +233,7 @@ public class FluidFrame {
 						// System.out.println(pred + " -> \n" + predPrev);
 					}
 				} else {
-					lID = new LinkedList<Frame>();
+					lID = new LinkedList<>();
 					lastID.put(ii.info.name, lID);
 				}
 				int maxData = 0;
@@ -273,8 +274,9 @@ public class FluidFrame {
 
 			@Override
 			public String toString() {
-				if (type != PartType.none)
+				if (type != PartType.none) {
 					return '$' + part + num + type;
+				}
 				return '$' + part + num;
 			}
 		}
@@ -304,19 +306,24 @@ public class FluidFrame {
 		public boolean isMutual(PredicateChain pred) {
 			final Iterator<Part> piter = parts.iterator();
 			for (final Part p : pred.parts) {
-				if (!piter.hasNext())
+				if (!piter.hasNext()) {
 					// This is shorter, but has been the same so far, so it is a
 					// super statement
 					return false;
+				}
 				final Part s = piter.next();
-				if (!p.part.equals(s.part))
+				if (!p.part.equals(s.part)) {
 					return false;
+				}
 				final boolean isCase = "case".equals(p.part);
-				if (p.num != s.num)
-					if (isCase)
+				if (p.num != s.num) {
+					if (isCase) {
 						return isCase;
-				if (p.type != s.type)
+					}
+				}
+				if (p.type != s.type) {
 					return true;
+				}
 			}
 			return false;
 		}
@@ -379,8 +386,8 @@ public class FluidFrame {
 		int stringIdCount = 0;
 		boolean isFuncStatement = false;
 		int posEdge = -1, negEdge = -1;
-		final List<Integer> posPred = new LinkedList<Integer>(), negPred = new LinkedList<Integer>();
-		final List<FastInstruction> instr = new LinkedList<FastInstruction>();
+		final List<Integer> posPred = new LinkedList<>(), negPred = new LinkedList<>();
+		final List<FastInstruction> instr = new LinkedList<>();
 		for (final ArgumentedInstruction ai : instructions) {
 			stackCount += ai.instruction.push;
 			stackCount -= ai.instruction.pop;
@@ -390,8 +397,9 @@ public class FluidFrame {
 			switch (ai.instruction) {
 			case negPredicate: {
 				final Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
-				if (internalId == null)
+				if (internalId == null) {
 					throw new IllegalArgumentException(ai.toString());
+				}
 				internalDependencies.add(internalId);
 				negPred.add(internalId);
 				arg1 = internalId;
@@ -400,8 +408,9 @@ public class FluidFrame {
 			}
 			case posPredicate: {
 				final Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
-				if (internalId == null)
+				if (internalId == null) {
 					throw new IllegalArgumentException(ai.toString());
+				}
 				internalDependencies.add(internalId);
 				posPred.add(internalId);
 				maxDataWidth = Math.max(1, maxDataWidth);
@@ -410,8 +419,9 @@ public class FluidFrame {
 			}
 			case isFallingEdge: {
 				final Integer internalId = register.registerInternal(toFullRef(ai));
-				if (internalId == null)
+				if (internalId == null) {
 					throw new IllegalArgumentException(ai.toString());
+				}
 				internalDependencies.add(internalId);
 				negEdge = internalId;
 				maxDataWidth = Math.max(1, maxDataWidth);
@@ -420,8 +430,9 @@ public class FluidFrame {
 			}
 			case isRisingEdge: {
 				final Integer internalId = register.registerInternal(toFullRef(ai));
-				if (internalId == null)
+				if (internalId == null) {
 					throw new IllegalArgumentException(ai.toString());
+				}
 				internalDependencies.add(internalId);
 				posEdge = internalId;
 				maxDataWidth = Math.max(1, maxDataWidth);
@@ -430,8 +441,9 @@ public class FluidFrame {
 			}
 			case pushAddIndex: {
 				final Integer internalId = register.registerInternal(ai.args[0]);
-				if (internalId == null)
+				if (internalId == null) {
 					throw new IllegalArgumentException(ai.toString());
+				}
 				arg1 = internalId;
 				arg2 = Integer.parseInt(ai.args[1]);
 				break;
@@ -525,21 +537,24 @@ public class FluidFrame {
 			case sra:
 			case srl:
 			case xor:
-				if (ai.args.length == 0)
+				if (ai.args.length == 0) {
 					throw new IllegalArgumentException("missing targetSizeWithType for:" + ai);
+				}
 				arg1 = Integer.parseInt(ai.args[0]);
 				break;
 			}
-			if ((i.argCount > 0) && (arg1 == null))
+			if ((i.argCount > 0) && (arg1 == null)) {
 				throw new IllegalArgumentException("Missing argument 1 in instruction:" + i + " from instruction:" + ai);
-			if ((i.argCount > 1) && (arg2 == null))
+			}
+			if ((i.argCount > 1) && (arg2 == null)) {
 				throw new IllegalArgumentException("Missing argument 2 in instruction:" + i + " from instruction:" + ai);
+			}
 			instr.add(new FastInstruction(i, arg1, arg2));
 		}
 		for (final VariableInformation w : vars.values()) {
 			maxDataWidth = Math.max(w.width, maxDataWidth);
 		}
-		final List<Frame> res = new LinkedList<Frame>();
+		final List<Frame> res = new LinkedList<>();
 		if (hasInstructions()) {
 			int outputId[] = new int[0];
 			if (outputName != null) {
@@ -605,15 +620,19 @@ public class FluidFrame {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final FluidFrame other = (FluidFrame) obj;
-		if (id != other.id)
+		if (id != other.id) {
 			return false;
+		}
 		return true;
 	}
 

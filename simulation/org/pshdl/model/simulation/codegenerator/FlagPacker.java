@@ -57,11 +57,13 @@ public class FlagPacker {
 		@Override
 		public int compareTo(SetCount o) {
 			int comp = o.count - count;
-			if (comp != 0)
+			if (comp != 0) {
 				return comp;
+			}
 			comp = set.size() - o.set.size();
-			if (comp != 0)
+			if (comp != 0) {
 				return comp;
+			}
 			return 0;
 		}
 
@@ -75,15 +77,19 @@ public class FlagPacker {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			final SetCount other = (SetCount) obj;
-			if (!set.equals(other))
+			if (!set.equals(other)) {
 				return false;
+			}
 			return true;
 		}
 

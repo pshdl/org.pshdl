@@ -54,8 +54,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param cats
-	 *            the value for cats. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for cats. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
@@ -64,7 +63,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 		if (validate) {
 			cats = validateCats(cats);
 		}
-		this.cats = new ArrayList<HDLExpression>();
+		this.cats = new ArrayList<>();
 		if (cats != null) {
 			for (final HDLExpression newValue : cats) {
 				this.cats.add(newValue);
@@ -74,14 +73,13 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 
 	public AbstractHDLConcat() {
 		super();
-		this.cats = new ArrayList<HDLExpression>();
+		this.cats = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLExpression> cats;
 
 	/**
-	 * Get the cats field. Can <b>not</b> be <code>null</code>, additionally the
-	 * collection must contain at least one element.
+	 * Get the cats field. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
@@ -91,10 +89,12 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	}
 
 	protected Iterable<HDLExpression> validateCats(Iterable<HDLExpression> cats) {
-		if (cats == null)
+		if (cats == null) {
 			throw new IllegalArgumentException("The field cats can not be null!");
-		if (!cats.iterator().hasNext())
+		}
+		if (!cats.iterator().hasNext()) {
 			throw new IllegalArgumentException("The field cats must contain at least one item!");
+		}
 		return cats;
 	}
 
@@ -140,10 +140,8 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLConcat} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLConcat} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -155,9 +153,8 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * Setter for the field {@link #getCats()}.
 	 *
 	 * @param cats
-	 *            sets the new cats of this object. Can <b>not</b> be
-	 *            <code>null</code>, additionally the collection must contain at
-	 *            least one element.
+	 *            sets the new cats of this object. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least
+	 *            one element.
 	 * @return a new instance of {@link HDLConcat} with the updated cats field.
 	 */
 	@Nonnull
@@ -176,8 +173,9 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 */
 	@Nonnull
 	public HDLConcat addCats(@Nonnull HDLExpression newCats) {
-		if (newCats == null)
+		if (newCats == null) {
 			throw new IllegalArgumentException("Element of cats can not be null!");
+		}
 		final ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
 		cats.add(newCats);
 		final HDLConcat res = new HDLConcat(id, container, cats, false);
@@ -188,14 +186,14 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * Removes a value from the field {@link #getCats()}.
 	 *
 	 * @param newCats
-	 *            the value that should be removed from the field
-	 *            {@link #getCats()}
+	 *            the value that should be removed from the field {@link #getCats()}
 	 * @return a new instance of {@link HDLConcat} with the updated cats field.
 	 */
 	@Nonnull
 	public HDLConcat removeCats(@Nonnull HDLExpression newCats) {
-		if (newCats == null)
+		if (newCats == null) {
 			throw new IllegalArgumentException("Removed element of cats can not be null!");
+		}
 		final ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
 		cats.remove(newCats);
 		final HDLConcat res = new HDLConcat(id, container, cats, false);
@@ -206,8 +204,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * Removes a value from the field {@link #getCats()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getCats()}
+	 *            the index of the value that should be removed from the field {@link #getCats()}
 	 * @return a new instance of {@link HDLConcat} with the updated cats field.
 	 */
 	@Nonnull
@@ -220,20 +217,26 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLConcat))
+		}
+		if (!(obj instanceof AbstractHDLConcat)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLConcat other = (AbstractHDLConcat) obj;
 		if (cats == null) {
-			if (other.cats != null)
+			if (other.cats != null) {
 				return false;
-		} else if (!cats.equals(other.cats))
+			}
+		} else if (!cats.equals(other.cats)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -241,8 +244,9 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((cats == null) ? 0 : cats.hashCode());

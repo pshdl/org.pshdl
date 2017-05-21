@@ -53,8 +53,9 @@ public class SyntaxHighlighter {
 
 		@Override
 		public String newLine() {
-			if (preContext)
+			if (preContext) {
 				return "\n";
+			}
 			return "<br />\n";
 		}
 
@@ -107,7 +108,7 @@ public class SyntaxHighlighter {
 		HDLPackage, HDLUnit, HDLStatement, HDLExpression, HDLInterface;
 	}
 
-	private final Stack<Context> context = new Stack<SyntaxHighlighter.Context>();
+	private final Stack<Context> context = new Stack<>();
 
 	protected int spacing = 0;
 
@@ -258,8 +259,9 @@ public class SyntaxHighlighter {
 	}
 
 	public Context getContext() {
-		if (context.isEmpty())
+		if (context.isEmpty()) {
 			return null;
+		}
 		return context.peek();
 	}
 
@@ -272,8 +274,9 @@ public class SyntaxHighlighter {
 	}
 
 	public String comment(String string) {
-		if (string.contains("\n"))
+		if (string.contains("\n")) {
 			return "/*" + newLine() + string + newLine() + "*/";
+		}
 		return "//" + string;
 	}
 

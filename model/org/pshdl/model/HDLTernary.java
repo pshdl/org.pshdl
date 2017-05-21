@@ -47,7 +47,6 @@ public class HDLTernary extends AbstractHDLTernary {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param ifExpr
@@ -81,15 +80,17 @@ public class HDLTernary extends AbstractHDLTernary {
 	public static HDLFieldAccess<HDLTernary, HDLExpression> fIfExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("ifExpr", HDLExpression.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfExpr();
 		}
 
 		@Override
 		public HDLTernary setValue(HDLTernary obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setIfExpr(value);
 		}
 	};
@@ -100,15 +101,17 @@ public class HDLTernary extends AbstractHDLTernary {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getThenExpr();
 		}
 
 		@Override
 		public HDLTernary setValue(HDLTernary obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setThenExpr(value);
 		}
 	};
@@ -119,27 +122,32 @@ public class HDLTernary extends AbstractHDLTernary {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getElseExpr();
 		}
 
 		@Override
 		public HDLTernary setValue(HDLTernary obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setElseExpr(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (ifExpr == obj)
+		if (ifExpr == obj) {
 			return fIfExpr;
-		if (thenExpr == obj)
+		}
+		if (thenExpr == obj) {
 			return fThenExpr;
-		if (elseExpr == obj)
+		}
+		if (elseExpr == obj) {
 			return fElseExpr;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

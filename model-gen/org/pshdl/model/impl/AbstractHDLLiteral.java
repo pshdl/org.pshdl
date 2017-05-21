@@ -86,8 +86,9 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	}
 
 	protected String validateVal(String val) {
-		if (val == null)
+		if (val == null) {
 			throw new IllegalArgumentException("The field val can not be null!");
+		}
 		return val;
 	}
 
@@ -150,10 +151,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLLiteral} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLLiteral} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -165,8 +164,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * Setter for the field {@link #getVal()}.
 	 *
 	 * @param val
-	 *            sets the new val of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new val of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLLiteral} with the updated val field.
 	 */
 	@Nonnull
@@ -206,25 +204,33 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLLiteral))
+		}
+		if (!(obj instanceof AbstractHDLLiteral)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLLiteral other = (AbstractHDLLiteral) obj;
 		if (val == null) {
-			if (other.val != null)
+			if (other.val != null) {
 				return false;
-		} else if (!val.equals(other.val))
+			}
+		} else if (!val.equals(other.val)) {
 			return false;
+		}
 		if (str == null) {
-			if (other.str != null)
+			if (other.str != null) {
 				return false;
-		} else if (!str.equals(other.str))
+			}
+		} else if (!str.equals(other.str)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -232,8 +238,9 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((val == null) ? 0 : val.hashCode());

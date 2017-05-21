@@ -50,7 +50,6 @@ public abstract class HDLType extends AbstractHDLType {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -82,45 +81,50 @@ public abstract class HDLType extends AbstractHDLType {
 	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLType obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 
 		@Override
 		public HDLType setValue(HDLType obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setName(value);
 		}
 	};
 	/**
-	 * The accessor for the field dim which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field dim which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLType, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLType, ArrayList<HDLExpression>>("dim", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLType obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDim();
 		}
 
 		@Override
 		public HDLType setValue(HDLType obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDim(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (name == obj)
+		if (name == obj) {
 			return fName;
-		if (dim.contains(obj))
+		}
+		if (dim.contains(obj)) {
 			return fDim;
+		}
 		return super.getContainingFeature(obj);
 	}
 

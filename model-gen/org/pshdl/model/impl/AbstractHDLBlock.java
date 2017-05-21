@@ -69,7 +69,7 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 		if (validate) {
 			statements = validateStatements(statements);
 		}
-		this.statements = new ArrayList<HDLStatement>();
+		this.statements = new ArrayList<>();
 		if (statements != null) {
 			for (final HDLStatement newValue : statements) {
 				this.statements.add(newValue);
@@ -80,7 +80,7 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	public AbstractHDLBlock() {
 		super();
 		this.process = null;
-		this.statements = new ArrayList<HDLStatement>();
+		this.statements = new ArrayList<>();
 	}
 
 	protected final Boolean process;
@@ -96,8 +96,9 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	}
 
 	protected Boolean validateProcess(Boolean process) {
-		if (process == null)
+		if (process == null) {
 			throw new IllegalArgumentException("The field process can not be null!");
+		}
 		return process;
 	}
 
@@ -114,8 +115,9 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	}
 
 	protected Iterable<HDLStatement> validateStatements(Iterable<HDLStatement> statements) {
-		if (statements == null)
-			return new ArrayList<HDLStatement>();
+		if (statements == null) {
+			return new ArrayList<>();
+		}
 		return statements;
 	}
 
@@ -162,10 +164,8 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLBlock} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLBlock} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -177,10 +177,8 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Setter for the field {@link #getProcess()}.
 	 *
 	 * @param process
-	 *            sets the new process of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLBlock} with the updated process
-	 *         field.
+	 *            sets the new process of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLBlock} with the updated process field.
 	 */
 	@Nonnull
 	public HDLBlock setProcess(@Nonnull Boolean process) {
@@ -193,10 +191,8 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Setter for the field {@link #getProcess()}.
 	 *
 	 * @param process
-	 *            sets the new process of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLBlock} with the updated process
-	 *         field.
+	 *            sets the new process of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLBlock} with the updated process field.
 	 */
 	@Nonnull
 	public HDLBlock setProcess(boolean process) {
@@ -209,10 +205,8 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Setter for the field {@link #getStatements()}.
 	 *
 	 * @param statements
-	 *            sets the new statements of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLBlock} with the updated statements
-	 *         field.
+	 *            sets the new statements of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLBlock} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLBlock setStatements(@Nullable Iterable<HDLStatement> statements) {
@@ -225,15 +219,14 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Adds a new value to the field {@link #getStatements()}.
 	 *
 	 * @param newStatements
-	 *            the value that should be added to the field
-	 *            {@link #getStatements()}
-	 * @return a new instance of {@link HDLBlock} with the updated statements
-	 *         field.
+	 *            the value that should be added to the field {@link #getStatements()}
+	 * @return a new instance of {@link HDLBlock} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLBlock addStatements(@Nullable HDLStatement newStatements) {
-		if (newStatements == null)
+		if (newStatements == null) {
 			throw new IllegalArgumentException("Element of statements can not be null!");
+		}
 		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.add(newStatements);
 		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
@@ -244,15 +237,14 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Removes a value from the field {@link #getStatements()}.
 	 *
 	 * @param newStatements
-	 *            the value that should be removed from the field
-	 *            {@link #getStatements()}
-	 * @return a new instance of {@link HDLBlock} with the updated statements
-	 *         field.
+	 *            the value that should be removed from the field {@link #getStatements()}
+	 * @return a new instance of {@link HDLBlock} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLBlock removeStatements(@Nullable HDLStatement newStatements) {
-		if (newStatements == null)
+		if (newStatements == null) {
 			throw new IllegalArgumentException("Removed element of statements can not be null!");
+		}
 		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.remove(newStatements);
 		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
@@ -263,10 +255,8 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 	 * Removes a value from the field {@link #getStatements()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getStatements()}
-	 * @return a new instance of {@link HDLBlock} with the updated statements
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getStatements()}
+	 * @return a new instance of {@link HDLBlock} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLBlock removeStatements(int idx) {
@@ -278,25 +268,33 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLBlock))
+		}
+		if (!(obj instanceof AbstractHDLBlock)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLBlock other = (AbstractHDLBlock) obj;
 		if (process == null) {
-			if (other.process != null)
+			if (other.process != null) {
 				return false;
-		} else if (!process.equals(other.process))
+			}
+		} else if (!process.equals(other.process)) {
 			return false;
+		}
 		if (statements == null) {
-			if (other.statements != null)
+			if (other.statements != null) {
 				return false;
-		} else if (!statements.equals(other.statements))
+			}
+		} else if (!statements.equals(other.statements)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -304,8 +302,9 @@ public abstract class AbstractHDLBlock extends HDLCompound {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((process == null) ? 0 : process.hashCode());

@@ -65,11 +65,9 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * @param hIf
 	 *            the value for hIf. Can be <code>null</code>.
 	 * @param generatorID
-	 *            the value for generatorID. Can <b>not</b> be <code>null</code>
-	 *            .
+	 *            the value for generatorID. Can <b>not</b> be <code>null</code> .
 	 * @param generatorContent
-	 *            the value for generatorContent. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            the value for generatorContent. Can <b>not</b> be <code>null</code>.
 	 * @param include
 	 *            the value for include. Can <b>not</b> be <code>null</code>.
 	 * @param validate
@@ -138,8 +136,9 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	}
 
 	protected String validateGeneratorID(String generatorID) {
-		if (generatorID == null)
+		if (generatorID == null) {
 			throw new IllegalArgumentException("The field generatorID can not be null!");
+		}
 		return generatorID;
 	}
 
@@ -156,8 +155,9 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	}
 
 	protected String validateGeneratorContent(String generatorContent) {
-		if (generatorContent == null)
+		if (generatorContent == null) {
 			throw new IllegalArgumentException("The field generatorContent can not be null!");
+		}
 		return generatorContent;
 	}
 
@@ -174,8 +174,9 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	}
 
 	protected Boolean validateInclude(Boolean include) {
-		if (include == null)
+		if (include == null) {
 			throw new IllegalArgumentException("The field include can not be null!");
+		}
 		return include;
 	}
 
@@ -228,10 +229,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLDirectGeneration} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLDirectGeneration} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -243,10 +242,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -260,16 +257,15 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLDirectGeneration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
@@ -280,16 +276,15 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLDirectGeneration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
@@ -300,10 +295,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration removeAnnotations(int idx) {
@@ -317,10 +310,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getVar()}.
 	 *
 	 * @param var
-	 *            sets the new var of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         var field.
+	 *            sets the new var of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated var field.
 	 */
 	@Override
 	@Nonnull
@@ -334,10 +325,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getArguments()}.
 	 *
 	 * @param arguments
-	 *            sets the new arguments of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         arguments field.
+	 *            sets the new arguments of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated arguments field.
 	 */
 	@Override
 	@Nonnull
@@ -351,16 +340,15 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Adds a new value to the field {@link #getArguments()}.
 	 *
 	 * @param newArguments
-	 *            the value that should be added to the field
-	 *            {@link #getArguments()}
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         arguments field.
+	 *            the value that should be added to the field {@link #getArguments()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated arguments field.
 	 */
 	@Override
 	@Nonnull
 	public HDLDirectGeneration addArguments(@Nullable HDLArgument newArguments) {
-		if (newArguments == null)
+		if (newArguments == null) {
 			throw new IllegalArgumentException("Element of arguments can not be null!");
+		}
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.add(newArguments);
 		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
@@ -371,16 +359,15 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Removes a value from the field {@link #getArguments()}.
 	 *
 	 * @param newArguments
-	 *            the value that should be removed from the field
-	 *            {@link #getArguments()}
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         arguments field.
+	 *            the value that should be removed from the field {@link #getArguments()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated arguments field.
 	 */
 	@Override
 	@Nonnull
 	public HDLDirectGeneration removeArguments(@Nullable HDLArgument newArguments) {
-		if (newArguments == null)
+		if (newArguments == null) {
 			throw new IllegalArgumentException("Removed element of arguments can not be null!");
+		}
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.remove(newArguments);
 		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
@@ -391,10 +378,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Removes a value from the field {@link #getArguments()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getArguments()}
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         arguments field.
+	 *            the index of the value that should be removed from the field {@link #getArguments()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated arguments field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration removeArguments(int idx) {
@@ -409,8 +394,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 *
 	 * @param hIf
 	 *            sets the new hIf of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         hIf field.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated hIf field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration setHIf(@Nullable HDLInterface hIf) {
@@ -423,10 +407,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getGeneratorID()}.
 	 *
 	 * @param generatorID
-	 *            sets the new generatorID of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         generatorID field.
+	 *            sets the new generatorID of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated generatorID field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration setGeneratorID(@Nonnull String generatorID) {
@@ -439,10 +421,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getGeneratorContent()}.
 	 *
 	 * @param generatorContent
-	 *            sets the new generatorContent of this object. Can <b>not</b>
-	 *            be <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         generatorContent field.
+	 *            sets the new generatorContent of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated generatorContent field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration setGeneratorContent(@Nonnull String generatorContent) {
@@ -455,10 +435,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getInclude()}.
 	 *
 	 * @param include
-	 *            sets the new include of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         include field.
+	 *            sets the new include of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated include field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration setInclude(@Nonnull Boolean include) {
@@ -471,10 +449,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getInclude()}.
 	 *
 	 * @param include
-	 *            sets the new include of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLDirectGeneration} with the updated
-	 *         include field.
+	 *            sets the new include of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated include field.
 	 */
 	@Nonnull
 	public HDLDirectGeneration setInclude(boolean include) {
@@ -485,35 +461,47 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLDirectGeneration))
+		}
+		if (!(obj instanceof AbstractHDLDirectGeneration)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLDirectGeneration other = (AbstractHDLDirectGeneration) obj;
 		if (hIf == null) {
-			if (other.hIf != null)
+			if (other.hIf != null) {
 				return false;
-		} else if (!hIf.equals(other.hIf))
+			}
+		} else if (!hIf.equals(other.hIf)) {
 			return false;
+		}
 		if (generatorID == null) {
-			if (other.generatorID != null)
+			if (other.generatorID != null) {
 				return false;
-		} else if (!generatorID.equals(other.generatorID))
+			}
+		} else if (!generatorID.equals(other.generatorID)) {
 			return false;
+		}
 		if (generatorContent == null) {
-			if (other.generatorContent != null)
+			if (other.generatorContent != null) {
 				return false;
-		} else if (!generatorContent.equals(other.generatorContent))
+			}
+		} else if (!generatorContent.equals(other.generatorContent)) {
 			return false;
+		}
 		if (include == null) {
-			if (other.include != null)
+			if (other.include != null) {
 				return false;
-		} else if (!include.equals(other.include))
+			}
+		} else if (!include.equals(other.include)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -521,8 +509,9 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((hIf == null) ? 0 : hIf.hashCode());

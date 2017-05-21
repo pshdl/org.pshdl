@@ -40,7 +40,6 @@ import org.pshdl.model.validation.Problem;
  * Marker interface for type providers
  *
  * @author Karsten Becker
- *
  */
 public interface ITypeOuptutProvider {
 	/**
@@ -51,11 +50,9 @@ public interface ITypeOuptutProvider {
 	public String getHookName();
 
 	/**
-	 * An informal information about which arguments this
-	 * {@link IOutputProvider} is expecting and how it can be used.
+	 * An informal information about which arguments this {@link IOutputProvider} is expecting and how it can be used.
 	 *
-	 * @return multiple strings, each explaining one option. The first one is
-	 *         some general information
+	 * @return multiple strings, each explaining one option. The first one is some general information
 	 */
 	public MultiOption getUsage();
 

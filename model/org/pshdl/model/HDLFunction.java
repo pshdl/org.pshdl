@@ -46,11 +46,9 @@ import org.pshdl.model.utils.ModificationSet;
  * The class HDLFunction contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.</li>
  * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * </ul>
  */
@@ -60,7 +58,6 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -97,72 +94,79 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 
 		@Override
 		public HDLFunction setValue(HDLFunction obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setName(value);
 		}
 	};
 	/**
-	 * The accessor for the field args which is of type
-	 * ArrayList&lt;HDLFunctionParameter&gt;.
+	 * The accessor for the field args which is of type ArrayList&lt;HDLFunctionParameter&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>> fArgs = new HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>>("args",
 			HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLFunctionParameter> getValue(HDLFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArgs();
 		}
 
 		@Override
 		public HDLFunction setValue(HDLFunction obj, ArrayList<HDLFunctionParameter> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setArgs(value);
 		}
 	};
 	/**
-	 * The accessor for the field returnType which is of type
-	 * HDLFunctionParameter.
+	 * The accessor for the field returnType which is of type HDLFunctionParameter.
 	 */
 	public static HDLFieldAccess<HDLFunction, HDLFunctionParameter> fReturnType = new HDLFieldAccess<HDLFunction, HDLFunctionParameter>("returnType", HDLFunctionParameter.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLFunctionParameter getValue(HDLFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getReturnType();
 		}
 
 		@Override
 		public HDLFunction setValue(HDLFunction obj, HDLFunctionParameter value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setReturnType(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (name == obj)
+		if (name == obj) {
 			return fName;
-		if (args.contains(obj))
+		}
+		if (args.contains(obj)) {
 			return fArgs;
-		if (returnType == obj)
+		}
+		if (returnType == obj) {
 			return fReturnType;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
-	public static final GenericMeta<IHDLObject> META = new GenericMeta<IHDLObject>("INLINED_FROM", true);
+	public static final GenericMeta<IHDLObject> META = new GenericMeta<>("INLINED_FROM", true);
 
 	@Nonnull
 	public <T extends IHDLObject> T substitute(Iterable<HDLFunctionParameter> paraneter, Iterable<HDLExpression> arguments, T stmnt, IHDLObject origin) {

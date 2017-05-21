@@ -96,18 +96,23 @@ public class HDLFunctions {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			final FunctionScore other = (FunctionScore) obj;
 			if (function == null) {
-				if (other.function != null)
+				if (other.function != null) {
 					return false;
-			} else if (!function.equals(other.function))
+				}
+			} else if (!function.equals(other.function)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -159,12 +164,14 @@ public class HDLFunctions {
 
 	public static Optional<HDLFunction> resolveNativeFunction(HDLQualifiedName functionRefName, HDLFunctionCall call) {
 		final Iterable<HDLFunction> list = getCandidateFunctions(functionRefName, call);
-		if (!list.iterator().hasNext())
+		if (!list.iterator().hasNext()) {
 			return Optional.absent();
+		}
 		final SortedSet<FunctionScore> scored = scoreList(list, call);
 		final FunctionScore first = scored.first();
-		if (first.score < 1000)
+		if (first.score < 1000) {
 			return Optional.of(first.function);
+		}
 		return Optional.absent();
 	}
 
@@ -346,21 +353,24 @@ public class HDLFunctions {
 
 	public static Optional<BigInteger> constantEvaluate(HDLFunctionCall call, HDLEvaluationContext context) {
 		final Optional<HDLFunction> func = call.resolveFunction();
-		if (!func.isPresent())
+		if (!func.isPresent()) {
 			return Optional.absent();
+		}
 		final Collection<HDLFunctionImplementation> funcProvider = provider.get(FullNameExtension.fullNameOf(func.get()));
 		for (final HDLFunctionImplementation funcImpl : funcProvider) {
 			final Optional<BigInteger> value = funcImpl.getConstantValue(call, context);
-			if (value.isPresent())
+			if (value.isPresent()) {
 				return value;
+			}
 		}
 		return Optional.absent();
 	}
 
 	public static void transform(HDLFunctionCall call, HDLEvaluationContext context, ModificationSet ms) {
 		final Optional<HDLFunction> function = call.resolveFunction();
-		if (!function.isPresent())
+		if (!function.isPresent()) {
 			return;
+		}
 		switch (function.get().getClassType()) {
 		case HDLInlineFunction:
 			final HDLInlineFunction hif = (HDLInlineFunction) function.get();
@@ -387,8 +397,9 @@ public class HDLFunctions {
 	public static Optional<Range<BigInteger>> determineRange(HDLFunctionCall call, HDLEvaluationContext context) {
 		for (final HDLFunctionImplementation funcImpl : provider.get(call.getFunctionRefName())) {
 			final Optional<Range<BigInteger>> value = funcImpl.getRange(call, context);
-			if (value.isPresent())
+			if (value.isPresent()) {
 				return value;
+			}
 		}
 		return Optional.absent();
 	}
@@ -402,8 +413,9 @@ public class HDLFunctions {
 		final Collection<HDLFunctionImplementation> providers = provider.get(fqn);
 		for (final HDLFunctionImplementation funcImpl : providers) {
 			final Optional<? extends HDLType> specified = funcImpl.specifyReturnType(function, call, context);
-			if (specified.isPresent())
+			if (specified.isPresent()) {
 				return specified;
+			}
 		}
 		return Optional.absent();
 	}

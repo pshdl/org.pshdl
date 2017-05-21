@@ -39,8 +39,8 @@ import org.pshdl.model.utils.Insulin;
  * The class HDLForLoop contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLRange&gt; range. Can <b>not</b> be <code>null</code>,
- * additionally the collection must contain at least one element.</li>
+ * <li>ArrayList&lt;HDLRange&gt; range. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one
+ * element.</li>
  * <li>HDLVariable param. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLStatement&gt; dos. Can be <code>null</code>.</li>
  * </ul>
@@ -51,12 +51,10 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param range
-	 *            the value for range. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for range. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 * @param param
 	 *            the value for param. Can <b>not</b> be <code>null</code>.
 	 * @param dos
@@ -82,22 +80,23 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	}
 
 	/**
-	 * The accessor for the field range which is of type
-	 * ArrayList&lt;HDLRange&gt;.
+	 * The accessor for the field range which is of type ArrayList&lt;HDLRange&gt;.
 	 */
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>("range", HDLRange.class,
 			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLForLoop obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRange();
 		}
 
 		@Override
 		public HDLForLoop setValue(HDLForLoop obj, ArrayList<HDLRange> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setRange(value);
 		}
 	};
@@ -107,47 +106,53 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>("param", HDLVariable.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLVariable getValue(HDLForLoop obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getParam();
 		}
 
 		@Override
 		public HDLForLoop setValue(HDLForLoop obj, HDLVariable value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setParam(value);
 		}
 	};
 	/**
-	 * The accessor for the field dos which is of type
-	 * ArrayList&lt;HDLStatement&gt;.
+	 * The accessor for the field dos which is of type ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>("dos", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLForLoop obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDos();
 		}
 
 		@Override
 		public HDLForLoop setValue(HDLForLoop obj, ArrayList<HDLStatement> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDos(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (range.contains(obj))
+		if (range.contains(obj)) {
 			return fRange;
-		if (param == obj)
+		}
+		if (param == obj) {
 			return fParam;
-		if (dos.contains(obj))
+		}
+		if (dos.contains(obj)) {
 			return fDos;
+		}
 		return super.getContainingFeature(obj);
 	}
 

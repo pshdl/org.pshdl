@@ -1,38 +1,53 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
 // Generated from PSHDLLang.g4 by ANTLR 4.7
 package org.pshdl.model.parser;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.antlr.v4.runtime.FailedPredicateException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.RuntimeMetaData;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class PSHDLLang extends Parser {
@@ -183,19 +198,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsModel(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsModel(this);
+			}
 		}
 	}
 
 	public final PsModelContext psModel() throws RecognitionException {
-		PsModelContext _localctx = new PsModelContext(_ctx, getState());
+		final PsModelContext _localctx = new PsModelContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_psModel);
 		int _la;
 		try {
@@ -244,7 +261,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -300,19 +317,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsUnit(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsUnit(this);
+			}
 		}
 	}
 
 	public final PsUnitContext psUnit() throws RecognitionException {
-		PsUnitContext _localctx = new PsUnitContext(_ctx, getState());
+		final PsUnitContext _localctx = new PsUnitContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_psUnit);
 		int _la;
 		try {
@@ -341,8 +360,9 @@ public class PSHDLLang extends Parser {
 				if (!((_la == MODULE) || (_la == TESTBENCH))) {
 					_localctx.unitType = _errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
@@ -419,8 +439,9 @@ public class PSHDLLang extends Parser {
 				if (!((_la == MODULE) || (_la == TESTBENCH))) {
 					_localctx.unitType = _errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
@@ -475,7 +496,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -505,19 +526,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsExtends(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsExtends(this);
+			}
 		}
 	}
 
 	public final PsExtendsContext psExtends() throws RecognitionException {
-		PsExtendsContext _localctx = new PsExtendsContext(_ctx, getState());
+		final PsExtendsContext _localctx = new PsExtendsContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_psExtends);
 		int _la;
 		try {
@@ -544,7 +567,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -570,19 +593,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsImports(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsImports(this);
+			}
 		}
 	}
 
 	public final PsImportsContext psImports() throws RecognitionException {
-		PsImportsContext _localctx = new PsImportsContext(_ctx, getState());
+		final PsImportsContext _localctx = new PsImportsContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_psImports);
 		try {
 			setState(219);
@@ -608,7 +633,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -634,19 +659,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsQualifiedNameImport(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsQualifiedNameImport(this);
+			}
 		}
 	}
 
 	public final PsQualifiedNameImportContext psQualifiedNameImport() throws RecognitionException {
-		PsQualifiedNameImportContext _localctx = new PsQualifiedNameImportContext(_ctx, getState());
+		final PsQualifiedNameImportContext _localctx = new PsQualifiedNameImportContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_psQualifiedNameImport);
 		int _la;
 		try {
@@ -665,7 +692,7 @@ public class PSHDLLang extends Parser {
 				}
 
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -707,19 +734,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBlock(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBlock(this);
+			}
 		}
 	}
 
 	public final PsBlockContext psBlock() throws RecognitionException {
-		PsBlockContext _localctx = new PsBlockContext(_ctx, getState());
+		final PsBlockContext _localctx = new PsBlockContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_psBlock);
 		int _la;
 		try {
@@ -813,7 +842,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -845,19 +874,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsProcess(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsProcess(this);
+			}
 		}
 	}
 
 	public final PsProcessContext psProcess() throws RecognitionException {
-		PsProcessContext _localctx = new PsProcessContext(_ctx, getState());
+		final PsProcessContext _localctx = new PsProcessContext(_ctx, getState());
 		enterRule(_localctx, 12, RULE_psProcess);
 		int _la;
 		try {
@@ -889,7 +920,7 @@ public class PSHDLLang extends Parser {
 				setState(248);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -927,19 +958,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInstantiation(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInstantiation(this);
+			}
 		}
 	}
 
 	public final PsInstantiationContext psInstantiation() throws RecognitionException {
-		PsInstantiationContext _localctx = new PsInstantiationContext(_ctx, getState());
+		final PsInstantiationContext _localctx = new PsInstantiationContext(_ctx, getState());
 		enterRule(_localctx, 14, RULE_psInstantiation);
 		int _la;
 		try {
@@ -974,7 +1007,7 @@ public class PSHDLLang extends Parser {
 					break;
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1012,19 +1045,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInterfaceInstantiation(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInterfaceInstantiation(this);
+			}
 		}
 	}
 
 	public final PsInterfaceInstantiationContext psInterfaceInstantiation() throws RecognitionException {
-		PsInterfaceInstantiationContext _localctx = new PsInterfaceInstantiationContext(_ctx, getState());
+		final PsInterfaceInstantiationContext _localctx = new PsInterfaceInstantiationContext(_ctx, getState());
 		enterRule(_localctx, 16, RULE_psInterfaceInstantiation);
 		int _la;
 		try {
@@ -1091,7 +1126,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1135,19 +1170,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsDirectGeneration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsDirectGeneration(this);
+			}
 		}
 	}
 
 	public final PsDirectGenerationContext psDirectGeneration() throws RecognitionException {
-		PsDirectGenerationContext _localctx = new PsDirectGenerationContext(_ctx, getState());
+		final PsDirectGenerationContext _localctx = new PsDirectGenerationContext(_ctx, getState());
 		enterRule(_localctx, 18, RULE_psDirectGeneration);
 		int _la;
 		try {
@@ -1246,7 +1283,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1276,19 +1313,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsPassedArguments(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsPassedArguments(this);
+			}
 		}
 	}
 
 	public final PsPassedArgumentsContext psPassedArguments() throws RecognitionException {
-		PsPassedArgumentsContext _localctx = new PsPassedArgumentsContext(_ctx, getState());
+		final PsPassedArgumentsContext _localctx = new PsPassedArgumentsContext(_ctx, getState());
 		enterRule(_localctx, 20, RULE_psPassedArguments);
 		int _la;
 		try {
@@ -1325,7 +1364,7 @@ public class PSHDLLang extends Parser {
 				setState(327);
 				match(PAREN_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1355,19 +1394,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsArgument(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsArgument(this);
+			}
 		}
 	}
 
 	public final PsArgumentContext psArgument() throws RecognitionException {
-		PsArgumentContext _localctx = new PsArgumentContext(_ctx, getState());
+		final PsArgumentContext _localctx = new PsArgumentContext(_ctx, getState());
 		enterRule(_localctx, 22, RULE_psArgument);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -1379,7 +1420,7 @@ public class PSHDLLang extends Parser {
 				setState(331);
 				psExpression(0);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1409,19 +1450,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsCast(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsCast(this);
+			}
 		}
 	}
 
 	public final PsCastContext psCast() throws RecognitionException {
-		PsCastContext _localctx = new PsCastContext(_ctx, getState());
+		final PsCastContext _localctx = new PsCastContext(_ctx, getState());
 		enterRule(_localctx, 24, RULE_psCast);
 		int _la;
 		try {
@@ -1444,7 +1487,7 @@ public class PSHDLLang extends Parser {
 				setState(338);
 				match(PAREN_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1487,14 +1530,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBitAnd(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBitAnd(this);
+			}
 		}
 	}
 
@@ -1515,14 +1560,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsAdd(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsAdd(this);
+			}
 		}
 	}
 
@@ -1541,14 +1588,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsConcat(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsConcat(this);
+			}
 		}
 	}
 
@@ -1563,14 +1612,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsValueExp(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsValueExp(this);
+			}
 		}
 	}
 
@@ -1591,14 +1642,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsShift(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsShift(this);
+			}
 		}
 	}
 
@@ -1617,14 +1670,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBitLogAnd(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBitLogAnd(this);
+			}
 		}
 	}
 
@@ -1643,14 +1698,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBitOr(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBitOr(this);
+			}
 		}
 	}
 
@@ -1665,14 +1722,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsParens(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsParens(this);
+			}
 		}
 	}
 
@@ -1693,14 +1752,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsEqualityComp(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsEqualityComp(this);
+			}
 		}
 	}
 
@@ -1719,14 +1780,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBitLogOr(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBitLogOr(this);
+			}
 		}
 	}
 
@@ -1745,14 +1808,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsTernary(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsTernary(this);
+			}
 		}
 	}
 
@@ -1767,14 +1832,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsArrayInitExp(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsArrayInitExp(this);
+			}
 		}
 	}
 
@@ -1795,14 +1862,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsManip(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsManip(this);
+			}
 		}
 	}
 
@@ -1823,14 +1892,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsEquality(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsEquality(this);
+			}
 		}
 	}
 
@@ -1849,14 +1920,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBitXor(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBitXor(this);
+			}
 		}
 	}
 
@@ -1877,14 +1950,16 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsMul(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsMul(this);
+			}
 		}
 	}
 
@@ -1893,11 +1968,11 @@ public class PSHDLLang extends Parser {
 	}
 
 	private PsExpressionContext psExpression(int _p) throws RecognitionException {
-		ParserRuleContext _parentctx = _ctx;
-		int _parentState = getState();
+		final ParserRuleContext _parentctx = _ctx;
+		final int _parentState = getState();
 		PsExpressionContext _localctx = new PsExpressionContext(_ctx, _parentState);
 		PsExpressionContext _prevctx = _localctx;
-		int _startState = 26;
+		final int _startState = 26;
 		enterRecursionRule(_localctx, 26, RULE_psExpression, _p);
 		int _la;
 		try {
@@ -1977,8 +2052,9 @@ public class PSHDLLang extends Parser {
 				_alt = getInterpreter().adaptivePredict(_input, 39, _ctx);
 				while ((_alt != 2) && (_alt != org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER)) {
 					if (_alt == 1) {
-						if (_parseListeners != null)
+						if (_parseListeners != null) {
 							triggerExitRuleEvent();
+						}
 						_prevctx = _localctx;
 						{
 							setState(395);
@@ -1988,16 +2064,18 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsMulContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(356);
-								if (!(precpred(_ctx, 15)))
+								if (!(precpred(_ctx, 15))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 15)");
+								}
 								setState(357);
 								((PsMulContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << MUL) | (1L << DIV) | (1L << MOD) | (1L << POW))) != 0)))) {
 									((PsMulContext) _localctx).op = _errHandler.recoverInline(this);
 								} else {
-									if (_input.LA(1) == Token.EOF)
+									if (_input.LA(1) == Token.EOF) {
 										matchedEOF = true;
+									}
 									_errHandler.reportMatch(this);
 									consume();
 								}
@@ -2009,16 +2087,18 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsAddContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(359);
-								if (!(precpred(_ctx, 14)))
+								if (!(precpred(_ctx, 14))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 14)");
+								}
 								setState(360);
 								((PsAddContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!((_la == PLUS) || (_la == ARITH_NEG))) {
 									((PsAddContext) _localctx).op = _errHandler.recoverInline(this);
 								} else {
-									if (_input.LA(1) == Token.EOF)
+									if (_input.LA(1) == Token.EOF) {
 										matchedEOF = true;
+									}
 									_errHandler.reportMatch(this);
 									consume();
 								}
@@ -2030,16 +2110,18 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsShiftContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(362);
-								if (!(precpred(_ctx, 13)))
+								if (!(precpred(_ctx, 13))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 13)");
+								}
 								setState(363);
 								((PsShiftContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << SLL) | (1L << SRA) | (1L << SRL))) != 0)))) {
 									((PsShiftContext) _localctx).op = _errHandler.recoverInline(this);
 								} else {
-									if (_input.LA(1) == Token.EOF)
+									if (_input.LA(1) == Token.EOF) {
 										matchedEOF = true;
+									}
 									_errHandler.reportMatch(this);
 									consume();
 								}
@@ -2051,16 +2133,18 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsEqualityCompContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(365);
-								if (!(precpred(_ctx, 12)))
+								if (!(precpred(_ctx, 12))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 12)");
+								}
 								setState(366);
 								((PsEqualityCompContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << LESS) | (1L << LESS_EQ) | (1L << GREATER) | (1L << GREATER_EQ))) != 0)))) {
 									((PsEqualityCompContext) _localctx).op = _errHandler.recoverInline(this);
 								} else {
-									if (_input.LA(1) == Token.EOF)
+									if (_input.LA(1) == Token.EOF) {
 										matchedEOF = true;
+									}
 									_errHandler.reportMatch(this);
 									consume();
 								}
@@ -2072,16 +2156,18 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsEqualityContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(368);
-								if (!(precpred(_ctx, 11)))
+								if (!(precpred(_ctx, 11))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 11)");
+								}
 								setState(369);
 								((PsEqualityContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!((_la == EQ) || (_la == NOT_EQ))) {
 									((PsEqualityContext) _localctx).op = _errHandler.recoverInline(this);
 								} else {
-									if (_input.LA(1) == Token.EOF)
+									if (_input.LA(1) == Token.EOF) {
 										matchedEOF = true;
+									}
 									_errHandler.reportMatch(this);
 									consume();
 								}
@@ -2093,8 +2179,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsBitAndContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(371);
-								if (!(precpred(_ctx, 10)))
+								if (!(precpred(_ctx, 10))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 10)");
+								}
 								setState(372);
 								match(AND);
 								setState(373);
@@ -2105,8 +2192,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsBitXorContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(374);
-								if (!(precpred(_ctx, 9)))
+								if (!(precpred(_ctx, 9))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 9)");
+								}
 								setState(375);
 								match(XOR);
 								setState(376);
@@ -2117,8 +2205,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsBitOrContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(377);
-								if (!(precpred(_ctx, 8)))
+								if (!(precpred(_ctx, 8))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 8)");
+								}
 								setState(378);
 								match(OR);
 								setState(379);
@@ -2129,8 +2218,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsConcatContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(380);
-								if (!(precpred(_ctx, 7)))
+								if (!(precpred(_ctx, 7))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 7)");
+								}
 								setState(381);
 								match(HASH);
 								setState(382);
@@ -2141,8 +2231,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsBitLogAndContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(383);
-								if (!(precpred(_ctx, 6)))
+								if (!(precpred(_ctx, 6))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+								}
 								setState(384);
 								match(LOGI_AND);
 								setState(385);
@@ -2153,8 +2244,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsBitLogOrContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(386);
-								if (!(precpred(_ctx, 5)))
+								if (!(precpred(_ctx, 5))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+								}
 								setState(387);
 								match(LOGI_OR);
 								setState(388);
@@ -2165,8 +2257,9 @@ public class PSHDLLang extends Parser {
 								_localctx = new PsTernaryContext(new PsExpressionContext(_parentctx, _parentState));
 								pushNewRecursionContext(_localctx, _startState, RULE_psExpression);
 								setState(389);
-								if (!(precpred(_ctx, 4)))
+								if (!(precpred(_ctx, 4))) {
 									throw new FailedPredicateException(this, "precpred(_ctx, 4)");
+								}
 								setState(390);
 								match(QUESTIONMARK);
 								setState(391);
@@ -2185,7 +2278,7 @@ public class PSHDLLang extends Parser {
 					_alt = getInterpreter().adaptivePredict(_input, 39, _ctx);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2219,19 +2312,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsValue(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsValue(this);
+			}
 		}
 	}
 
 	public final PsValueContext psValue() throws RecognitionException {
-		PsValueContext _localctx = new PsValueContext(_ctx, getState());
+		final PsValueContext _localctx = new PsValueContext(_ctx, getState());
 		enterRule(_localctx, 28, RULE_psValue);
 		try {
 			setState(403);
@@ -2260,7 +2355,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2290,19 +2385,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsBitAccess(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsBitAccess(this);
+			}
 		}
 	}
 
 	public final PsBitAccessContext psBitAccess() throws RecognitionException {
-		PsBitAccessContext _localctx = new PsBitAccessContext(_ctx, getState());
+		final PsBitAccessContext _localctx = new PsBitAccessContext(_ctx, getState());
 		enterRule(_localctx, 30, RULE_psBitAccess);
 		int _la;
 		try {
@@ -2331,7 +2428,7 @@ public class PSHDLLang extends Parser {
 				setState(414);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2366,19 +2463,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsAccessRange(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsAccessRange(this);
+			}
 		}
 	}
 
 	public final PsAccessRangeContext psAccessRange() throws RecognitionException {
-		PsAccessRangeContext _localctx = new PsAccessRangeContext(_ctx, getState());
+		final PsAccessRangeContext _localctx = new PsAccessRangeContext(_ctx, getState());
 		enterRule(_localctx, 32, RULE_psAccessRange);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -2422,7 +2521,7 @@ public class PSHDLLang extends Parser {
 					break;
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2455,19 +2554,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsVariableRef(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsVariableRef(this);
+			}
 		}
 	}
 
 	public final PsVariableRefContext psVariableRef() throws RecognitionException {
-		PsVariableRefContext _localctx = new PsVariableRefContext(_ctx, getState());
+		final PsVariableRefContext _localctx = new PsVariableRefContext(_ctx, getState());
 		enterRule(_localctx, 34, RULE_psVariableRef);
 		try {
 			int _alt;
@@ -2513,7 +2614,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2551,19 +2652,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsRefPart(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsRefPart(this);
+			}
 		}
 	}
 
 	public final PsRefPartContext psRefPart() throws RecognitionException {
-		PsRefPartContext _localctx = new PsRefPartContext(_ctx, getState());
+		final PsRefPartContext _localctx = new PsRefPartContext(_ctx, getState());
 		enterRule(_localctx, 36, RULE_psRefPart);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -2601,7 +2704,7 @@ public class PSHDLLang extends Parser {
 					break;
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2627,19 +2730,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsVariable(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsVariable(this);
+			}
 		}
 	}
 
 	public final PsVariableContext psVariable() throws RecognitionException {
-		PsVariableContext _localctx = new PsVariableContext(_ctx, getState());
+		final PsVariableContext _localctx = new PsVariableContext(_ctx, getState());
 		enterRule(_localctx, 38, RULE_psVariable);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -2647,7 +2752,7 @@ public class PSHDLLang extends Parser {
 				setState(447);
 				match(RULE_ID);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2677,19 +2782,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsVariableMatch(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsVariableMatch(this);
+			}
 		}
 	}
 
 	public final PsVariableMatchContext psVariableMatch() throws RecognitionException {
-		PsVariableMatchContext _localctx = new PsVariableMatchContext(_ctx, getState());
+		final PsVariableMatchContext _localctx = new PsVariableMatchContext(_ctx, getState());
 		enterRule(_localctx, 40, RULE_psVariableMatch);
 		int _la;
 		try {
@@ -2702,8 +2809,9 @@ public class PSHDLLang extends Parser {
 				if (!((_la == MUL) || (_la == QUESTIONMARK))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
@@ -2718,7 +2826,7 @@ public class PSHDLLang extends Parser {
 				}
 
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2756,19 +2864,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsStatement(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsStatement(this);
+			}
 		}
 	}
 
 	public final PsStatementContext psStatement() throws RecognitionException {
-		PsStatementContext _localctx = new PsStatementContext(_ctx, getState());
+		final PsStatementContext _localctx = new PsStatementContext(_ctx, getState());
 		enterRule(_localctx, 42, RULE_psStatement);
 		try {
 			setState(458);
@@ -2805,7 +2915,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2831,19 +2941,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsGroupMatch(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsGroupMatch(this);
+			}
 		}
 	}
 
 	public final PsGroupMatchContext psGroupMatch() throws RecognitionException {
-		PsGroupMatchContext _localctx = new PsGroupMatchContext(_ctx, getState());
+		final PsGroupMatchContext _localctx = new PsGroupMatchContext(_ctx, getState());
 		enterRule(_localctx, 44, RULE_psGroupMatch);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -2855,7 +2967,7 @@ public class PSHDLLang extends Parser {
 				setState(462);
 				match(DIV);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2893,19 +3005,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsExport(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsExport(this);
+			}
 		}
 	}
 
 	public final PsExportContext psExport() throws RecognitionException {
-		PsExportContext _localctx = new PsExportContext(_ctx, getState());
+		final PsExportContext _localctx = new PsExportContext(_ctx, getState());
 		enterRule(_localctx, 46, RULE_psExport);
 		int _la;
 		try {
@@ -2944,7 +3058,7 @@ public class PSHDLLang extends Parser {
 				setState(473);
 				match(SEMICOLON);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -2978,19 +3092,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFunctionDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFunctionDeclaration(this);
+			}
 		}
 	}
 
 	public final PsFunctionDeclarationContext psFunctionDeclaration() throws RecognitionException {
-		PsFunctionDeclarationContext _localctx = new PsFunctionDeclarationContext(_ctx, getState());
+		final PsFunctionDeclarationContext _localctx = new PsFunctionDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 48, RULE_psFunctionDeclaration);
 		try {
 			setState(478);
@@ -3018,7 +3134,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3056,19 +3172,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInlineFunction(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInlineFunction(this);
+			}
 		}
 	}
 
 	public final PsInlineFunctionContext psInlineFunction() throws RecognitionException {
-		PsInlineFunctionContext _localctx = new PsInlineFunctionContext(_ctx, getState());
+		final PsInlineFunctionContext _localctx = new PsInlineFunctionContext(_ctx, getState());
 		enterRule(_localctx, 50, RULE_psInlineFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -3092,7 +3210,7 @@ public class PSHDLLang extends Parser {
 				setState(488);
 				match(PAREN_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3134,19 +3252,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsSubstituteFunction(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsSubstituteFunction(this);
+			}
 		}
 	}
 
 	public final PsSubstituteFunctionContext psSubstituteFunction() throws RecognitionException {
-		PsSubstituteFunctionContext _localctx = new PsSubstituteFunctionContext(_ctx, getState());
+		final PsSubstituteFunctionContext _localctx = new PsSubstituteFunctionContext(_ctx, getState());
 		enterRule(_localctx, 52, RULE_psSubstituteFunction);
 		int _la;
 		try {
@@ -3192,7 +3312,7 @@ public class PSHDLLang extends Parser {
 				setState(504);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3228,19 +3348,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsNativeFunction(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsNativeFunction(this);
+			}
 		}
 	}
 
 	public final PsNativeFunctionContext psNativeFunction() throws RecognitionException {
-		PsNativeFunctionContext _localctx = new PsNativeFunctionContext(_ctx, getState());
+		final PsNativeFunctionContext _localctx = new PsNativeFunctionContext(_ctx, getState());
 		enterRule(_localctx, 54, RULE_psNativeFunction);
 		int _la;
 		try {
@@ -3279,7 +3401,7 @@ public class PSHDLLang extends Parser {
 				setState(516);
 				match(SEMICOLON);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3291,7 +3413,7 @@ public class PSHDLLang extends Parser {
 
 	public static class PsFuncRecturnTypeContext extends ParserRuleContext {
 		public PsFuncOptArrayContext psFuncOptArray;
-		public List<PsFuncOptArrayContext> dims = new ArrayList<PsFuncOptArrayContext>();
+		public List<PsFuncOptArrayContext> dims = new ArrayList<>();
 
 		public PsFuncParamTypeContext psFuncParamType() {
 			return getRuleContext(PsFuncParamTypeContext.class, 0);
@@ -3316,19 +3438,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncRecturnType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncRecturnType(this);
+			}
 		}
 	}
 
 	public final PsFuncRecturnTypeContext psFuncRecturnType() throws RecognitionException {
-		PsFuncRecturnTypeContext _localctx = new PsFuncRecturnTypeContext(_ctx, getState());
+		final PsFuncRecturnTypeContext _localctx = new PsFuncRecturnTypeContext(_ctx, getState());
 		enterRule(_localctx, 56, RULE_psFuncRecturnType);
 		int _la;
 		try {
@@ -3352,7 +3476,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3382,19 +3506,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncParam(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncParam(this);
+			}
 		}
 	}
 
 	public final PsFuncParamContext psFuncParam() throws RecognitionException {
-		PsFuncParamContext _localctx = new PsFuncParamContext(_ctx, getState());
+		final PsFuncParamContext _localctx = new PsFuncParamContext(_ctx, getState());
 		enterRule(_localctx, 58, RULE_psFuncParam);
 		int _la;
 		try {
@@ -3434,7 +3560,7 @@ public class PSHDLLang extends Parser {
 				setState(536);
 				match(PAREN_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3446,7 +3572,7 @@ public class PSHDLLang extends Parser {
 
 	public static class PsFuncSpecContext extends ParserRuleContext {
 		public PsFuncOptArrayContext psFuncOptArray;
-		public List<PsFuncOptArrayContext> dims = new ArrayList<PsFuncOptArrayContext>();
+		public List<PsFuncOptArrayContext> dims = new ArrayList<>();
 
 		public PsFuncParamWithRWContext psFuncParamWithRW() {
 			return getRuleContext(PsFuncParamWithRWContext.class, 0);
@@ -3475,19 +3601,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncSpec(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncSpec(this);
+			}
 		}
 	}
 
 	public final PsFuncSpecContext psFuncSpec() throws RecognitionException {
-		PsFuncSpecContext _localctx = new PsFuncSpecContext(_ctx, getState());
+		final PsFuncSpecContext _localctx = new PsFuncSpecContext(_ctx, getState());
 		enterRule(_localctx, 60, RULE_psFuncSpec);
 		int _la;
 		try {
@@ -3513,7 +3641,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3545,19 +3673,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncParamWithRW(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncParamWithRW(this);
+			}
 		}
 	}
 
 	public final PsFuncParamWithRWContext psFuncParamWithRW() throws RecognitionException {
-		PsFuncParamWithRWContext _localctx = new PsFuncParamWithRWContext(_ctx, getState());
+		final PsFuncParamWithRWContext _localctx = new PsFuncParamWithRWContext(_ctx, getState());
 		enterRule(_localctx, 62, RULE_psFuncParamWithRW);
 		int _la;
 		try {
@@ -3596,7 +3726,7 @@ public class PSHDLLang extends Parser {
 				setState(554);
 				psFuncParamType();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3622,19 +3752,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncOptArray(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncOptArray(this);
+			}
 		}
 	}
 
 	public final PsFuncOptArrayContext psFuncOptArray() throws RecognitionException {
-		PsFuncOptArrayContext _localctx = new PsFuncOptArrayContext(_ctx, getState());
+		final PsFuncOptArrayContext _localctx = new PsFuncOptArrayContext(_ctx, getState());
 		enterRule(_localctx, 64, RULE_psFuncOptArray);
 		int _la;
 		try {
@@ -3659,7 +3791,7 @@ public class PSHDLLang extends Parser {
 					match(BRACKET_CLOSE);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3681,19 +3813,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncParamRWType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncParamRWType(this);
+			}
 		}
 	}
 
 	public final PsFuncParamRWTypeContext psFuncParamRWType() throws RecognitionException {
-		PsFuncParamRWTypeContext _localctx = new PsFuncParamRWTypeContext(_ctx, getState());
+		final PsFuncParamRWTypeContext _localctx = new PsFuncParamRWTypeContext(_ctx, getState());
 		enterRule(_localctx, 66, RULE_psFuncParamRWType);
 		int _la;
 		try {
@@ -3704,13 +3838,14 @@ public class PSHDLLang extends Parser {
 				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << MUL) | (1L << PLUS) | (1L << ARITH_NEG))) != 0)))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -3806,19 +3941,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncParamType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncParamType(this);
+			}
 		}
 	}
 
 	public final PsFuncParamTypeContext psFuncParamType() throws RecognitionException {
-		PsFuncParamTypeContext _localctx = new PsFuncParamTypeContext(_ctx, getState());
+		final PsFuncParamTypeContext _localctx = new PsFuncParamTypeContext(_ctx, getState());
 		enterRule(_localctx, 68, RULE_psFuncParamType);
 		int _la;
 		try {
@@ -4005,7 +4142,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4031,19 +4168,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFunction(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFunction(this);
+			}
 		}
 	}
 
 	public final PsFunctionContext psFunction() throws RecognitionException {
-		PsFunctionContext _localctx = new PsFunctionContext(_ctx, getState());
+		final PsFunctionContext _localctx = new PsFunctionContext(_ctx, getState());
 		enterRule(_localctx, 70, RULE_psFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4051,7 +4190,7 @@ public class PSHDLLang extends Parser {
 				setState(612);
 				match(RULE_ID);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4081,19 +4220,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsFuncArgs(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsFuncArgs(this);
+			}
 		}
 	}
 
 	public final PsFuncArgsContext psFuncArgs() throws RecognitionException {
-		PsFuncArgsContext _localctx = new PsFuncArgsContext(_ctx, getState());
+		final PsFuncArgsContext _localctx = new PsFuncArgsContext(_ctx, getState());
 		enterRule(_localctx, 72, RULE_psFuncArgs);
 		int _la;
 		try {
@@ -4132,7 +4273,7 @@ public class PSHDLLang extends Parser {
 				setState(625);
 				match(PAREN_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4166,19 +4307,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsAssignmentOrFunc(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsAssignmentOrFunc(this);
+			}
 		}
 	}
 
 	public final PsAssignmentOrFuncContext psAssignmentOrFunc() throws RecognitionException {
-		PsAssignmentOrFuncContext _localctx = new PsAssignmentOrFuncContext(_ctx, getState());
+		final PsAssignmentOrFuncContext _localctx = new PsAssignmentOrFuncContext(_ctx, getState());
 		enterRule(_localctx, 74, RULE_psAssignmentOrFunc);
 		int _la;
 		try {
@@ -4227,7 +4370,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4249,19 +4392,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsAssignmentOp(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsAssignmentOp(this);
+			}
 		}
 	}
 
 	public final PsAssignmentOpContext psAssignmentOp() throws RecognitionException {
-		PsAssignmentOpContext _localctx = new PsAssignmentOpContext(_ctx, getState());
+		final PsAssignmentOpContext _localctx = new PsAssignmentOpContext(_ctx, getState());
 		enterRule(_localctx, 76, RULE_psAssignmentOp);
 		int _la;
 		try {
@@ -4273,13 +4418,14 @@ public class PSHDLLang extends Parser {
 						| (1L << AND_ASSGN) | (1L << XOR_ASSGN) | (1L << OR_ASSGN) | (1L << SLL_ASSGN) | (1L << SRL_ASSGN) | (1L << SRA_ASSGN))) != 0)))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4313,19 +4459,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsCompoundStatement(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsCompoundStatement(this);
+			}
 		}
 	}
 
 	public final PsCompoundStatementContext psCompoundStatement() throws RecognitionException {
-		PsCompoundStatementContext _localctx = new PsCompoundStatementContext(_ctx, getState());
+		final PsCompoundStatementContext _localctx = new PsCompoundStatementContext(_ctx, getState());
 		enterRule(_localctx, 78, RULE_psCompoundStatement);
 		try {
 			setState(650);
@@ -4352,7 +4500,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4389,19 +4537,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsIfStatement(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsIfStatement(this);
+			}
 		}
 	}
 
 	public final PsIfStatementContext psIfStatement() throws RecognitionException {
-		PsIfStatementContext _localctx = new PsIfStatementContext(_ctx, getState());
+		final PsIfStatementContext _localctx = new PsIfStatementContext(_ctx, getState());
 		enterRule(_localctx, 80, RULE_psIfStatement);
 		try {
 			setState(670);
@@ -4455,7 +4605,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4485,19 +4635,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsSimpleBlock(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsSimpleBlock(this);
+			}
 		}
 	}
 
 	public final PsSimpleBlockContext psSimpleBlock() throws RecognitionException {
-		PsSimpleBlockContext _localctx = new PsSimpleBlockContext(_ctx, getState());
+		final PsSimpleBlockContext _localctx = new PsSimpleBlockContext(_ctx, getState());
 		enterRule(_localctx, 82, RULE_psSimpleBlock);
 		int _la;
 		try {
@@ -4538,7 +4690,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4572,19 +4724,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsForStatement(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsForStatement(this);
+			}
 		}
 	}
 
 	public final PsForStatementContext psForStatement() throws RecognitionException {
-		PsForStatementContext _localctx = new PsForStatementContext(_ctx, getState());
+		final PsForStatementContext _localctx = new PsForStatementContext(_ctx, getState());
 		enterRule(_localctx, 84, RULE_psForStatement);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -4604,7 +4758,7 @@ public class PSHDLLang extends Parser {
 				setState(689);
 				psSimpleBlock();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4638,19 +4792,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsSwitchStatement(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsSwitchStatement(this);
+			}
 		}
 	}
 
 	public final PsSwitchStatementContext psSwitchStatement() throws RecognitionException {
-		PsSwitchStatementContext _localctx = new PsSwitchStatementContext(_ctx, getState());
+		final PsSwitchStatementContext _localctx = new PsSwitchStatementContext(_ctx, getState());
 		enterRule(_localctx, 86, RULE_psSwitchStatement);
 		int _la;
 		try {
@@ -4683,7 +4839,7 @@ public class PSHDLLang extends Parser {
 				setState(702);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4717,19 +4873,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsCaseStatements(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsCaseStatements(this);
+			}
 		}
 	}
 
 	public final PsCaseStatementsContext psCaseStatements() throws RecognitionException {
-		PsCaseStatementsContext _localctx = new PsCaseStatementsContext(_ctx, getState());
+		final PsCaseStatementsContext _localctx = new PsCaseStatementsContext(_ctx, getState());
 		enterRule(_localctx, 88, RULE_psCaseStatements);
 		int _la;
 		try {
@@ -4775,7 +4933,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4809,19 +4967,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsDeclaration(this);
+			}
 		}
 	}
 
 	public final PsDeclarationContext psDeclaration() throws RecognitionException {
-		PsDeclarationContext _localctx = new PsDeclarationContext(_ctx, getState());
+		final PsDeclarationContext _localctx = new PsDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 90, RULE_psDeclaration);
 		int _la;
 		try {
@@ -4854,7 +5014,7 @@ public class PSHDLLang extends Parser {
 				}
 
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4888,19 +5048,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsDeclarationType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsDeclarationType(this);
+			}
 		}
 	}
 
 	public final PsDeclarationTypeContext psDeclarationType() throws RecognitionException {
-		PsDeclarationTypeContext _localctx = new PsDeclarationTypeContext(_ctx, getState());
+		final PsDeclarationTypeContext _localctx = new PsDeclarationTypeContext(_ctx, getState());
 		enterRule(_localctx, 92, RULE_psDeclarationType);
 		try {
 			setState(729);
@@ -4925,7 +5087,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -4955,19 +5117,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsTypeDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsTypeDeclaration(this);
+			}
 		}
 	}
 
 	public final PsTypeDeclarationContext psTypeDeclaration() throws RecognitionException {
-		PsTypeDeclarationContext _localctx = new PsTypeDeclarationContext(_ctx, getState());
+		final PsTypeDeclarationContext _localctx = new PsTypeDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 94, RULE_psTypeDeclaration);
 		try {
 			setState(733);
@@ -4988,7 +5152,7 @@ public class PSHDLLang extends Parser {
 			default:
 				throw new NoViableAltException(this);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5024,19 +5188,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsEnumDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsEnumDeclaration(this);
+			}
 		}
 	}
 
 	public final PsEnumDeclarationContext psEnumDeclaration() throws RecognitionException {
-		PsEnumDeclarationContext _localctx = new PsEnumDeclarationContext(_ctx, getState());
+		final PsEnumDeclarationContext _localctx = new PsEnumDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 96, RULE_psEnumDeclaration);
 		int _la;
 		try {
@@ -5079,7 +5245,7 @@ public class PSHDLLang extends Parser {
 				setState(749);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5105,19 +5271,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsEnum(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsEnum(this);
+			}
 		}
 	}
 
 	public final PsEnumContext psEnum() throws RecognitionException {
-		PsEnumContext _localctx = new PsEnumContext(_ctx, getState());
+		final PsEnumContext _localctx = new PsEnumContext(_ctx, getState());
 		enterRule(_localctx, 98, RULE_psEnum);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -5125,7 +5293,7 @@ public class PSHDLLang extends Parser {
 				setState(751);
 				psQualifiedName();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5163,19 +5331,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsVariableDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsVariableDeclaration(this);
+			}
 		}
 	}
 
 	public final PsVariableDeclarationContext psVariableDeclaration() throws RecognitionException {
-		PsVariableDeclarationContext _localctx = new PsVariableDeclarationContext(_ctx, getState());
+		final PsVariableDeclarationContext _localctx = new PsVariableDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 100, RULE_psVariableDeclaration);
 		int _la;
 		try {
@@ -5312,7 +5482,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5354,19 +5524,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsDeclAssignment(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsDeclAssignment(this);
+			}
 		}
 	}
 
 	public final PsDeclAssignmentContext psDeclAssignment() throws RecognitionException {
-		PsDeclAssignmentContext _localctx = new PsDeclAssignmentContext(_ctx, getState());
+		final PsDeclAssignmentContext _localctx = new PsDeclAssignmentContext(_ctx, getState());
 		enterRule(_localctx, 102, RULE_psDeclAssignment);
 		int _la;
 		try {
@@ -5411,7 +5583,7 @@ public class PSHDLLang extends Parser {
 				}
 
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5441,19 +5613,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsArrayInit(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsArrayInit(this);
+			}
 		}
 	}
 
 	public final PsArrayInitContext psArrayInit() throws RecognitionException {
-		PsArrayInitContext _localctx = new PsArrayInitContext(_ctx, getState());
+		final PsArrayInitContext _localctx = new PsArrayInitContext(_ctx, getState());
 		enterRule(_localctx, 104, RULE_psArrayInit);
 		try {
 			setState(825);
@@ -5472,7 +5646,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5498,19 +5672,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsArrayInitSubParens(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsArrayInitSubParens(this);
+			}
 		}
 	}
 
 	public final PsArrayInitSubParensContext psArrayInitSubParens() throws RecognitionException {
-		PsArrayInitSubParensContext _localctx = new PsArrayInitSubParensContext(_ctx, getState());
+		final PsArrayInitSubParensContext _localctx = new PsArrayInitSubParensContext(_ctx, getState());
 		enterRule(_localctx, 106, RULE_psArrayInitSubParens);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -5522,7 +5698,7 @@ public class PSHDLLang extends Parser {
 				setState(829);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5556,19 +5732,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsArrayInitSub(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsArrayInitSub(this);
+			}
 		}
 	}
 
 	public final PsArrayInitSubContext psArrayInitSub() throws RecognitionException {
-		PsArrayInitSubContext _localctx = new PsArrayInitSubContext(_ctx, getState());
+		final PsArrayInitSubContext _localctx = new PsArrayInitSubContext(_ctx, getState());
 		enterRule(_localctx, 108, RULE_psArrayInitSub);
 		int _la;
 		try {
@@ -5604,7 +5782,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5634,19 +5812,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsArray(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsArray(this);
+			}
 		}
 	}
 
 	public final PsArrayContext psArray() throws RecognitionException {
-		PsArrayContext _localctx = new PsArrayContext(_ctx, getState());
+		final PsArrayContext _localctx = new PsArrayContext(_ctx, getState());
 		enterRule(_localctx, 110, RULE_psArray);
 		try {
 			int _alt;
@@ -5676,7 +5856,7 @@ public class PSHDLLang extends Parser {
 					_alt = getInterpreter().adaptivePredict(_input, 105, _ctx);
 				} while ((_alt != 2) && (_alt != org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER));
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5698,19 +5878,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsDirection(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsDirection(this);
+			}
 		}
 	}
 
 	public final PsDirectionContext psDirection() throws RecognitionException {
-		PsDirectionContext _localctx = new PsDirectionContext(_ctx, getState());
+		final PsDirectionContext _localctx = new PsDirectionContext(_ctx, getState());
 		enterRule(_localctx, 112, RULE_psDirection);
 		int _la;
 		try {
@@ -5721,13 +5903,14 @@ public class PSHDLLang extends Parser {
 				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << IN) | (1L << OUT) | (1L << INOUT) | (1L << PARAM) | (1L << CONST))) != 0)))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5757,19 +5940,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsAnnotation(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsAnnotation(this);
+			}
 		}
 	}
 
 	public final PsAnnotationContext psAnnotation() throws RecognitionException {
-		PsAnnotationContext _localctx = new PsAnnotationContext(_ctx, getState());
+		final PsAnnotationContext _localctx = new PsAnnotationContext(_ctx, getState());
 		enterRule(_localctx, 114, RULE_psAnnotation);
 		int _la;
 		try {
@@ -5792,7 +5977,7 @@ public class PSHDLLang extends Parser {
 				}
 
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5818,19 +6003,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsAnnotationType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsAnnotationType(this);
+			}
 		}
 	}
 
 	public final PsAnnotationTypeContext psAnnotationType() throws RecognitionException {
-		PsAnnotationTypeContext _localctx = new PsAnnotationTypeContext(_ctx, getState());
+		final PsAnnotationTypeContext _localctx = new PsAnnotationTypeContext(_ctx, getState());
 		enterRule(_localctx, 116, RULE_psAnnotationType);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -5840,7 +6027,7 @@ public class PSHDLLang extends Parser {
 				setState(859);
 				match(RULE_ID);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -5882,19 +6069,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsPrimitive(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsPrimitive(this);
+			}
 		}
 	}
 
 	public final PsPrimitiveContext psPrimitive() throws RecognitionException {
-		PsPrimitiveContext _localctx = new PsPrimitiveContext(_ctx, getState());
+		final PsPrimitiveContext _localctx = new PsPrimitiveContext(_ctx, getState());
 		enterRule(_localctx, 118, RULE_psPrimitive);
 		int _la;
 		try {
@@ -6049,7 +6238,7 @@ public class PSHDLLang extends Parser {
 			}
 				break;
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6083,19 +6272,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsPrimitiveType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsPrimitiveType(this);
+			}
 		}
 	}
 
 	public final PsPrimitiveTypeContext psPrimitiveType() throws RecognitionException {
-		PsPrimitiveTypeContext _localctx = new PsPrimitiveTypeContext(_ctx, getState());
+		final PsPrimitiveTypeContext _localctx = new PsPrimitiveTypeContext(_ctx, getState());
 		enterRule(_localctx, 120, RULE_psPrimitiveType);
 		int _la;
 		try {
@@ -6107,13 +6298,14 @@ public class PSHDLLang extends Parser {
 						| (1L << UINT32) | (1L << STRING) | (1L << BOOL))) != 0)))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6139,19 +6331,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsWidth(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsWidth(this);
+			}
 		}
 	}
 
 	public final PsWidthContext psWidth() throws RecognitionException {
-		PsWidthContext _localctx = new PsWidthContext(_ctx, getState());
+		final PsWidthContext _localctx = new PsWidthContext(_ctx, getState());
 		enterRule(_localctx, 122, RULE_psWidth);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -6163,7 +6357,7 @@ public class PSHDLLang extends Parser {
 				setState(901);
 				match(GREATER);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6197,19 +6391,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInterfaceDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInterfaceDeclaration(this);
+			}
 		}
 	}
 
 	public final PsInterfaceDeclarationContext psInterfaceDeclaration() throws RecognitionException {
-		PsInterfaceDeclarationContext _localctx = new PsInterfaceDeclarationContext(_ctx, getState());
+		final PsInterfaceDeclarationContext _localctx = new PsInterfaceDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 124, RULE_psInterfaceDeclaration);
 		int _la;
 		try {
@@ -6234,7 +6430,7 @@ public class PSHDLLang extends Parser {
 				setState(909);
 				psInterfaceDecl();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6260,19 +6456,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInterface(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInterface(this);
+			}
 		}
 	}
 
 	public final PsInterfaceContext psInterface() throws RecognitionException {
-		PsInterfaceContext _localctx = new PsInterfaceContext(_ctx, getState());
+		final PsInterfaceContext _localctx = new PsInterfaceContext(_ctx, getState());
 		enterRule(_localctx, 126, RULE_psInterface);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -6280,7 +6478,7 @@ public class PSHDLLang extends Parser {
 				setState(911);
 				psQualifiedName();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6310,19 +6508,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInterfaceExtends(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInterfaceExtends(this);
+			}
 		}
 	}
 
 	public final PsInterfaceExtendsContext psInterfaceExtends() throws RecognitionException {
-		PsInterfaceExtendsContext _localctx = new PsInterfaceExtendsContext(_ctx, getState());
+		final PsInterfaceExtendsContext _localctx = new PsInterfaceExtendsContext(_ctx, getState());
 		enterRule(_localctx, 128, RULE_psInterfaceExtends);
 		int _la;
 		try {
@@ -6347,7 +6547,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6377,19 +6577,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsInterfaceDecl(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsInterfaceDecl(this);
+			}
 		}
 	}
 
 	public final PsInterfaceDeclContext psInterfaceDecl() throws RecognitionException {
-		PsInterfaceDeclContext _localctx = new PsInterfaceDeclContext(_ctx, getState());
+		final PsInterfaceDeclContext _localctx = new PsInterfaceDeclContext(_ctx, getState());
 		enterRule(_localctx, 130, RULE_psInterfaceDecl);
 		int _la;
 		try {
@@ -6416,7 +6618,7 @@ public class PSHDLLang extends Parser {
 				setState(928);
 				match(CURLY_CLOSE);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6450,19 +6652,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsPortDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsPortDeclaration(this);
+			}
 		}
 	}
 
 	public final PsPortDeclarationContext psPortDeclaration() throws RecognitionException {
-		PsPortDeclarationContext _localctx = new PsPortDeclarationContext(_ctx, getState());
+		final PsPortDeclarationContext _localctx = new PsPortDeclarationContext(_ctx, getState());
 		enterRule(_localctx, 132, RULE_psPortDeclaration);
 		int _la;
 		try {
@@ -6485,7 +6689,7 @@ public class PSHDLLang extends Parser {
 				setState(936);
 				psVariableDeclaration();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -6523,19 +6727,21 @@ public class PSHDLLang extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).enterPsQualifiedName(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof PSHDLLangListener)
+			if (listener instanceof PSHDLLangListener) {
 				((PSHDLLangListener) listener).exitPsQualifiedName(this);
+			}
 		}
 	}
 
 	public final PsQualifiedNameContext psQualifiedName() throws RecognitionException {
-		PsQualifiedNameContext _localctx = new PsQualifiedNameContext(_ctx, getState());
+		final PsQualifiedNameContext _localctx = new PsQualifiedNameContext(_ctx, getState());
 		enterRule(_localctx, 134, RULE_psQualifiedName);
 		int _la;
 		try {
@@ -6560,7 +6766,7 @@ public class PSHDLLang extends Parser {
 					_la = _input.LA(1);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);

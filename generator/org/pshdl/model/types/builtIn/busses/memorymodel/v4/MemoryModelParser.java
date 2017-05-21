@@ -27,14 +27,24 @@
 // Generated from MemoryModel.g4 by ANTLR 4.7
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
+
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.RuntimeMetaData;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class MemoryModelParser extends Parser {
@@ -138,19 +148,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterUnit(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitUnit(this);
+			}
 		}
 	}
 
 	public final UnitContext unit() throws RecognitionException {
-		UnitContext _localctx = new UnitContext(_ctx, getState());
+		final UnitContext _localctx = new UnitContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_unit);
 		int _la;
 		try {
@@ -159,7 +171,7 @@ public class MemoryModelParser extends Parser {
 				setState(33);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__12) | (1L << T__13))) != 0)) {
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__0) | (1L << T__12) | (1L << T__13))) != 0))) {
 					{
 						{
 							setState(30);
@@ -175,7 +187,7 @@ public class MemoryModelParser extends Parser {
 					memory();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -209,19 +221,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterDeclaration(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitDeclaration(this);
+			}
 		}
 	}
 
 	public final DeclarationContext declaration() throws RecognitionException {
-		DeclarationContext _localctx = new DeclarationContext(_ctx, getState());
+		final DeclarationContext _localctx = new DeclarationContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_declaration);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -254,7 +268,7 @@ public class MemoryModelParser extends Parser {
 					throw new NoViableAltException(this);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -312,19 +326,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterRow(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitRow(this);
+			}
 		}
 	}
 
 	public final RowContext row() throws RecognitionException {
-		RowContext _localctx = new RowContext(_ctx, getState());
+		final RowContext _localctx = new RowContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_row);
 		int _la;
 		try {
@@ -339,7 +355,7 @@ public class MemoryModelParser extends Parser {
 				setState(52);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__11) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << ID))) != 0)) {
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__4) | (1L << T__11) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << ID))) != 0))) {
 					{
 						setState(50);
 						_errHandler.sync(this);
@@ -385,7 +401,7 @@ public class MemoryModelParser extends Parser {
 				setState(55);
 				match(T__2);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -411,19 +427,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterRowID(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitRowID(this);
+			}
 		}
 	}
 
 	public final RowIDContext rowID() throws RecognitionException {
-		RowIDContext _localctx = new RowIDContext(_ctx, getState());
+		final RowIDContext _localctx = new RowIDContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_rowID);
 		int _la;
 		try {
@@ -442,7 +460,7 @@ public class MemoryModelParser extends Parser {
 				setState(60);
 				match(ID);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -478,19 +496,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterConstant(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitConstant(this);
+			}
 		}
 	}
 
 	public final ConstantContext constant() throws RecognitionException {
-		ConstantContext _localctx = new ConstantContext(_ctx, getState());
+		final ConstantContext _localctx = new ConstantContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_constant);
 		int _la;
 		try {
@@ -523,20 +543,21 @@ public class MemoryModelParser extends Parser {
 				}
 
 				setState(72);
-				((ConstantContext) _localctx).value = _input.LT(1);
+				_localctx.value = _input.LT(1);
 				_la = _input.LA(1);
-				if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << NUMBER))) != 0))) {
-					((ConstantContext) _localctx).value = (Token) _errHandler.recoverInline(this);
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << NUMBER))) != 0)))) {
+					_localctx.value = _errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 				setState(73);
 				match(T__10);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -562,19 +583,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterFilling(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitFilling(this);
+			}
 		}
 	}
 
 	public final FillingContext filling() throws RecognitionException {
-		FillingContext _localctx = new FillingContext(_ctx, getState());
+		final FillingContext _localctx = new FillingContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_filling);
 		int _la;
 		try {
@@ -599,7 +622,7 @@ public class MemoryModelParser extends Parser {
 				setState(82);
 				match(T__10);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -641,19 +664,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterColumn(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitColumn(this);
+			}
 		}
 	}
 
 	public final ColumnContext column() throws RecognitionException {
-		ColumnContext _localctx = new ColumnContext(_ctx, getState());
+		final ColumnContext _localctx = new ColumnContext(_ctx, getState());
 		enterRule(_localctx, 12, RULE_column);
 		int _la;
 		try {
@@ -668,7 +693,7 @@ public class MemoryModelParser extends Parser {
 				setState(91);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la == T__4 || _la == ID) {
+				while ((_la == T__4) || (_la == ID)) {
 					{
 						setState(89);
 						_errHandler.sync(this);
@@ -698,7 +723,7 @@ public class MemoryModelParser extends Parser {
 				setState(94);
 				match(T__2);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -740,19 +765,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterAlias(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitAlias(this);
+			}
 		}
 	}
 
 	public final AliasContext alias() throws RecognitionException {
-		AliasContext _localctx = new AliasContext(_ctx, getState());
+		final AliasContext _localctx = new AliasContext(_ctx, getState());
 		enterRule(_localctx, 14, RULE_alias);
 		int _la;
 		try {
@@ -767,7 +794,7 @@ public class MemoryModelParser extends Parser {
 				setState(103);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << ID))) != 0)) {
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << ID))) != 0))) {
 					{
 						setState(101);
 						_errHandler.sync(this);
@@ -799,7 +826,7 @@ public class MemoryModelParser extends Parser {
 				setState(106);
 				match(T__2);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -837,19 +864,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterMemory(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitMemory(this);
+			}
 		}
 	}
 
 	public final MemoryContext memory() throws RecognitionException {
-		MemoryContext _localctx = new MemoryContext(_ctx, getState());
+		final MemoryContext _localctx = new MemoryContext(_ctx, getState());
 		enterRule(_localctx, 16, RULE_memory);
 		int _la;
 		try {
@@ -862,7 +891,7 @@ public class MemoryModelParser extends Parser {
 				setState(114);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la == T__4 || _la == ID) {
+				while ((_la == T__4) || (_la == ID)) {
 					{
 						setState(112);
 						_errHandler.sync(this);
@@ -892,7 +921,7 @@ public class MemoryModelParser extends Parser {
 				setState(117);
 				match(T__2);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -945,19 +974,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterDefinition(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitDefinition(this);
+			}
 		}
 	}
 
 	public final DefinitionContext definition() throws RecognitionException {
-		DefinitionContext _localctx = new DefinitionContext(_ctx, getState());
+		final DefinitionContext _localctx = new DefinitionContext(_ctx, getState());
 		enterRule(_localctx, 18, RULE_definition);
 		int _la;
 		try {
@@ -971,7 +1002,7 @@ public class MemoryModelParser extends Parser {
 				if (_la == T__15) {
 					{
 						setState(120);
-						((DefinitionContext) _localctx).hasRegister = match(T__15);
+						_localctx.hasRegister = match(T__15);
 					}
 				}
 
@@ -1014,7 +1045,7 @@ public class MemoryModelParser extends Parser {
 				setState(140);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22))) != 0)) {
+				if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22))) != 0))) {
 					{
 						setState(139);
 						warnType();
@@ -1027,14 +1058,14 @@ public class MemoryModelParser extends Parser {
 				if (_la == T__18) {
 					{
 						setState(142);
-						((DefinitionContext) _localctx).modFlag = match(T__18);
+						_localctx.modFlag = match(T__18);
 					}
 				}
 
 				setState(145);
 				match(T__10);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1059,19 +1090,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterWarnType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitWarnType(this);
+			}
 		}
 	}
 
 	public final WarnTypeContext warnType() throws RecognitionException {
-		WarnTypeContext _localctx = new WarnTypeContext(_ctx, getState());
+		final WarnTypeContext _localctx = new WarnTypeContext(_ctx, getState());
 		enterRule(_localctx, 20, RULE_warnType);
 		int _la;
 		try {
@@ -1083,23 +1116,24 @@ public class MemoryModelParser extends Parser {
 				if (_la == T__19) {
 					{
 						setState(147);
-						((WarnTypeContext) _localctx).silent = match(T__19);
+						_localctx.silent = match(T__19);
 					}
 				}
 
 				setState(150);
-				((WarnTypeContext) _localctx).typeString = _input.LT(1);
+				_localctx.typeString = _input.LT(1);
 				_la = _input.LA(1);
-				if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__20) | (1L << T__21) | (1L << T__22))) != 0))) {
-					((WarnTypeContext) _localctx).typeString = (Token) _errHandler.recoverInline(this);
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__20) | (1L << T__21) | (1L << T__22))) != 0)))) {
+					_localctx.typeString = _errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1121,19 +1155,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterRwStatus(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitRwStatus(this);
+			}
 		}
 	}
 
 	public final RwStatusContext rwStatus() throws RecognitionException {
-		RwStatusContext _localctx = new RwStatusContext(_ctx, getState());
+		final RwStatusContext _localctx = new RwStatusContext(_ctx, getState());
 		enterRule(_localctx, 22, RULE_rwStatus);
 		int _la;
 		try {
@@ -1141,16 +1177,17 @@ public class MemoryModelParser extends Parser {
 			{
 				setState(152);
 				_la = _input.LA(1);
-				if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__23) | (1L << T__24) | (1L << T__25))) != 0))) {
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__23) | (1L << T__24) | (1L << T__25))) != 0)))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1176,19 +1213,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterWidth(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitWidth(this);
+			}
 		}
 	}
 
 	public final WidthContext width() throws RecognitionException {
-		WidthContext _localctx = new WidthContext(_ctx, getState());
+		final WidthContext _localctx = new WidthContext(_ctx, getState());
 		enterRule(_localctx, 24, RULE_width);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -1196,7 +1235,7 @@ public class MemoryModelParser extends Parser {
 				setState(154);
 				match(NUMBER);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1218,19 +1257,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterType(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitType(this);
+			}
 		}
 	}
 
 	public final TypeContext type() throws RecognitionException {
-		TypeContext _localctx = new TypeContext(_ctx, getState());
+		final TypeContext _localctx = new TypeContext(_ctx, getState());
 		enterRule(_localctx, 26, RULE_type);
 		int _la;
 		try {
@@ -1238,16 +1279,17 @@ public class MemoryModelParser extends Parser {
 			{
 				setState(156);
 				_la = _input.LA(1);
-				if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__26) | (1L << T__27) | (1L << T__28))) != 0))) {
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__26) | (1L << T__27) | (1L << T__28))) != 0)))) {
 					_errHandler.recoverInline(this);
 				} else {
-					if (_input.LA(1) == Token.EOF)
+					if (_input.LA(1) == Token.EOF) {
 						matchedEOF = true;
+					}
 					_errHandler.reportMatch(this);
 					consume();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1281,19 +1323,21 @@ public class MemoryModelParser extends Parser {
 
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).enterReference(this);
+			}
 		}
 
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if (listener instanceof MemoryModelListener)
+			if (listener instanceof MemoryModelListener) {
 				((MemoryModelListener) listener).exitReference(this);
+			}
 		}
 	}
 
 	public final ReferenceContext reference() throws RecognitionException {
-		ReferenceContext _localctx = new ReferenceContext(_ctx, getState());
+		final ReferenceContext _localctx = new ReferenceContext(_ctx, getState());
 		enterRule(_localctx, 28, RULE_reference);
 		int _la;
 		try {
@@ -1322,7 +1366,7 @@ public class MemoryModelParser extends Parser {
 				setState(167);
 				match(T__10);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);

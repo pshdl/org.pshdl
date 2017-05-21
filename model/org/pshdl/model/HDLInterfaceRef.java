@@ -55,7 +55,6 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -95,45 +94,50 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIfRefName();
 		}
 
 		@Override
 		public HDLInterfaceRef setValue(HDLInterfaceRef obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHIf(value);
 		}
 	};
 	/**
-	 * The accessor for the field ifArray which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field ifArray which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>("ifArray", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLInterfaceRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfArray();
 		}
 
 		@Override
 		public HDLInterfaceRef setValue(HDLInterfaceRef obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setIfArray(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hIf == obj)
+		if (hIf == obj) {
 			return fHIf;
-		if (ifArray.contains(obj))
+		}
+		if (ifArray.contains(obj)) {
 			return fIfArray;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
@@ -141,8 +145,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	@Override
 	public Optional<HDLVariable> resolveVar() {
 		final Optional<HDLVariable> resolveHIf = resolveHIf();
-		if (!resolveHIf.isPresent())
+		if (!resolveHIf.isPresent()) {
 			return Optional.absent();
+		}
 		final Optional<? extends HDLType> type = TypeExtension.typeOf(resolveHIf.get());
 		if (type.isPresent() && (type.get() instanceof HDLInterface)) {
 			final HDLInterface hIf = (HDLInterface) type.get();
@@ -150,8 +155,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 			for (final HDLVariableDeclaration vd : hIf.getPorts()) {
 				for (final HDLVariable hv : vd.getVariables()) {
 					final String lastSegment = hv.getName();
-					if (lastSegment.equals(lastSegment2))
+					if (lastSegment.equals(lastSegment2)) {
 						return Optional.of(hv);
+					}
 				}
 			}
 		}

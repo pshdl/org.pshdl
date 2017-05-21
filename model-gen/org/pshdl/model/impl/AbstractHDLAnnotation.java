@@ -85,8 +85,9 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	}
 
 	protected String validateName(String name) {
-		if (name == null)
+		if (name == null) {
 			throw new IllegalArgumentException("The field name can not be null!");
+		}
 		return name;
 	}
 
@@ -149,10 +150,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLAnnotation} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLAnnotation} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -164,10 +163,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLAnnotation} with the updated name
-	 *         field.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLAnnotation} with the updated name field.
 	 */
 	@Nonnull
 	public HDLAnnotation setName(@Nonnull String name) {
@@ -181,8 +178,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 *
 	 * @param value
 	 *            sets the new value of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLAnnotation} with the updated value
-	 *         field.
+	 * @return a new instance of {@link HDLAnnotation} with the updated value field.
 	 */
 	@Nonnull
 	public HDLAnnotation setValue(@Nullable String value) {
@@ -193,25 +189,33 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLAnnotation))
+		}
+		if (!(obj instanceof AbstractHDLAnnotation)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLAnnotation other = (AbstractHDLAnnotation) obj;
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (value == null) {
-			if (other.value != null)
+			if (other.value != null) {
 				return false;
-		} else if (!value.equals(other.value))
+			}
+		} else if (!value.equals(other.value)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -219,8 +223,9 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());

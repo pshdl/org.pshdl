@@ -54,7 +54,7 @@ public class BusGenSideFiles {
 	public static final String WRAPPER_APPENDIX = "core";
 
 	public static List<AuxiliaryContent> getSideFiles(HDLUnit unit, int regCount, int memCount, HDLGenerationInfo hdgi, boolean axi, boolean withDate) {
-		final List<AuxiliaryContent> res = new LinkedList<AuxiliaryContent>();
+		final List<AuxiliaryContent> res = new LinkedList<>();
 		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		final String ipcorename = unitName + WRAPPER_APPENDIX;
 		final String dirName = ipcorename + "_" + hdgi.version;
@@ -205,8 +205,9 @@ public class BusGenSideFiles {
 			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null) {
 				continue;
 			}
-			if (vhd.getPrimitive() == null)
+			if (vhd.getPrimitive() == null) {
 				throw new IllegalArgumentException("Only primitive types are supported as in/out pins in a bus based unit");
+			}
 			final StringBuilder type = new StringBuilder();
 			switch (vhd.getDirection()) {
 			case IN:
@@ -247,7 +248,7 @@ public class BusGenSideFiles {
 			default:
 				throw new IllegalArgumentException("Direction:" + vhd.getDirection() + " not supported");
 			}
-			for (final HDLVariable var : vhd.getVariables())
+			for (final HDLVariable var : vhd.getVariables()) {
 				if (vhd.getDirection() == HDLDirection.PARAMETER) {
 					final HDLExpression defaultValue = var.getDefaultValue();
 					String init = "";
@@ -258,6 +259,7 @@ public class BusGenSideFiles {
 				} else {
 					ports.append("PORT ").append(var.getName()).append(type).append('\n');
 				}
+			}
 		}
 		for (int i = 0; i < memCount; i++) {
 			generics.append("PARAMETER C_MEM" + i + "_BASEADDR = 0xffffffff, DT = std_logic_vector, PAIR = C_MEM" + i + "_HIGHADDR, ADDRESS = BASE, BUS = SPLB");

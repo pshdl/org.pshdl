@@ -48,7 +48,6 @@ public class HDLBlock extends AbstractHDLBlock {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param process
@@ -80,45 +79,50 @@ public class HDLBlock extends AbstractHDLBlock {
 	public static HDLFieldAccess<HDLBlock, Boolean> fProcess = new HDLFieldAccess<HDLBlock, Boolean>("process", Boolean.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLBlock obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getProcess();
 		}
 
 		@Override
 		public HDLBlock setValue(HDLBlock obj, Boolean value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setProcess(value);
 		}
 	};
 	/**
-	 * The accessor for the field statements which is of type
-	 * ArrayList&lt;HDLStatement&gt;.
+	 * The accessor for the field statements which is of type ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>>("statements", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLBlock obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getStatements();
 		}
 
 		@Override
 		public HDLBlock setValue(HDLBlock obj, ArrayList<HDLStatement> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setStatements(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (process == obj)
+		if (process == obj) {
 			return fProcess;
-		if (statements.contains(obj))
+		}
+		if (statements.contains(obj)) {
 			return fStatements;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

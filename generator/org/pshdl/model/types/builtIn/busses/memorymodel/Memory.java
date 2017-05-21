@@ -32,7 +32,7 @@ import java.util.List;
 import org.antlr.v4.runtime.Token;
 
 public class Memory implements NamedElement {
-	private List<Object> references = new LinkedList<Object>();
+	private final List<Object> references = new LinkedList<>();
 
 	public Memory() {
 	}

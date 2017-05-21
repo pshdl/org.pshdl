@@ -56,8 +56,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * @param left
 	 *            the value for left. Can <b>not</b> be <code>null</code>.
 	 * @param type
-	 *            the value for type. If <code>null</code>,
-	 *            {@link HDLAssignmentType#ASSGN} is used as default.
+	 *            the value for type. If <code>null</code>, {@link HDLAssignmentType#ASSGN} is used as default.
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 * @param validate
@@ -108,16 +107,16 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	}
 
 	protected HDLReference validateLeft(HDLReference left) {
-		if (left == null)
+		if (left == null) {
 			throw new IllegalArgumentException("The field left can not be null!");
+		}
 		return left;
 	}
 
 	protected final HDLAssignmentType type;
 
 	/**
-	 * Get the type field. If <code>null</code>, {@link HDLAssignmentType#ASSGN}
-	 * is used as default.
+	 * Get the type field. If <code>null</code>, {@link HDLAssignmentType#ASSGN} is used as default.
 	 *
 	 * @return the field
 	 */
@@ -143,8 +142,9 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	}
 
 	protected HDLExpression validateRight(HDLExpression right) {
-		if (right == null)
+		if (right == null) {
 			throw new IllegalArgumentException("The field right can not be null!");
+		}
 		return right;
 	}
 
@@ -192,10 +192,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLAssignment} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLAssignment} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -207,10 +205,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * Setter for the field {@link #getLeft()}.
 	 *
 	 * @param left
-	 *            sets the new left of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLAssignment} with the updated left
-	 *         field.
+	 *            sets the new left of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLAssignment} with the updated left field.
 	 */
 	@Nonnull
 	public HDLAssignment setLeft(@Nonnull HDLReference left) {
@@ -223,10 +219,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * Setter for the field {@link #getType()}.
 	 *
 	 * @param type
-	 *            sets the new type of this object. If <code>null</code>,
-	 *            {@link HDLAssignmentType#ASSGN} is used as default.
-	 * @return a new instance of {@link HDLAssignment} with the updated type
-	 *         field.
+	 *            sets the new type of this object. If <code>null</code>, {@link HDLAssignmentType#ASSGN} is used as default.
+	 * @return a new instance of {@link HDLAssignment} with the updated type field.
 	 */
 	@Nonnull
 	public HDLAssignment setType(@Nullable HDLAssignmentType type) {
@@ -239,10 +233,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * Setter for the field {@link #getRight()}.
 	 *
 	 * @param right
-	 *            sets the new right of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLAssignment} with the updated right
-	 *         field.
+	 *            sets the new right of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLAssignment} with the updated right field.
 	 */
 	@Nonnull
 	public HDLAssignment setRight(@Nonnull HDLExpression right) {
@@ -253,30 +245,40 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLAssignment))
+		}
+		if (!(obj instanceof AbstractHDLAssignment)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLAssignment other = (AbstractHDLAssignment) obj;
 		if (left == null) {
-			if (other.left != null)
+			if (other.left != null) {
 				return false;
-		} else if (!left.equals(other.left))
+			}
+		} else if (!left.equals(other.left)) {
 			return false;
+		}
 		if (type == null) {
-			if (other.type != null)
+			if (other.type != null) {
 				return false;
-		} else if (!type.equals(other.type))
+			}
+		} else if (!type.equals(other.type)) {
 			return false;
+		}
 		if (right == null) {
-			if (other.right != null)
+			if (other.right != null) {
 				return false;
-		} else if (!right.equals(other.right))
+			}
+		} else if (!right.equals(other.right)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -284,8 +286,9 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((left == null) ? 0 : left.hashCode());

@@ -30,8 +30,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.pshdl.model.impl.AbstractHDLManip;
-import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.MetaAccess;
 
 /**
  * The class HDLManip contains the following fields
@@ -48,7 +48,6 @@ public class HDLManip extends AbstractHDLManip {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param type
@@ -86,15 +85,17 @@ public class HDLManip extends AbstractHDLManip {
 	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>("type", HDLManipType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLManipType getValue(HDLManip obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLManip setValue(HDLManip obj, HDLManipType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
@@ -104,15 +105,17 @@ public class HDLManip extends AbstractHDLManip {
 	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>("target", HDLExpression.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLManip obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getTarget();
 		}
 
 		@Override
 		public HDLManip setValue(HDLManip obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setTarget(value);
 		}
 	};
@@ -122,27 +125,32 @@ public class HDLManip extends AbstractHDLManip {
 	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>("castTo", HDLType.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLType getValue(HDLManip obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getCastTo();
 		}
 
 		@Override
 		public HDLManip setValue(HDLManip obj, HDLType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setCastTo(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (type == obj)
+		if (type == obj) {
 			return fType;
-		if (target == obj)
+		}
+		if (target == obj) {
 			return fTarget;
-		if (castTo == obj)
+		}
+		if (castTo == obj) {
 			return fCastTo;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

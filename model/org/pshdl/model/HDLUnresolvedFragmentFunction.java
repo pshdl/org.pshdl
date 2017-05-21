@@ -52,14 +52,12 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param frag
 	 *            the value for frag. Can <b>not</b> be <code>null</code>.
 	 * @param isStatement
-	 *            the value for isStatement. Can <b>not</b> be <code>null</code>
-	 *            .
+	 *            the value for isStatement. Can <b>not</b> be <code>null</code> .
 	 * @param array
 	 *            the value for array. Can be <code>null</code>.
 	 * @param bits
@@ -89,30 +87,32 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 	}
 
 	/**
-	 * The accessor for the field params which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field params which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragmentFunction, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLUnresolvedFragmentFunction, ArrayList<HDLExpression>>(
 			"params", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLUnresolvedFragmentFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getParams();
 		}
 
 		@Override
 		public HDLUnresolvedFragmentFunction setValue(HDLUnresolvedFragmentFunction obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setParams(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (params.contains(obj))
+		if (params.contains(obj)) {
 			return fParams;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

@@ -167,8 +167,9 @@ public abstract class AbstractHDLRange extends HDLObject {
 	}
 
 	protected HDLExpression validateTo(HDLExpression to) {
-		if (to == null)
+		if (to == null) {
 			throw new IllegalArgumentException("The field to can not be null!");
+		}
 		return to;
 	}
 
@@ -217,10 +218,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLRange} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLRange} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -274,8 +273,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * Setter for the field {@link #getTo()}.
 	 *
 	 * @param to
-	 *            sets the new to of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new to of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLRange} with the updated to field.
 	 */
 	@Nonnull
@@ -287,35 +285,47 @@ public abstract class AbstractHDLRange extends HDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLRange))
+		}
+		if (!(obj instanceof AbstractHDLRange)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLRange other = (AbstractHDLRange) obj;
 		if (from == null) {
-			if (other.from != null)
+			if (other.from != null) {
 				return false;
-		} else if (!from.equals(other.from))
+			}
+		} else if (!from.equals(other.from)) {
 			return false;
+		}
 		if (inc == null) {
-			if (other.inc != null)
+			if (other.inc != null) {
 				return false;
-		} else if (!inc.equals(other.inc))
+			}
+		} else if (!inc.equals(other.inc)) {
 			return false;
+		}
 		if (dec == null) {
-			if (other.dec != null)
+			if (other.dec != null) {
 				return false;
-		} else if (!dec.equals(other.dec))
+			}
+		} else if (!dec.equals(other.dec)) {
 			return false;
+		}
 		if (to == null) {
-			if (other.to != null)
+			if (other.to != null) {
 				return false;
-		} else if (!to.equals(other.to))
+			}
+		} else if (!to.equals(other.to)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -323,8 +333,9 @@ public abstract class AbstractHDLRange extends HDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((from == null) ? 0 : from.hashCode());

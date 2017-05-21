@@ -31,12 +31,10 @@ import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.MetaAccess;
 
 /**
- * This {@link MetaAccess} is used to annotate an {@link IHDLObject} with
- * information on why an evaluation failed. Use
+ * This {@link MetaAccess} is used to annotate an {@link IHDLObject} with information on why an evaluation failed. Use
  * {@link ProblemDescription#DESCRIPTION} to access the value.
  *
  * @author Karsten Becker
- *
  */
 public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 
@@ -54,11 +52,10 @@ public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 	NON_PRIMITVE_TYPE_NOT_EVALUATED, CAN_NOT_USE_PARAMETER, FAILED_TO_RESOLVE_ENUM;
 
 	/**
-	 * This annotation can be used to find out what caused the evaluation to
-	 * fail. When this marker can be found, also check
+	 * This annotation can be used to find out what caused the evaluation to fail. When this marker can be found, also check
 	 * {@link ProblemDescription#DESCRIPTION}
 	 */
-	public static final GenericMeta<IHDLObject> SOURCE = new GenericMeta<IHDLObject>("SOURCE", true);
+	public static final GenericMeta<IHDLObject> SOURCE = new GenericMeta<>("SOURCE", true);
 
 	@Override
 	public boolean inherit() {

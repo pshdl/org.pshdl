@@ -78,14 +78,16 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 
 	public HDLVariable resolveVarForced(String stage) {
 		final Optional<HDLVariable> opt = resolveVar();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + var, stage);
 	}
 
 	public Optional<HDLVariable> resolveVar() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveVariable(this, var);
 	}
 
@@ -94,8 +96,9 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 	}
 
 	protected HDLQualifiedName validateVar(HDLQualifiedName var) {
-		if (var == null)
+		if (var == null) {
 			throw new IllegalArgumentException("The field var can not be null!");
+		}
 		return var;
 	}
 
@@ -131,20 +134,26 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLResolvedRef))
+		}
+		if (!(obj instanceof AbstractHDLResolvedRef)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLResolvedRef other = (AbstractHDLResolvedRef) obj;
 		if (var == null) {
-			if (other.var != null)
+			if (other.var != null) {
 				return false;
-		} else if (!var.equals(other.var))
+			}
+		} else if (!var.equals(other.var)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -152,8 +161,9 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((var == null) ? 0 : var.hashCode());
@@ -176,9 +186,11 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateVar(getVarRefName());
-		if (checkResolve && (getVarRefName() != null))
-			if (!resolveVar().isPresent())
+		if (checkResolve && (getVarRefName() != null)) {
+			if (!resolveVar().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
+			}
+		}
 	}
 
 	@Override

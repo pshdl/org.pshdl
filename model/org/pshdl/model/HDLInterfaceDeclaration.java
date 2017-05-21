@@ -36,8 +36,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLInterfaceDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -47,7 +46,6 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -80,23 +78,26 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLInterface getValue(HDLInterfaceDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIf();
 		}
 
 		@Override
 		public HDLInterfaceDeclaration setValue(HDLInterfaceDeclaration obj, HDLInterface value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHIf(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hIf == obj)
+		if (hIf == obj) {
 			return fHIf;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

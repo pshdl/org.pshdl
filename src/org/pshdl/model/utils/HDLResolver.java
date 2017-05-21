@@ -95,7 +95,7 @@ public class HDLResolver {
 	}
 
 	protected List<HDLType> doGetTypeDeclarations() {
-		final List<HDLType> types = new LinkedList<HDLType>();
+		final List<HDLType> types = new LinkedList<>();
 		for (final HDLEnumDeclaration hEnumDecl : ScopingExtension.INST.doGetEnumDeclarations(resolveTo)) {
 			types.add(hEnumDecl.getHEnum());
 		}
@@ -127,10 +127,12 @@ public class HDLResolver {
 		// XXX Check if the qualifier does either match the pkg name, or is not
 		// existant
 		final HDLEnum checkCache = checkCache(hEnum, enumCache);
-		if (checkCache != null)
+		if (checkCache != null) {
 			return Optional.of(checkCache);
-		if ((resolveContainer == null) || !descent)
+		}
+		if ((resolveContainer == null) || !descent) {
 			return Optional.absent();
+		}
 		return ScopingExtension.INST.resolveEnum(resolveContainer, hEnum);
 	}
 
@@ -147,10 +149,12 @@ public class HDLResolver {
 		// XXX Check if the qualifier does either match the pkg name, or is not
 		// existant
 		final Iterable<HDLFunction> checkCache = checkCache(funcName, funcCache);
-		if ((checkCache != null) && checkCache.iterator().hasNext())
+		if ((checkCache != null) && checkCache.iterator().hasNext()) {
 			return Optional.of(checkCache);
-		if ((resolveContainer == null) || !descent)
+		}
+		if ((resolveContainer == null) || !descent) {
 			return Optional.absent();
+		}
 		return ScopingExtension.INST.resolveFunctionCall(resolveContainer, call, funcName);
 	}
 
@@ -172,10 +176,12 @@ public class HDLResolver {
 		// XXX Check if the qualifier does either match the pkg name, or is not
 		// existant
 		final HDLInterface checkCache = checkCache(hIf, ifCache);
-		if (checkCache != null)
+		if (checkCache != null) {
 			return Optional.of(checkCache);
-		if ((resolveContainer == null) || !descent)
+		}
+		if ((resolveContainer == null) || !descent) {
 			return Optional.absent();
+		}
 		return ScopingExtension.INST.resolveInterface(resolveContainer, hIf);
 	}
 
@@ -192,8 +198,9 @@ public class HDLResolver {
 			}
 		}
 		final HDLType checkCache = checkCache(var, typeCache);
-		if (checkCache != null)
+		if (checkCache != null) {
 			return Optional.of(checkCache);
+		}
 		if ((resolveContainer == null) || !descent) {
 			if (resolveTo instanceof HDLUnit) {
 				final HDLUnit unit = (HDLUnit) resolveTo;
@@ -223,51 +230,61 @@ public class HDLResolver {
 			}
 		}
 		final HDLVariable checkCache = checkCache(var, variableCache);
-		if (checkCache != null)
+		if (checkCache != null) {
 			return Optional.of(checkCache);
+		}
 		if (var.length > 1) {
 			// Using lastSgement if $for0.I or ThisObject.I
 			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(resolveName.getTypePart())) {
 				final String string = var.getLastSegment();
-				for (final Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet())
-					if (entry.getKey().getLastSegment().equals(string))
+				for (final Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {
+					if (entry.getKey().getLastSegment().equals(string)) {
 						return Optional.of(entry.getValue());
+					}
+				}
 			}
 		}
-		if (HDLRegisterConfig.DEF_CLK.equals(var.getLastSegment()))
+		if (HDLRegisterConfig.DEF_CLK.equals(var.getLastSegment())) {
 			return Optional.of(HDLRegisterConfig.defaultClk(true));
-		if (HDLRegisterConfig.DEF_RST.equals(var.getLastSegment()))
+		}
+		if (HDLRegisterConfig.DEF_RST.equals(var.getLastSegment())) {
 			return Optional.of(HDLRegisterConfig.defaultRst(true));
+		}
 		final IHDLObject container = resolveContainer;
-		if ((container == null) || !descent)
+		if ((container == null) || !descent) {
 			return Optional.absent();
+		}
 		return ScopingExtension.INST.resolveVariable(container, var);
 	}
 
 	private <T> Iterable<T> checkCache(HDLQualifiedName var, Multimap<HDLQualifiedName, T> map) {
-		if (map.get(var) != null)
+		if (map.get(var) != null) {
 			return map.get(var);
+		}
 		if (var.length == 1) {
 			final HDLQualifiedName fqn = resolveName.append(var);
-			if (map.get(fqn) != null)
+			if (map.get(fqn) != null) {
 				return map.get(fqn);
+			}
 		}
 		return null;
 	}
 
 	private <T> T checkCache(HDLQualifiedName var, Map<HDLQualifiedName, T> map) {
-		if (map.get(var) != null)
+		if (map.get(var) != null) {
 			return map.get(var);
+		}
 		if (var.length == 1) {
 			final HDLQualifiedName fqn = resolveName.append(var);
-			if (map.get(fqn) != null)
+			if (map.get(fqn) != null) {
 				return map.get(fqn);
+			}
 		}
 		return null;
 	}
 
 	public static List<HDLEnumDeclaration> getallEnumDeclarations(List<HDLStatement> stmnts) {
-		final List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
+		final List<HDLEnumDeclaration> res = new LinkedList<>();
 		for (final HDLStatement hdlStatement : stmnts) {
 			res.addAll(ScopingExtension.INST.doGetEnumDeclarations(hdlStatement));
 		}
@@ -275,7 +292,7 @@ public class HDLResolver {
 	}
 
 	public static List<HDLInterface> getallInterfaceDeclarations(List<HDLStatement> stmnts) {
-		final List<HDLInterface> res = new LinkedList<HDLInterface>();
+		final List<HDLInterface> res = new LinkedList<>();
 		for (final HDLStatement hdlStatement : stmnts) {
 			res.addAll(ScopingExtension.INST.doGetInterfaceDeclarations(hdlStatement));
 		}
@@ -283,7 +300,7 @@ public class HDLResolver {
 	}
 
 	public static List<HDLVariable> getallVariableDeclarations(List<HDLStatement> stmnts) {
-		final List<HDLVariable> res = new LinkedList<HDLVariable>();
+		final List<HDLVariable> res = new LinkedList<>();
 		for (final HDLStatement hdlStatement : stmnts) {
 			res.addAll(ScopingExtension.INST.doGetVariables(hdlStatement));
 		}

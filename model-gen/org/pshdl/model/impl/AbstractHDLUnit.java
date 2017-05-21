@@ -88,7 +88,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		if (validate) {
 			annotations = validateAnnotations(annotations);
 		}
-		this.annotations = new ArrayList<HDLAnnotation>();
+		this.annotations = new ArrayList<>();
 		if (annotations != null) {
 			for (final HDLAnnotation newValue : annotations) {
 				this.annotations.add(newValue);
@@ -105,7 +105,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		if (validate) {
 			imports = validateImports(imports);
 		}
-		this.imports = new ArrayList<String>();
+		this.imports = new ArrayList<>();
 		if (imports != null) {
 			for (final String newValue : imports) {
 				this.imports.add(newValue);
@@ -114,7 +114,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		if (validate) {
 			inits = validateInits(inits);
 		}
-		this.inits = new ArrayList<HDLStatement>();
+		this.inits = new ArrayList<>();
 		if (inits != null) {
 			for (final HDLStatement newValue : inits) {
 				this.inits.add(newValue);
@@ -123,7 +123,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		if (validate) {
 			statements = validateStatements(statements);
 		}
-		this.statements = new ArrayList<HDLStatement>();
+		this.statements = new ArrayList<>();
 		if (statements != null) {
 			for (final HDLStatement newValue : statements) {
 				this.statements.add(newValue);
@@ -136,7 +136,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		if (validate) {
 			extend = validateExtend(extend);
 		}
-		this.extend = new ArrayList<HDLQualifiedName>();
+		this.extend = new ArrayList<>();
 		if (extend != null) {
 			for (final HDLQualifiedName newValue : extend) {
 				this.extend.add(newValue);
@@ -146,14 +146,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	public AbstractHDLUnit() {
 		super();
-		this.annotations = new ArrayList<HDLAnnotation>();
+		this.annotations = new ArrayList<>();
 		this.libURI = null;
 		this.name = null;
-		this.imports = new ArrayList<String>();
-		this.inits = new ArrayList<HDLStatement>();
-		this.statements = new ArrayList<HDLStatement>();
+		this.imports = new ArrayList<>();
+		this.inits = new ArrayList<>();
+		this.statements = new ArrayList<>();
 		this.simulation = null;
-		this.extend = new ArrayList<HDLQualifiedName>();
+		this.extend = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLAnnotation> annotations;
@@ -169,8 +169,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
-		if (annotations == null)
-			return new ArrayList<HDLAnnotation>();
+		if (annotations == null) {
+			return new ArrayList<>();
+		}
 		return annotations;
 	}
 
@@ -187,8 +188,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected String validateLibURI(String libURI) {
-		if (libURI == null)
+		if (libURI == null) {
 			throw new IllegalArgumentException("The field libURI can not be null!");
+		}
 		return libURI;
 	}
 
@@ -205,8 +207,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected String validateName(String name) {
-		if (name == null)
+		if (name == null) {
 			throw new IllegalArgumentException("The field name can not be null!");
+		}
 		return name;
 	}
 
@@ -223,8 +226,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected Iterable<String> validateImports(Iterable<String> imports) {
-		if (imports == null)
-			return new ArrayList<String>();
+		if (imports == null) {
+			return new ArrayList<>();
+		}
 		return imports;
 	}
 
@@ -241,8 +245,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected Iterable<HDLStatement> validateInits(Iterable<HDLStatement> inits) {
-		if (inits == null)
-			return new ArrayList<HDLStatement>();
+		if (inits == null) {
+			return new ArrayList<>();
+		}
 		return inits;
 	}
 
@@ -259,8 +264,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected Iterable<HDLStatement> validateStatements(Iterable<HDLStatement> statements) {
-		if (statements == null)
-			return new ArrayList<HDLStatement>();
+		if (statements == null) {
+			return new ArrayList<>();
+		}
 		return statements;
 	}
 
@@ -277,8 +283,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected Boolean validateSimulation(Boolean simulation) {
-		if (simulation == null)
+		if (simulation == null) {
 			throw new IllegalArgumentException("The field simulation can not be null!");
+		}
 		return simulation;
 	}
 
@@ -286,14 +293,16 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	public HDLInterface resolveExtendForced(int index, String stage) {
 		final Optional<HDLInterface> opt = resolveExtend(index);
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + extend.get(index), stage);
 	}
 
 	public Optional<HDLInterface> resolveExtend(int index) {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveInterface(this, extend.get(index));
 	}
 
@@ -302,8 +311,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	protected Iterable<HDLQualifiedName> validateExtend(Iterable<HDLQualifiedName> extend) {
-		if (extend == null)
-			return new ArrayList<HDLQualifiedName>();
+		if (extend == null) {
+			return new ArrayList<>();
+		}
 		return extend;
 	}
 
@@ -357,10 +367,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLUnit} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLUnit} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -372,10 +380,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnit} with the updated annotations
-	 *         field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLUnit} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLUnit setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
@@ -388,15 +394,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLUnit} with the updated annotations
-	 *         field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLUnit} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLUnit addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -407,15 +412,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLUnit} with the updated annotations
-	 *         field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLUnit} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLUnit removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -426,10 +430,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLUnit} with the updated annotations
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLUnit} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLUnit removeAnnotations(int idx) {
@@ -443,8 +445,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getLibURI()}.
 	 *
 	 * @param libURI
-	 *            sets the new libURI of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new libURI of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLUnit} with the updated libURI field.
 	 */
 	@Nonnull
@@ -458,8 +459,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLUnit} with the updated name field.
 	 */
 	@Nonnull
@@ -487,14 +487,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Adds a new value to the field {@link #getImports()}.
 	 *
 	 * @param newImports
-	 *            the value that should be added to the field
-	 *            {@link #getImports()}
+	 *            the value that should be added to the field {@link #getImports()}
 	 * @return a new instance of {@link HDLUnit} with the updated imports field.
 	 */
 	@Nonnull
 	public HDLUnit addImports(@Nullable String newImports) {
-		if (newImports == null)
+		if (newImports == null) {
 			throw new IllegalArgumentException("Element of imports can not be null!");
+		}
 		final ArrayList<String> imports = (ArrayList<String>) this.imports.clone();
 		imports.add(newImports);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -505,14 +505,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getImports()}.
 	 *
 	 * @param newImports
-	 *            the value that should be removed from the field
-	 *            {@link #getImports()}
+	 *            the value that should be removed from the field {@link #getImports()}
 	 * @return a new instance of {@link HDLUnit} with the updated imports field.
 	 */
 	@Nonnull
 	public HDLUnit removeImports(@Nullable String newImports) {
-		if (newImports == null)
+		if (newImports == null) {
 			throw new IllegalArgumentException("Removed element of imports can not be null!");
+		}
 		final ArrayList<String> imports = (ArrayList<String>) this.imports.clone();
 		imports.remove(newImports);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -523,8 +523,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getImports()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getImports()}
+	 *            the index of the value that should be removed from the field {@link #getImports()}
 	 * @return a new instance of {@link HDLUnit} with the updated imports field.
 	 */
 	@Nonnull
@@ -553,14 +552,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Adds a new value to the field {@link #getInits()}.
 	 *
 	 * @param newInits
-	 *            the value that should be added to the field
-	 *            {@link #getInits()}
+	 *            the value that should be added to the field {@link #getInits()}
 	 * @return a new instance of {@link HDLUnit} with the updated inits field.
 	 */
 	@Nonnull
 	public HDLUnit addInits(@Nullable HDLStatement newInits) {
-		if (newInits == null)
+		if (newInits == null) {
 			throw new IllegalArgumentException("Element of inits can not be null!");
+		}
 		final ArrayList<HDLStatement> inits = (ArrayList<HDLStatement>) this.inits.clone();
 		inits.add(newInits);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -571,14 +570,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getInits()}.
 	 *
 	 * @param newInits
-	 *            the value that should be removed from the field
-	 *            {@link #getInits()}
+	 *            the value that should be removed from the field {@link #getInits()}
 	 * @return a new instance of {@link HDLUnit} with the updated inits field.
 	 */
 	@Nonnull
 	public HDLUnit removeInits(@Nullable HDLStatement newInits) {
-		if (newInits == null)
+		if (newInits == null) {
 			throw new IllegalArgumentException("Removed element of inits can not be null!");
+		}
 		final ArrayList<HDLStatement> inits = (ArrayList<HDLStatement>) this.inits.clone();
 		inits.remove(newInits);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -589,8 +588,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getInits()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getInits()}
+	 *            the index of the value that should be removed from the field {@link #getInits()}
 	 * @return a new instance of {@link HDLUnit} with the updated inits field.
 	 */
 	@Nonnull
@@ -605,10 +603,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getStatements()}.
 	 *
 	 * @param statements
-	 *            sets the new statements of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnit} with the updated statements
-	 *         field.
+	 *            sets the new statements of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLUnit} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLUnit setStatements(@Nullable Iterable<HDLStatement> statements) {
@@ -621,15 +617,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Adds a new value to the field {@link #getStatements()}.
 	 *
 	 * @param newStatements
-	 *            the value that should be added to the field
-	 *            {@link #getStatements()}
-	 * @return a new instance of {@link HDLUnit} with the updated statements
-	 *         field.
+	 *            the value that should be added to the field {@link #getStatements()}
+	 * @return a new instance of {@link HDLUnit} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLUnit addStatements(@Nullable HDLStatement newStatements) {
-		if (newStatements == null)
+		if (newStatements == null) {
 			throw new IllegalArgumentException("Element of statements can not be null!");
+		}
 		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.add(newStatements);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -640,15 +635,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getStatements()}.
 	 *
 	 * @param newStatements
-	 *            the value that should be removed from the field
-	 *            {@link #getStatements()}
-	 * @return a new instance of {@link HDLUnit} with the updated statements
-	 *         field.
+	 *            the value that should be removed from the field {@link #getStatements()}
+	 * @return a new instance of {@link HDLUnit} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLUnit removeStatements(@Nullable HDLStatement newStatements) {
-		if (newStatements == null)
+		if (newStatements == null) {
 			throw new IllegalArgumentException("Removed element of statements can not be null!");
+		}
 		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.remove(newStatements);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -659,10 +653,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getStatements()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getStatements()}
-	 * @return a new instance of {@link HDLUnit} with the updated statements
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getStatements()}
+	 * @return a new instance of {@link HDLUnit} with the updated statements field.
 	 */
 	@Nonnull
 	public HDLUnit removeStatements(int idx) {
@@ -676,10 +668,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getSimulation()}.
 	 *
 	 * @param simulation
-	 *            sets the new simulation of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnit} with the updated simulation
-	 *         field.
+	 *            sets the new simulation of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLUnit} with the updated simulation field.
 	 */
 	@Nonnull
 	public HDLUnit setSimulation(@Nonnull Boolean simulation) {
@@ -692,10 +682,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Setter for the field {@link #getSimulation()}.
 	 *
 	 * @param simulation
-	 *            sets the new simulation of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnit} with the updated simulation
-	 *         field.
+	 *            sets the new simulation of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLUnit} with the updated simulation field.
 	 */
 	@Nonnull
 	public HDLUnit setSimulation(boolean simulation) {
@@ -722,14 +710,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Adds a new value to the field {@link #getExtendRefName()}.
 	 *
 	 * @param newExtend
-	 *            the value that should be added to the field
-	 *            {@link #getExtendRefName()}
+	 *            the value that should be added to the field {@link #getExtendRefName()}
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
 	 */
 	@Nonnull
 	public HDLUnit addExtend(@Nullable HDLQualifiedName newExtend) {
-		if (newExtend == null)
+		if (newExtend == null) {
 			throw new IllegalArgumentException("Element of extend can not be null!");
+		}
 		final ArrayList<HDLQualifiedName> extend = (ArrayList<HDLQualifiedName>) this.extend.clone();
 		extend.add(newExtend);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -740,14 +728,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getExtendRefName()}.
 	 *
 	 * @param newExtend
-	 *            the value that should be removed from the field
-	 *            {@link #getExtendRefName()}
+	 *            the value that should be removed from the field {@link #getExtendRefName()}
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
 	 */
 	@Nonnull
 	public HDLUnit removeExtend(@Nullable HDLQualifiedName newExtend) {
-		if (newExtend == null)
+		if (newExtend == null) {
 			throw new IllegalArgumentException("Removed element of extend can not be null!");
+		}
 		final ArrayList<HDLQualifiedName> extend = (ArrayList<HDLQualifiedName>) this.extend.clone();
 		extend.remove(newExtend);
 		final HDLUnit res = new HDLUnit(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, false);
@@ -758,8 +746,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * Removes a value from the field {@link #getExtendRefName()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getExtendRefName()}
+	 *            the index of the value that should be removed from the field {@link #getExtendRefName()}
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
 	 */
 	@Nonnull
@@ -772,50 +759,68 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLUnit))
+		}
+		if (!(obj instanceof AbstractHDLUnit)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLUnit other = (AbstractHDLUnit) obj;
 		if (annotations == null) {
-			if (other.annotations != null)
+			if (other.annotations != null) {
 				return false;
-		} else if (!annotations.equals(other.annotations))
+			}
+		} else if (!annotations.equals(other.annotations)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (imports == null) {
-			if (other.imports != null)
+			if (other.imports != null) {
 				return false;
-		} else if (!imports.equals(other.imports))
+			}
+		} else if (!imports.equals(other.imports)) {
 			return false;
+		}
 		if (inits == null) {
-			if (other.inits != null)
+			if (other.inits != null) {
 				return false;
-		} else if (!inits.equals(other.inits))
+			}
+		} else if (!inits.equals(other.inits)) {
 			return false;
+		}
 		if (statements == null) {
-			if (other.statements != null)
+			if (other.statements != null) {
 				return false;
-		} else if (!statements.equals(other.statements))
+			}
+		} else if (!statements.equals(other.statements)) {
 			return false;
+		}
 		if (simulation == null) {
-			if (other.simulation != null)
+			if (other.simulation != null) {
 				return false;
-		} else if (!simulation.equals(other.simulation))
+			}
+		} else if (!simulation.equals(other.simulation)) {
 			return false;
+		}
 		if (extend == null) {
-			if (other.extend != null)
+			if (other.extend != null) {
 				return false;
-		} else if (!extend.equals(other.extend))
+			}
+		} else if (!extend.equals(other.extend)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -823,8 +828,9 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());
@@ -922,9 +928,11 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		validateSimulation(getSimulation());
 		validateExtend(getExtendRefName());
 		if (checkResolve && (getExtendRefName() != null)) {
-			for (int i = 0; i < getExtendRefName().size(); i++)
-				if (!resolveExtend(i).isPresent())
+			for (int i = 0; i < getExtendRefName().size(); i++) {
+				if (!resolveExtend(i).isPresent()) {
 					throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getExtendRefName().get(i)));
+				}
+			}
 		}
 	}
 

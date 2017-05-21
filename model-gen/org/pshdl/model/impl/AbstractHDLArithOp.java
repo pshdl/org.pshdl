@@ -87,8 +87,9 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	}
 
 	protected HDLArithOpType validateType(HDLArithOpType type) {
-		if (type == null)
+		if (type == null) {
 			throw new IllegalArgumentException("The field type can not be null!");
+		}
 		return type;
 	}
 
@@ -136,10 +137,8 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLArithOp} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLArithOp} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -151,8 +150,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * Setter for the field {@link #getLeft()}.
 	 *
 	 * @param left
-	 *            sets the new left of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new left of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLArithOp} with the updated left field.
 	 */
 	@Override
@@ -167,10 +165,8 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * Setter for the field {@link #getRight()}.
 	 *
 	 * @param right
-	 *            sets the new right of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLArithOp} with the updated right
-	 *         field.
+	 *            sets the new right of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLArithOp} with the updated right field.
 	 */
 	@Override
 	@Nonnull
@@ -184,8 +180,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * Setter for the field {@link #getType()}.
 	 *
 	 * @param type
-	 *            sets the new type of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new type of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLArithOp} with the updated type field.
 	 */
 	@Nonnull
@@ -197,20 +192,26 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLArithOp))
+		}
+		if (!(obj instanceof AbstractHDLArithOp)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLArithOp other = (AbstractHDLArithOp) obj;
 		if (type == null) {
-			if (other.type != null)
+			if (other.type != null) {
 				return false;
-		} else if (!type.equals(other.type))
+			}
+		} else if (!type.equals(other.type)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -218,8 +219,9 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((type == null) ? 0 : type.hashCode());

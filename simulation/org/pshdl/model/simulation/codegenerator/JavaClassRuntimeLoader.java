@@ -67,8 +67,9 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		@Override
 		public String getMessage() {
 			for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
-				if (diagnostic.getKind() == Kind.ERROR)
+				if (diagnostic.getKind() == Kind.ERROR) {
 					return diagnostic.getMessage(null);
+				}
 			}
 			return super.getMessage();
 		}
@@ -114,17 +115,13 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoad(String mainClassFQN, CharSequence sourceCode, final boolean disableEdge, final boolean disableOutputLogic)
 			throws Exception {
 		final Class<?> cls = compileClass(mainClassFQN, sourceCode);
-		return new IHDLInterpreterFactory<IHDLInterpreter>() {
-
-			@Override
-			public IHDLInterpreter newInstance() {
-				Constructor<?> constructor;
-				try {
-					constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
-					return (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
-				} catch (final Exception e) {
-					throw new RuntimeException(e);
-				}
+		return () -> {
+			Constructor<?> constructor;
+			try {
+				constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
+				return (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
+			} catch (final Exception e) {
+				throw new RuntimeException(e);
 			}
 		};
 	}
@@ -133,17 +130,20 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		final String pathName = mainClassFQN.replace('.', File.separatorChar) + ".java";
 		final File sourceFile = new File(tempDir, pathName);
 		final File pkgDir = sourceFile.getParentFile();
-		if (pkgDir == null)
+		if (pkgDir == null) {
 			throw new IllegalArgumentException("Failed to get parent of:" + sourceFile);
-		if (!pkgDir.exists() && !pkgDir.mkdirs())
+		}
+		if (!pkgDir.exists() && !pkgDir.mkdirs()) {
 			throw new IllegalArgumentException("Failed to create package directories:" + pkgDir);
+		}
 		Files.write(sourceCode, sourceFile, StandardCharsets.UTF_8);
 
 		final StringWriter error = new StringWriter();
 		final ErrorCheckDiagnostic diagnostic = new ErrorCheckDiagnostic();
 		compiler.getTask(error, fileManager, diagnostic, null, null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile))).call();
-		if (diagnostic.kind == Kind.ERROR)
+		if (diagnostic.kind == Kind.ERROR) {
 			throw new DiagnosticsException(diagnostic.diagnostics);
+		}
 
 		// Load and instantiate compiled class.
 		return Class.forName(mainClassFQN, true, classLoader);
@@ -161,21 +161,17 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoadChangeAdapter(String mainClassFQN, CharSequence sourceCode, final IHDLInterpreter mainInterpreter,
 			final IChangeListener... listeners) throws Exception {
 		final Class<?> adapterClass = compileClass(mainClassFQN, sourceCode);
-		return new IHDLInterpreterFactory<IHDLInterpreter>() {
-
-			@Override
-			public IHDLInterpreter newInstance() {
+		return () -> {
+			try {
+				Constructor<?> constructor = null;
 				try {
-					Constructor<?> constructor = null;
-					try {
-						constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
-					} catch (final Exception e) {
-						constructor = adapterClass.getConstructor(IHDLInterpreter.class, IChangeListener[].class);
-					}
-					return (IHDLInterpreter) constructor.newInstance(mainInterpreter, listeners);
-				} catch (final Exception e) {
-					throw new RuntimeException(e);
+					constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
+				} catch (final Exception e1) {
+					constructor = adapterClass.getConstructor(IHDLInterpreter.class, IChangeListener[].class);
 				}
+				return (IHDLInterpreter) constructor.newInstance(mainInterpreter, listeners);
+			} catch (final Exception e2) {
+				throw new RuntimeException(e2);
 			}
 		};
 	}

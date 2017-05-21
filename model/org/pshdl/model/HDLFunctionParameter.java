@@ -39,13 +39,11 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLFunctionParameter contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>RWType rw. If <code>null</code>, {@link RWType#READ} is used as default.
- * </li>
+ * <li>RWType rw. If <code>null</code>, {@link RWType#READ} is used as default.</li>
  * <li>Type type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName enumSpec. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName ifSpec. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLFunctionParameter&gt; funcSpec. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; funcSpec. Can be <code>null</code>.</li>
  * <li>HDLFunctionParameter funcReturnSpec. Can be <code>null</code>.</li>
  * <li>HDLVariable name. Can be <code>null</code>.</li>
  * <li>HDLExpression width. Can be <code>null</code>.</li>
@@ -59,12 +57,10 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param rw
-	 *            the value for rw. If <code>null</code>, {@link RWType#READ} is
-	 *            used as default.
+	 *            the value for rw. If <code>null</code>, {@link RWType#READ} is used as default.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param enumSpec
@@ -115,8 +111,9 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 		@Nullable
 		public static RWType getOp(String op) {
 			for (final RWType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -140,8 +137,9 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 		@Nullable
 		public static Type getOp(String op) {
 			for (final Type ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -159,15 +157,17 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	public static HDLFieldAccess<HDLFunctionParameter, RWType> fRw = new HDLFieldAccess<HDLFunctionParameter, RWType>("rw", RWType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public RWType getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRw();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, RWType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setRw(value);
 		}
 	};
@@ -177,15 +177,17 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	public static HDLFieldAccess<HDLFunctionParameter, Type> fType = new HDLFieldAccess<HDLFunctionParameter, Type>("type", Type.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Type getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, Type value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
@@ -196,15 +198,17 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getEnumSpecRefName();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setEnumSpec(value);
 		}
 	};
@@ -215,55 +219,59 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfSpecRefName();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setIfSpec(value);
 		}
 	};
 	/**
-	 * The accessor for the field funcSpec which is of type
-	 * ArrayList&lt;HDLFunctionParameter&gt;.
+	 * The accessor for the field funcSpec which is of type ArrayList&lt;HDLFunctionParameter&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLFunctionParameter>> fFuncSpec = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLFunctionParameter>>(
 			"funcSpec", HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLFunctionParameter> getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getFuncSpec();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, ArrayList<HDLFunctionParameter> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setFuncSpec(value);
 		}
 	};
 	/**
-	 * The accessor for the field funcReturnSpec which is of type
-	 * HDLFunctionParameter.
+	 * The accessor for the field funcReturnSpec which is of type HDLFunctionParameter.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter> fFuncReturnSpec = new HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter>("funcReturnSpec",
 			HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLFunctionParameter getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getFuncReturnSpec();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLFunctionParameter value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setFuncReturnSpec(value);
 		}
 	};
@@ -274,15 +282,17 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLVariable getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLVariable value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setName(value);
 		}
 	};
@@ -293,35 +303,38 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getWidth();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setWidth(value);
 		}
 	};
 	/**
-	 * The accessor for the field dim which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field dim which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>>("dim",
 			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDim();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDim(value);
 		}
 	};
@@ -332,49 +345,62 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLFunctionParameter obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getConstant();
 		}
 
 		@Override
 		public HDLFunctionParameter setValue(HDLFunctionParameter obj, Boolean value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setConstant(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (rw == obj)
+		if (rw == obj) {
 			return fRw;
-		if (type == obj)
+		}
+		if (type == obj) {
 			return fType;
-		if (enumSpec == obj)
+		}
+		if (enumSpec == obj) {
 			return fEnumSpec;
-		if (ifSpec == obj)
+		}
+		if (ifSpec == obj) {
 			return fIfSpec;
-		if (funcSpec.contains(obj))
+		}
+		if (funcSpec.contains(obj)) {
 			return fFuncSpec;
-		if (funcReturnSpec == obj)
+		}
+		if (funcReturnSpec == obj) {
 			return fFuncReturnSpec;
-		if (name == obj)
+		}
+		if (name == obj) {
 			return fName;
-		if (width == obj)
+		}
+		if (width == obj) {
 			return fWidth;
-		if (dim.contains(obj))
+		}
+		if (dim.contains(obj)) {
 			return fDim;
-		if (constant == obj)
+		}
+		if (constant == obj) {
 			return fConstant;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
 	@Override
 	public Boolean getConstant() {
-		if (constant == null)
+		if (constant == null) {
 			return false;
+		}
 		return super.getConstant();
 	}
 

@@ -124,8 +124,9 @@ public class Refactoring {
 				value = HDLLiteral.get(constValue.get());
 			}
 			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(ref);
-			if (!typeOf.isPresent())
+			if (!typeOf.isPresent()) {
 				throw new IllegalArgumentException("Should be able to resolve type, but failed for expression:" + ref);
+			}
 			ms.replace(ref, new HDLManip().setType(HDLManipType.CAST).setCastTo(typeOf.get()).setTarget(value));
 		}
 
@@ -175,8 +176,9 @@ public class Refactoring {
 		int counter = 0;
 		do {
 			counter++;
-			if (counter > 50)
+			if (counter > 50) {
 				throw new IllegalArgumentException("Something went wrong when removing variable references");
+			}
 			obj = res;
 			final ModificationSet ms = new ModificationSet();
 			final Iterable<? extends HDLReference> refs = getAllVarRefs(obj, hdlVariable, ms, counter == 1);

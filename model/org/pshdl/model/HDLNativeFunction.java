@@ -36,11 +36,9 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLNativeFunction contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.</li>
  * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * <li>Boolean simOnly. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
@@ -51,7 +49,6 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -90,23 +87,26 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	public static HDLFieldAccess<HDLNativeFunction, Boolean> fSimOnly = new HDLFieldAccess<HDLNativeFunction, Boolean>("simOnly", Boolean.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLNativeFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getSimOnly();
 		}
 
 		@Override
 		public HDLNativeFunction setValue(HDLNativeFunction obj, Boolean value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setSimOnly(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (simOnly == obj)
+		if (simOnly == obj) {
 			return fSimOnly;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

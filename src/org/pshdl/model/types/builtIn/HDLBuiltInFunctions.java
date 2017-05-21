@@ -101,14 +101,16 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return Optional.of(HDLPrimitive.getBit());
+			}
 			final HDLExpression expression = call.getParams().get(0);
 			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(expression, context);
 			if (valueOf.isPresent()) {
 				final BigInteger val = valueOf.get();
-				if (val.equals(BigInteger.ONE))
+				if (val.equals(BigInteger.ONE)) {
 					return Optional.of(HDLPrimitive.getBit());
+				}
 			}
 			return Optional.of(HDLPrimitive.getBitvector().setWidth(expression));
 		}
@@ -175,22 +177,26 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Optional<BigInteger> getConstantValue(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return Optional.absent();
+			}
 			final HDLExpression arg = call.getParams().get(0);
 			final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(arg, context);
-			if (!constVal.isPresent())
+			if (!constVal.isPresent()) {
 				return Optional.absent();
+			}
 			return Optional.of(constVal.get().abs());
 		}
 
 		@Override
 		public Optional<Range<BigInteger>> getRange(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return Optional.absent();
+			}
 			final Optional<Range<BigInteger>> zeroArg = RangeExtension.rangeOf(call.getParams().get(0), context);
-			if (!zeroArg.isPresent())
+			if (!zeroArg.isPresent()) {
 				return Optional.absent();
+			}
 			final Range<BigInteger> zeroRange = zeroArg.get();
 			final BigInteger from = zeroRange.lowerEndpoint().abs();
 			final BigInteger to = zeroRange.upperEndpoint().abs();
@@ -258,18 +264,22 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Optional<BigInteger> getConstantValue(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().size() < 2)
+			if (call.getParams().size() < 2) {
 				return Optional.absent();
+			}
 			final HDLExpression arg0 = call.getParams().get(0);
 			final HDLExpression arg1 = call.getParams().get(1);
 			final Optional<BigInteger> constVal0 = ConstantEvaluate.valueOf(arg0, context);
-			if (!constVal0.isPresent())
+			if (!constVal0.isPresent()) {
 				return Optional.absent();
-			if (arg0.equals(arg1))
+			}
+			if (arg0.equals(arg1)) {
 				return constVal0;
+			}
 			final Optional<BigInteger> constVal1 = ConstantEvaluate.valueOf(arg1, context);
-			if (!constVal1.isPresent())
+			if (!constVal1.isPresent()) {
 				return Optional.absent();
+			}
 			switch (call.getFunctionRefName().getLastSegment()) {
 			case "min":
 				return Optional.of(constVal0.get().min(constVal1.get()));
@@ -281,18 +291,22 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Optional<Range<BigInteger>> getRange(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().size() < 2)
+			if (call.getParams().size() < 2) {
 				return Optional.absent();
+			}
 			final HDLExpression arg0 = call.getParams().get(0);
 			final HDLExpression arg1 = call.getParams().get(1);
 			final Optional<Range<BigInteger>> zeroArg = RangeExtension.rangeOf(arg0, context);
-			if (!zeroArg.isPresent())
+			if (!zeroArg.isPresent()) {
 				return Optional.absent();
-			if (arg0.equals(arg1))
+			}
+			if (arg0.equals(arg1)) {
 				return zeroArg;
+			}
 			final Optional<Range<BigInteger>> oneArg = RangeExtension.rangeOf(arg1, context);
-			if (!oneArg.isPresent())
+			if (!oneArg.isPresent()) {
 				return Optional.absent();
+			}
 			final Range<BigInteger> zeroRange = zeroArg.get();
 			switch (call.getFunctionRefName().getLastSegment()) {
 			case "min":
@@ -308,15 +322,18 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 			final HDLExpression arg0 = call.getParams().get(0);
 			final HDLExpression arg1 = call.getParams().get(1);
 			final Optional<? extends HDLType> arg0TypeOpt = TypeExtension.typeOf(arg0);
-			if (!arg0TypeOpt.isPresent())
+			if (!arg0TypeOpt.isPresent()) {
 				return Optional.absent();
-			if (arg0.equals(arg1))
+			}
+			if (arg0.equals(arg1)) {
 				return arg0TypeOpt;
+			}
 			// This should always work as the signature apparently matched
 			final HDLPrimitive arg0Type = (HDLPrimitive) arg0TypeOpt.get();
 			final Optional<? extends HDLType> arg1TypeOpt = TypeExtension.typeOf(arg1);
-			if (!arg1TypeOpt.isPresent())
+			if (!arg1TypeOpt.isPresent()) {
 				return Optional.absent();
+			}
 			final HDLPrimitive arg1Type = (HDLPrimitive) arg1TypeOpt.get();
 			final HDLExpression arg1Width = arg1Type.getWidth();
 			final HDLExpression arg0Width = arg0Type.getWidth();
@@ -345,8 +362,9 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 			case UINT: {
 				final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(arg1Width, context);
 				if (constVal.isPresent()) {
-					if (constVal.get().compareTo(BigInteger.valueOf(32)) <= 0)
+					if (constVal.get().compareTo(BigInteger.valueOf(32)) <= 0) {
 						return Optional.of(posTypeNoWidth);
+					}
 				}
 				return Optional.of(posType.setWidth(arg1Width));
 			}
@@ -363,12 +381,14 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 				HDLPrimitive posType, HDLPrimitive posTypeNoWidth, HDLEvaluationContext context) {
 			switch (arg1Type.getType()) {
 			case INT:
-				if (arg0Width.equals(arg1Width))
+				if (arg0Width.equals(arg1Width)) {
 					return Optional.of(HDLPrimitive.getInt().setWidth(arg0Width));
+				}
 				return Optional.of(HDLPrimitive.getInt().setWidth(MAX_UINT.getCall(arg0Width, arg1Width)));
 			case UINT:
-				if (arg0Width.equals(arg1Width))
+				if (arg0Width.equals(arg1Width)) {
 					return Optional.of(HDLPrimitive.getInt().setWidth(arg0Width));
+				}
 				return Optional.of(posType.setWidth(MAX_UINT.getCall(arg0Width, arg1Width)));
 			case INTEGER:
 				posType = HDLPrimitive.getInt();
@@ -377,8 +397,9 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 			case NATURAL: {
 				final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(arg0Width, context);
 				if (constVal.isPresent()) {
-					if (constVal.get().compareTo(BigInteger.valueOf(32)) <= 0)
+					if (constVal.get().compareTo(BigInteger.valueOf(32)) <= 0) {
 						return Optional.of(posTypeNoWidth);
+					}
 				}
 				return Optional.of(posType.setWidth(arg0Width));
 			}
@@ -396,8 +417,9 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public void transform(HDLFunctionCall call, HDLEvaluationContext context, ModificationSet ms) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return;
+			}
 			final HDLExpression enumRef = call.getParams().get(0);
 			final HDLEnum enumType = (HDLEnum) TypeExtension.typeOfForced(enumRef, "Insulin");
 			final HDLQualifiedName hEnum = FullNameExtension.fullNameOf(enumType);
@@ -418,13 +440,16 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Set<Problem> validateCall(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return Sets.newHashSet(new Problem(ErrorCode.FUNCTION_NOT_ENOUGH_PARAMETER, call));
+			}
 			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(call.getParams().get(0));
-			if (!typeOf.isPresent())
+			if (!typeOf.isPresent()) {
 				return Sets.newHashSet(new Problem(ErrorCode.UNRESOLVED_TYPE, call));
-			if (!(typeOf.get() instanceof HDLEnum))
+			}
+			if (!(typeOf.get() instanceof HDLEnum)) {
 				return Sets.newHashSet(new Problem(ErrorCode.UNSUPPORTED_TYPE_FOR_OP, call));
+			}
 			return super.validateCall(call, context);
 		}
 
@@ -482,12 +507,14 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Optional<BigInteger> getConstantValue(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return Optional.absent();
+			}
 			final HDLExpression arg = call.getParams().get(0);
 			final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(arg, context);
-			if (!constVal.isPresent())
+			if (!constVal.isPresent()) {
 				return Optional.absent();
+			}
 			switch (call.getFunctionRefName().getLastSegment()) {
 			case "log2ceil":
 				return Optional.of(log2ceil(constVal.get()));
@@ -499,11 +526,13 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public Optional<Range<BigInteger>> getRange(HDLFunctionCall call, HDLEvaluationContext context) {
-			if (call.getParams().isEmpty())
+			if (call.getParams().isEmpty()) {
 				return Optional.absent();
+			}
 			final Optional<Range<BigInteger>> zeroArg = RangeExtension.rangeOf(call.getParams().get(0), context);
-			if (!zeroArg.isPresent())
+			if (!zeroArg.isPresent()) {
 				return Optional.absent();
+			}
 			final Range<BigInteger> zeroRange = zeroArg.get();
 			switch (call.getFunctionRefName().getLastSegment()) {
 			case "log2ceil": {
@@ -608,8 +637,9 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 	}
 
 	public static Optional<Range<BigInteger>> asRange(BigInteger from, BigInteger to) {
-		if (from.compareTo(to) > 0)
+		if (from.compareTo(to) > 0) {
 			return Optional.of(RangeTool.createRange(to, from));
+		}
 		return Optional.of(RangeTool.createRange(from, to));
 	}
 
@@ -641,9 +671,10 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 				final HDLVariable name = new HDLVariable().setName("param" + (pos++));
 				HDLFunctionParameter param = new HDLFunctionParameter().setConstant(false).setRw(RWType.READ).setName(name);
 				final Optional<? extends HDLType> optType = TypeExtension.typeOf(hdlExpression);
-				if (!optType.isPresent())
+				if (!optType.isPresent()) {
 					// Handle function references
 					return;
+				}
 				final HDLType type = optType.get();
 				if (type instanceof HDLInterface) {
 					final HDLInterface hIf = (HDLInterface) type;
@@ -701,8 +732,9 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 		@Override
 		public HDLFunction[] signatures() {
-			if (signature == null)
+			if (signature == null) {
 				return new HDLFunction[0];// This should actually never happen
+			}
 			return new HDLFunction[] { signature };
 		}
 

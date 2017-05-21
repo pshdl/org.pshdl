@@ -48,14 +48,11 @@ import org.pshdl.model.utils.HDLQuery;
 import com.google.common.collect.Maps;
 
 /**
- * This is used to resolve parameter to constants. When a HDLUnit has parameter
- * ports, they can be initialized with a constant. However this constant does
- * not need to be the value the unit is instantiated with. This context stores a
- * mapping for those parameters to the actual value. See
- * {@link ConstantEvaluate#constantEvaluate(IHDLObject, HDLEvaluationContext, java.util.Set)}
+ * This is used to resolve parameter to constants. When a HDLUnit has parameter ports, they can be initialized with a constant. However this
+ * constant does not need to be the value the unit is instantiated with. This context stores a mapping for those parameters to the actual
+ * value. See {@link ConstantEvaluate#constantEvaluate(IHDLObject, HDLEvaluationContext, java.util.Set)}
  *
  * @author Karsten Becker
- *
  */
 public class HDLEvaluationContext {
 
@@ -85,19 +82,18 @@ public class HDLEvaluationContext {
 	 *
 	 * @param ref
 	 *            the name of this variable is used to lookup the value
-	 * @return the value if successful, <code>null</code> if no such value can
-	 *         be found
+	 * @return the value if successful, <code>null</code> if no such value can be found
 	 */
 	public HDLExpression get(HDLVariable ref) {
 		final HDLExpression hdlExpression = context.get(ref.getName());
-		if (hdlExpression != null)
+		if (hdlExpression != null) {
 			return hdlExpression;
+		}
 		return ref.getDefaultValue();
 	}
 
 	/**
-	 * Generates a default context where all parameter are assumed to be the
-	 * constant they are initialized with
+	 * Generates a default context where all parameter are assumed to be the constant they are initialized with
 	 *
 	 * @param pkg
 	 *            the package to create the context for
@@ -114,8 +110,7 @@ public class HDLEvaluationContext {
 	}
 
 	/**
-	 * Generates a default context where all parameter are assumed to be the
-	 * constant they are initialized with
+	 * Generates a default context where all parameter are assumed to be the constant they are initialized with
 	 *
 	 * @param unit
 	 *            the unit to create the context for
@@ -156,7 +151,7 @@ public class HDLEvaluationContext {
 	}
 
 	public Map<String, HDLExpression> getMap() {
-		return new LinkedHashMap<String, HDLExpression>(context);
+		return new LinkedHashMap<>(context);
 	}
 
 	public HDLEvaluationContext set(String key, HDLExpression val) {

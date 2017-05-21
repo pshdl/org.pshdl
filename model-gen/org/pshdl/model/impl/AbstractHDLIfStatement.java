@@ -77,7 +77,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		if (validate) {
 			thenDo = validateThenDo(thenDo);
 		}
-		this.thenDo = new ArrayList<HDLStatement>();
+		this.thenDo = new ArrayList<>();
 		if (thenDo != null) {
 			for (final HDLStatement newValue : thenDo) {
 				this.thenDo.add(newValue);
@@ -86,7 +86,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		if (validate) {
 			elseDo = validateElseDo(elseDo);
 		}
-		this.elseDo = new ArrayList<HDLStatement>();
+		this.elseDo = new ArrayList<>();
 		if (elseDo != null) {
 			for (final HDLStatement newValue : elseDo) {
 				this.elseDo.add(newValue);
@@ -97,8 +97,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	public AbstractHDLIfStatement() {
 		super();
 		this.ifExp = null;
-		this.thenDo = new ArrayList<HDLStatement>();
-		this.elseDo = new ArrayList<HDLStatement>();
+		this.thenDo = new ArrayList<>();
+		this.elseDo = new ArrayList<>();
 	}
 
 	protected final HDLExpression ifExp;
@@ -114,8 +114,9 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	}
 
 	protected HDLExpression validateIfExp(HDLExpression ifExp) {
-		if (ifExp == null)
+		if (ifExp == null) {
 			throw new IllegalArgumentException("The field ifExp can not be null!");
+		}
 		return ifExp;
 	}
 
@@ -132,8 +133,9 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	}
 
 	protected Iterable<HDLStatement> validateThenDo(Iterable<HDLStatement> thenDo) {
-		if (thenDo == null)
-			return new ArrayList<HDLStatement>();
+		if (thenDo == null) {
+			return new ArrayList<>();
+		}
 		return thenDo;
 	}
 
@@ -150,8 +152,9 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	}
 
 	protected Iterable<HDLStatement> validateElseDo(Iterable<HDLStatement> elseDo) {
-		if (elseDo == null)
-			return new ArrayList<HDLStatement>();
+		if (elseDo == null) {
+			return new ArrayList<>();
+		}
 		return elseDo;
 	}
 
@@ -199,10 +202,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLIfStatement} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLIfStatement} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -214,10 +215,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Setter for the field {@link #getIfExp()}.
 	 *
 	 * @param ifExp
-	 *            sets the new ifExp of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLIfStatement} with the updated ifExp
-	 *         field.
+	 *            sets the new ifExp of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLIfStatement} with the updated ifExp field.
 	 */
 	@Nonnull
 	public HDLIfStatement setIfExp(@Nonnull HDLExpression ifExp) {
@@ -231,8 +230,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 *
 	 * @param thenDo
 	 *            sets the new thenDo of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
-	 *         field.
+	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement setThenDo(@Nullable Iterable<HDLStatement> thenDo) {
@@ -245,15 +243,14 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Adds a new value to the field {@link #getThenDo()}.
 	 *
 	 * @param newThenDo
-	 *            the value that should be added to the field
-	 *            {@link #getThenDo()}
-	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
-	 *         field.
+	 *            the value that should be added to the field {@link #getThenDo()}
+	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement addThenDo(@Nullable HDLStatement newThenDo) {
-		if (newThenDo == null)
+		if (newThenDo == null) {
 			throw new IllegalArgumentException("Element of thenDo can not be null!");
+		}
 		final ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
 		thenDo.add(newThenDo);
 		final HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
@@ -264,15 +261,14 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Removes a value from the field {@link #getThenDo()}.
 	 *
 	 * @param newThenDo
-	 *            the value that should be removed from the field
-	 *            {@link #getThenDo()}
-	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
-	 *         field.
+	 *            the value that should be removed from the field {@link #getThenDo()}
+	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement removeThenDo(@Nullable HDLStatement newThenDo) {
-		if (newThenDo == null)
+		if (newThenDo == null) {
 			throw new IllegalArgumentException("Removed element of thenDo can not be null!");
+		}
 		final ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
 		thenDo.remove(newThenDo);
 		final HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
@@ -283,10 +279,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Removes a value from the field {@link #getThenDo()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getThenDo()}
-	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getThenDo()}
+	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement removeThenDo(int idx) {
@@ -301,8 +295,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 *
 	 * @param elseDo
 	 *            sets the new elseDo of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
-	 *         field.
+	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement setElseDo(@Nullable Iterable<HDLStatement> elseDo) {
@@ -315,15 +308,14 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Adds a new value to the field {@link #getElseDo()}.
 	 *
 	 * @param newElseDo
-	 *            the value that should be added to the field
-	 *            {@link #getElseDo()}
-	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
-	 *         field.
+	 *            the value that should be added to the field {@link #getElseDo()}
+	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement addElseDo(@Nullable HDLStatement newElseDo) {
-		if (newElseDo == null)
+		if (newElseDo == null) {
 			throw new IllegalArgumentException("Element of elseDo can not be null!");
+		}
 		final ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
 		elseDo.add(newElseDo);
 		final HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
@@ -334,15 +326,14 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Removes a value from the field {@link #getElseDo()}.
 	 *
 	 * @param newElseDo
-	 *            the value that should be removed from the field
-	 *            {@link #getElseDo()}
-	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
-	 *         field.
+	 *            the value that should be removed from the field {@link #getElseDo()}
+	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement removeElseDo(@Nullable HDLStatement newElseDo) {
-		if (newElseDo == null)
+		if (newElseDo == null) {
 			throw new IllegalArgumentException("Removed element of elseDo can not be null!");
+		}
 		final ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
 		elseDo.remove(newElseDo);
 		final HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
@@ -353,10 +344,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * Removes a value from the field {@link #getElseDo()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getElseDo()}
-	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getElseDo()}
+	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo field.
 	 */
 	@Nonnull
 	public HDLIfStatement removeElseDo(int idx) {
@@ -368,30 +357,40 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLIfStatement))
+		}
+		if (!(obj instanceof AbstractHDLIfStatement)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLIfStatement other = (AbstractHDLIfStatement) obj;
 		if (ifExp == null) {
-			if (other.ifExp != null)
+			if (other.ifExp != null) {
 				return false;
-		} else if (!ifExp.equals(other.ifExp))
+			}
+		} else if (!ifExp.equals(other.ifExp)) {
 			return false;
+		}
 		if (thenDo == null) {
-			if (other.thenDo != null)
+			if (other.thenDo != null) {
 				return false;
-		} else if (!thenDo.equals(other.thenDo))
+			}
+		} else if (!thenDo.equals(other.thenDo)) {
 			return false;
+		}
 		if (elseDo == null) {
-			if (other.elseDo != null)
+			if (other.elseDo != null) {
 				return false;
-		} else if (!elseDo.equals(other.elseDo))
+			}
+		} else if (!elseDo.equals(other.elseDo)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -399,8 +398,9 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((ifExp == null) ? 0 : ifExp.hashCode());

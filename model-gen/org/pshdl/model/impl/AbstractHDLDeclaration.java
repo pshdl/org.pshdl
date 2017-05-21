@@ -64,7 +64,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		if (validate) {
 			annotations = validateAnnotations(annotations);
 		}
-		this.annotations = new ArrayList<HDLAnnotation>();
+		this.annotations = new ArrayList<>();
 		if (annotations != null) {
 			for (final HDLAnnotation newValue : annotations) {
 				this.annotations.add(newValue);
@@ -74,7 +74,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 
 	public AbstractHDLDeclaration() {
 		super();
-		this.annotations = new ArrayList<HDLAnnotation>();
+		this.annotations = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLAnnotation> annotations;
@@ -90,8 +90,9 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	}
 
 	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
-		if (annotations == null)
-			return new ArrayList<HDLAnnotation>();
+		if (annotations == null) {
+			return new ArrayList<>();
+		}
 		return annotations;
 	}
 
@@ -133,20 +134,26 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLDeclaration))
+		}
+		if (!(obj instanceof AbstractHDLDeclaration)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLDeclaration other = (AbstractHDLDeclaration) obj;
 		if (annotations == null) {
-			if (other.annotations != null)
+			if (other.annotations != null) {
 				return false;
-		} else if (!annotations.equals(other.annotations))
+			}
+		} else if (!annotations.equals(other.annotations)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -154,8 +161,9 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());

@@ -48,16 +48,12 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 
 /**
- * HDLCore is the central place to register custom services like
- * {@link IHDLAnnotation}, {@link IHDLGenerator}, {@link IHDLValidator},
- * {@link IDynamicFunctionProvider} and {@link IHDLAnnotationProvider}. Those
- * services are added via an {@link IServiceProvider}. The default
- * {@link IServiceProvider},
- * {@link org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider}
- * uses the {@link ServiceLoader} facility of the JRE
+ * HDLCore is the central place to register custom services like {@link IHDLAnnotation}, {@link IHDLGenerator}, {@link IHDLValidator},
+ * {@link IDynamicFunctionProvider} and {@link IHDLAnnotationProvider}. Those services are added via an {@link IServiceProvider}. The
+ * default {@link IServiceProvider}, {@link org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider} uses the
+ * {@link ServiceLoader} facility of the JRE
  *
  * @author Karsten Becker
- *
  */
 public class HDLCore {
 	public static final String VERSION = getVersion();
@@ -66,8 +62,7 @@ public class HDLCore {
 	private static IServiceProvider serviceProvider = new ServiceLoaderProvider();
 
 	/**
-	 * Initializes the PSHDL Compiler infrastructure with the annotations,
-	 * generators, validators and functions provided by this
+	 * Initializes the PSHDL Compiler infrastructure with the annotations, generators, validators and functions provided by this
 	 * {@link IServiceProvider}
 	 *
 	 * @param serviceProvider
@@ -108,15 +103,15 @@ public class HDLCore {
 	 * @return {@link CompilerInformation} which contain all known services
 	 */
 	public static CompilerInformation getCompilerInformation() {
-		if (!initialized)
+		if (!initialized) {
 			throw new RuntimeException("HDLCore needs to be initialized first!");
+		}
 		return info;
 	}
 
 	/**
-	 * Initialize the {@link HDLCore} using the {@link ServiceLoaderProvider}.
-	 * If the {@link HDLCore} is already initialized, the known configuration
-	 * will be overwritten
+	 * Initialize the {@link HDLCore} using the {@link ServiceLoaderProvider}. If the {@link HDLCore} is already initialized, the known
+	 * configuration will be overwritten
 	 */
 	public static void defaultInit() {
 		init(new IServiceProvider.ServiceLoaderProvider());
@@ -125,8 +120,7 @@ public class HDLCore {
 	/**
 	 * Returns whether the {@link HDLCore} was initialized
 	 *
-	 * @return <code>true</code> when {@link #init(IServiceProvider)} was called
-	 *         at least once
+	 * @return <code>true</code> when {@link #init(IServiceProvider)} was called at least once
 	 */
 	public static boolean isInitialized() {
 		return initialized;

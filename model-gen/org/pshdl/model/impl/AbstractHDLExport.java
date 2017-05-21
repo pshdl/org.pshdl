@@ -93,14 +93,16 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 
 	public HDLVariable resolveHIfForced(String stage) {
 		final Optional<HDLVariable> opt = resolveHIf();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + hIf, stage);
 	}
 
 	public Optional<HDLVariable> resolveHIf() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveVariable(this, hIf);
 	}
 
@@ -109,8 +111,9 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	}
 
 	protected HDLQualifiedName validateHIf(HDLQualifiedName hIf) {
-		if (hIf == null)
+		if (hIf == null) {
 			throw new IllegalArgumentException("The field hIf can not be null!");
+		}
 		return hIf;
 	}
 
@@ -118,14 +121,16 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 
 	public HDLVariable resolveVarForced(String stage) {
 		final Optional<HDLVariable> opt = resolveVar();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + var, stage);
 	}
 
 	public Optional<HDLVariable> resolveVar() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveVariable(this, var);
 	}
 
@@ -197,10 +202,8 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLExport} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLExport} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -212,8 +215,7 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	 * Setter for the field {@link #getHIfRefName()}.
 	 *
 	 * @param hIf
-	 *            sets the new hIf of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new hIf of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLExport} with the updated hIf field.
 	 */
 	@Nonnull
@@ -253,30 +255,40 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLExport))
+		}
+		if (!(obj instanceof AbstractHDLExport)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLExport other = (AbstractHDLExport) obj;
 		if (hIf == null) {
-			if (other.hIf != null)
+			if (other.hIf != null) {
 				return false;
-		} else if (!hIf.equals(other.hIf))
+			}
+		} else if (!hIf.equals(other.hIf)) {
 			return false;
+		}
 		if (var == null) {
-			if (other.var != null)
+			if (other.var != null) {
 				return false;
-		} else if (!var.equals(other.var))
+			}
+		} else if (!var.equals(other.var)) {
 			return false;
+		}
 		if (match == null) {
-			if (other.match != null)
+			if (other.match != null) {
 				return false;
-		} else if (!match.equals(other.match))
+			}
+		} else if (!match.equals(other.match)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -284,8 +296,9 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((hIf == null) ? 0 : hIf.hashCode());
@@ -316,13 +329,17 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHIf(getHIfRefName());
-		if (checkResolve && (getHIfRefName() != null))
-			if (!resolveHIf().isPresent())
+		if (checkResolve && (getHIfRefName() != null)) {
+			if (!resolveHIf().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
+			}
+		}
 		validateVar(getVarRefName());
-		if (checkResolve && (getVarRefName() != null))
-			if (!resolveVar().isPresent())
+		if (checkResolve && (getVarRefName() != null)) {
+			if (!resolveVar().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
+			}
+		}
 		validateMatch(getMatch());
 	}
 

@@ -47,7 +47,6 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -86,8 +85,9 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		@Nullable
 		public static HDLArithOpType getOp(String op) {
 			for (final HDLArithOpType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -105,23 +105,26 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>("type", HDLArithOpType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLArithOpType getValue(HDLArithOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLArithOp setValue(HDLArithOp obj, HDLArithOpType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (type == obj)
+		if (type == obj) {
 			return fType;
+		}
 		return super.getContainingFeature(obj);
 	}
 

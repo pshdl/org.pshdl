@@ -47,7 +47,7 @@ public class SourceInfo {
 	public final int startLine, endLine;
 	public final int startPosInLine, endPosInLine;
 	public final int length;
-	public final List<String> comments = new LinkedList<String>();
+	public final List<String> comments = new LinkedList<>();
 
 	public final int totalOffset;
 

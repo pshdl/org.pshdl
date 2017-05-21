@@ -49,8 +49,7 @@ import com.google.common.base.Optional;
  * The class HDLInterfaceInstantiation contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLArgument&gt; arguments. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName hIf. Can <b>not</b> be <code>null</code>.</li>
@@ -62,7 +61,6 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -100,34 +98,38 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIfRefName();
 		}
 
 		@Override
 		public HDLInterfaceInstantiation setValue(HDLInterfaceInstantiation obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHIf(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hIf == obj)
+		if (hIf == obj) {
 			return fHIf;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
-	public static GenericMeta<String> ORIG_NAME = new GenericMeta<String>("ORIG_NAME", true);
+	public static GenericMeta<String> ORIG_NAME = new GenericMeta<>("ORIG_NAME", true);
 
 	@Override
 	public Optional<HDLInterface> resolveHIf() {
 		final Optional<HDLInterface> resolveHIf = super.resolveHIf();
-		if (!resolveHIf.isPresent())
+		if (!resolveHIf.isPresent()) {
 			return Optional.absent();
+		}
 		final ModificationSet ms = new ModificationSet();
 		final HDLInterface getInterface = Insulin.resolveFragments(resolveHIf.get());
 		final ArrayList<HDLVariableDeclaration> ports = getInterface.getPorts();
@@ -186,8 +188,9 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 				if (exp instanceof HDLArrayInit) {
 					final HDLArrayInit hai = (HDLArrayInit) exp;
 					inlineConstants(ms, hai);
-				} else
+				} else {
 					throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", exp));
+				}
 			}
 		}
 	}

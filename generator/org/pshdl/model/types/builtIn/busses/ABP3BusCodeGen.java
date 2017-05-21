@@ -34,19 +34,34 @@ import java.util.List;
 import java.util.Map;
 
 import org.antlr.v4.runtime.RecognitionException;
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
+import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
+import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLIfStatement;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
-import org.pshdl.model.HDLRegisterConfig.*;
+import org.pshdl.model.HDLPrimitive;
+import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLRegisterConfig.HDLRegClockType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
+import org.pshdl.model.HDLSwitchCaseStatement;
+import org.pshdl.model.HDLSwitchStatement;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.validation.Problem;
 
 import com.google.common.base.Charsets;
@@ -59,12 +74,13 @@ public class ABP3BusCodeGen extends CommonBusCode {
 		final HDLInterface hdi = MemoryModel.buildHDLInterface(unit, rows);
 		final Map<String, Boolean> isArray = buildArrayMap(hdi);
 		final int addrWidth = ((int) Math.ceil(Math.log10(rows.size() * 4) / Math.log10(2)));
-		HDLVariable pclkVar = new HDLVariable().setName("PCLK");
+		final HDLVariable pclkVar = new HDLVariable().setName("PCLK");
 		HDLVariableDeclaration pclk = new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()).addVariables(pclkVar);
-		if (defaultClock)
+		if (defaultClock) {
 			pclk = pclk.addAnnotations(HDLBuiltInAnnotations.clock.create(null));
-		HDLVariable presetVar = new HDLVariable().setName("PRESETn");
-		HDLVariableDeclaration preset = new HDLVariableDeclaration().setDirection(HDLDirection.INTERNAL).setType(HDLPrimitive.getBit())
+		}
+		final HDLVariable presetVar = new HDLVariable().setName("PRESETn");
+		final HDLVariableDeclaration preset = new HDLVariableDeclaration().setDirection(HDLDirection.INTERNAL).setType(HDLPrimitive.getBit())
 				.addAnnotations(HDLBuiltInAnnotations.reset.create(null))
 				.addVariables(new HDLVariable().setName("rst").setDefaultValue(new HDLManip().setType(HDLManipType.BIT_NEG).setTarget(presetVar.asHDLRef())));
 		HDLUnit res = new HDLUnit().setName(name).addStatements(pclk)
@@ -115,8 +131,9 @@ public class ABP3BusCodeGen extends CommonBusCode {
 								.addThenDo(createReadSwitch(rows, isArray)).addElseDo(new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PRDATA")))
 										.setType(HDLAssignmentType.ASSGN).setRight(new HDLLiteral().setVal("0"))))
 				.setSimulation(false);
-		if (defaultReset)
+		if (defaultReset) {
 			res = res.addStatements(preset);
+		}
 		for (final HDLVariableDeclaration port : hdi.getPorts()) {
 			res = res.addStatements(port.setDirection(HDLDirection.INTERNAL).setRegister(createRegister(defaultClock, pclkVar, defaultReset, presetVar)));
 		}
@@ -125,10 +142,12 @@ public class ABP3BusCodeGen extends CommonBusCode {
 
 	private static HDLRegisterConfig createRegister(boolean defaultClock, HDLVariable clockVar, boolean defaultReset, HDLVariable resetVar) {
 		HDLRegisterConfig config = HDLRegisterConfig.defaultConfig().setClockType(HDLRegClockType.RISING);
-		if (!defaultClock)
+		if (!defaultClock) {
 			config = config.setClk(clockVar.asHDLRef());
-		if (!defaultReset)
+		}
+		if (!defaultReset) {
 			config = config.setRst(resetVar.asHDLRef()).setResetType(HDLRegResetActiveType.LOW);
+		}
 		return config;
 	}
 

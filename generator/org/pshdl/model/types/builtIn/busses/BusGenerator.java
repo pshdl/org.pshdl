@@ -132,7 +132,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	}
 
 	private Optional<HDLInterface> createInterface(HDLDirectGeneration hdl, String name) {
-		final Optional<Unit> unitOpt = parse(hdl, Sets.<Problem>newHashSet());
+		final Optional<Unit> unitOpt = parse(hdl, Sets.<Problem> newHashSet());
 		if (unitOpt.isPresent()) {
 			final Unit unit = unitOpt.get();
 			final List<Row> rows = MemoryModel.buildRows(unit);
@@ -147,8 +147,9 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 		final int lineOffset = getLineOffset(hdl);
 		try {
 			unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, lineOffset);
-			if (!validate(unit, problems, lineOffset))
+			if (!validate(unit, problems, lineOffset)) {
 				return Optional.absent();
+			}
 			return Optional.of(unit);
 		} catch (final IOException e) {
 			return Optional.absent();
@@ -165,13 +166,16 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	}
 
 	private boolean validate(Unit unit, Set<Problem> problems, int lineOffset) {
-		if (unit == null)
+		if (unit == null) {
 			return false;
-		for (final Problem problem : problems)
-			if (problem.severity == ProblemSeverity.ERROR)
+		}
+		for (final Problem problem : problems) {
+			if (problem.severity == ProblemSeverity.ERROR) {
 				return false;
+			}
+		}
 		boolean hasError = false;
-		for (final Entry<String, NamedElement> entry : unit.declarations.entrySet())
+		for (final Entry<String, NamedElement> entry : unit.declarations.entrySet()) {
 			if (entry.getValue() instanceof Reference) {
 				final Reference ref = (Reference) entry.getValue();
 				final NamedElement decl = unit.declarations.get(ref.getName());
@@ -182,6 +186,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 					hasError = true;
 				}
 			}
+		}
 		return !hasError;
 	}
 
@@ -194,7 +199,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	private int getMemCount(HDLDirectGeneration hdl) {
 		final ArrayList<HDLArgument> args = hdl.getArguments();
 		int memCount = 0;
-		for (final HDLArgument arg : args)
+		for (final HDLArgument arg : args) {
 			if ("memCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
@@ -211,16 +216,18 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 							throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
 						}
 					}
-				} else
+				} else {
 					throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
+				}
 			}
+		}
 		return memCount;
 	}
 
 	private int getRegCount(HDLDirectGeneration hdl) {
 		final ArrayList<HDLArgument> args = hdl.getArguments();
 		int regCount = -1;
-		for (final HDLArgument arg : args)
+		for (final HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
@@ -237,11 +244,14 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 							throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
 						}
 					}
-				} else
+				} else {
 					throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
+				}
 			}
-		if (regCount == -1)
+		}
+		if (regCount == -1) {
 			throw new IllegalArgumentException("The parameter regCount is not present!");
+		}
 		return regCount;
 	}
 
@@ -256,19 +266,20 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				try {
 					final Set<Problem> problems = Sets.newHashSet();
 					unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, 0);
-					if (!validate(unit, problems, 0))
+					if (!validate(unit, problems, 0)) {
 						return Optional.absent();
+					}
 				} catch (final Exception e) {
 					throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
 				}
 			}
 			final String version = getVersion(hdl);
 			final String prefix = getPrefix(hdl);
-			boolean defaultClock = getClock(hdl);
-			boolean defaultReset = getReset(hdl);
+			final boolean defaultClock = getClock(hdl);
+			final boolean defaultReset = getReset(hdl);
 			final List<Row> rows = MemoryModel.buildRows(unit);
 			final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
-			final List<AuxiliaryContent> sideFiles = new LinkedList<AuxiliaryContent>();
+			final List<AuxiliaryContent> sideFiles = new LinkedList<>();
 			sideFiles.add(new AuxiliaryContent(hdl.getVar().getName() + "Map.html", html, true));
 			final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
 			sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, prefix, true));
@@ -338,30 +349,38 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	}
 
 	private String getVersion(HDLDirectGeneration hdl) {
-		for (final HDLArgument arg : hdl.getArguments())
-			if ("version".equals(arg.getName()))
+		for (final HDLArgument arg : hdl.getArguments()) {
+			if ("version".equals(arg.getName())) {
 				return ((HDLLiteral) arg.getExpression()).getVal();
+			}
+		}
 		return "v1_00_a";
 	}
 
 	private String getPrefix(HDLDirectGeneration hdl) {
-		for (final HDLArgument arg : hdl.getArguments())
-			if ("prefix".equals(arg.getName()))
+		for (final HDLArgument arg : hdl.getArguments()) {
+			if ("prefix".equals(arg.getName())) {
 				return ((HDLLiteral) arg.getExpression()).getVal();
+			}
+		}
 		return "";
 	}
 
 	private boolean getClock(HDLDirectGeneration hdl) {
-		for (final HDLArgument arg : hdl.getArguments())
-			if ("defaultClock".equals(arg.getName()))
+		for (final HDLArgument arg : hdl.getArguments()) {
+			if ("defaultClock".equals(arg.getName())) {
 				return !((HDLLiteral) arg.getExpression()).getVal().equals(HDLLiteral.FALSE);
+			}
+		}
 		return true;
 	}
 
 	private boolean getReset(HDLDirectGeneration hdl) {
-		for (final HDLArgument arg : hdl.getArguments())
-			if ("defaultReset".equals(arg.getName()))
+		for (final HDLArgument arg : hdl.getArguments()) {
+			if ("defaultReset".equals(arg.getName())) {
 				return !((HDLLiteral) arg.getExpression()).getVal().equals(HDLLiteral.FALSE);
+			}
+		}
 		return true;
 	}
 
@@ -429,7 +448,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
 		final Optional<HDLGenerationInfo> opt = getImplementation(hdl);
 		if (opt.isPresent()) {
-			final List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+			final List<HDLVariableDeclaration> res = new LinkedList<>();
 			final HDLVariableDeclaration[] hvd = opt.get().unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
 			for (final HDLVariableDeclaration hdlVariableDeclaration : hvd) {
 				switch (hdlVariableDeclaration.getDirection()) {

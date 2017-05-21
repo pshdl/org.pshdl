@@ -63,7 +63,6 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
@@ -92,23 +91,26 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public IHDLObject getValue(HDLObject obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getContainer();
 		}
 
 		@Override
 		public HDLObject setValue(HDLObject obj, IHDLObject value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setContainer(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (container == obj)
+		if (container == obj) {
 			return fContainer;
+		}
 		return null;
 	}
 	// $CONTENT-BEGIN$
@@ -120,10 +122,11 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	public static void copyMetaData(IHDLObject src, IHDLObject target, boolean all) {
 		final Map<MetaAccess<?>, Object> srcMeta = ((HDLObject) src).metaData;
 		final Map<MetaAccess<?>, Object> targetMeta = ((HDLObject) target).metaData;
-		for (final Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet())
+		for (final Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet()) {
 			if (all || entry.getKey().inherit()) {
 				targetMeta.put(entry.getKey(), entry.getValue());
 			}
+		}
 		target.setID(src.getID());
 	}
 
@@ -168,20 +171,26 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			final GenericMeta other = (GenericMeta) obj;
-			if (inherit != other.inherit)
+			if (inherit != other.inherit) {
 				return false;
+			}
 			if (name == null) {
-				if (other.name != null)
+				if (other.name != null) {
 					return false;
-			} else if (!name.equals(other.name))
+				}
+			} else if (!name.equals(other.name)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -246,22 +255,27 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (hashCode() != obj.hashCode())
+		}
+		if (hashCode() != obj.hashCode()) {
 			return false;
-		if (!(obj instanceof HDLObject))
+		}
+		if (!(obj instanceof HDLObject)) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
 		final HDLClass classFor = HDLClass.getClassFor(clazz);
-		if (classFor == null)
+		if (classFor == null) {
 			throw new IllegalArgumentException("Unkown class:" + clazz);
+		}
 		return getAllObjectsOf(classFor, clazz, deep);
 	}
 
@@ -271,9 +285,9 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	public <T> T[] getAllObjectsOf(HDLClass clazz, Class<? extends T> type, boolean deep) {
 		if (arrayClazzTypes == null) {
 			final HDLClass[] clazzes = HDLClass.values();
-			arrayClazzTypes = new EnumMap<HDLClass, IHDLObject[]>(HDLClass.class);
+			arrayClazzTypes = new EnumMap<>(HDLClass.class);
 			final Iterator<IHDLObject> iterator = iterator();
-			final EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<HDLClass, List<IHDLObject[]>>(HDLClass.class);
+			final EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<>(HDLClass.class);
 			addClazzArray(this, map);
 			while (iterator.hasNext()) {
 				final HDLObject c = (HDLObject) iterator.next();
@@ -282,7 +296,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 				for (final Entry<HDLClass, IHDLObject[]> e : c.arrayClazzTypes.entrySet()) {
 					final List<IHDLObject[]> list = map.get(e.getKey());
 					if (list == null) {
-						map.put(e.getKey(), new LinkedList<IHDLObject[]>(Collections.singleton(e.getValue())));
+						map.put(e.getKey(), new LinkedList<>(Collections.singleton(e.getValue())));
 					} else {
 						list.add(e.getValue());
 					}
@@ -291,7 +305,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			for (final HDLClass hClass : clazzes) {
 				final List<IHDLObject[]> set = map.get(hClass);
 				if (set != null) {
-					final NonSameList<IHDLObject> list = new NonSameList<IHDLObject>();
+					final NonSameList<IHDLObject> list = new NonSameList<>();
 					for (final IHDLObject[] ihdlObjects : set) {
 						for (final IHDLObject ihdlObject : ihdlObjects) {
 							list.add(ihdlObject);
@@ -302,14 +316,16 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			}
 		}
 		final IHDLObject[] list = arrayClazzTypes.get(clazz);
-		if (list == null)
+		if (list == null) {
 			return (T[]) Array.newInstance(clazz.clazz, 0);
+		}
 		if (deep == false) {
-			final LinkedList<IHDLObject> res = new LinkedList<IHDLObject>();
-			for (final IHDLObject ihdlObject : list)
+			final LinkedList<IHDLObject> res = new LinkedList<>();
+			for (final IHDLObject ihdlObject : list) {
 				if (ihdlObject.getContainer() == this) {
 					res.add(ihdlObject);
 				}
+			}
 			return res.toArray((T[]) Array.newInstance(clazz.clazz, res.size()));
 		}
 		// T[] res = (T[]) Array.newInstance(clazz.clazz, list.length);
@@ -322,7 +338,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 		for (final HDLClass hdlClass : set) {
 			List<IHDLObject[]> list = map.get(hdlClass);
 			if (list == null) {
-				list = new LinkedList<IHDLObject[]>();
+				list = new LinkedList<>();
 				map.put(hdlClass, list);
 			}
 			list.add(new IHDLObject[] { hdlObject });
@@ -333,8 +349,9 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	@SuppressWarnings("unchecked")
 	public <T extends IHDLObject> T getContainer(Class<T> clazz) {
 		if (container != null) {
-			if (clazz.isInstance(container))
+			if (clazz.isInstance(container)) {
 				return (T) container;
+			}
 			return container.getContainer(clazz);
 		}
 		return null;
@@ -343,23 +360,28 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	@Override
 	@Nonnull
 	public HDLObject setContainer(@Nullable IHDLObject container) {
-		if (container == this)
+		if (container == this) {
 			throw new IllegalArgumentException("Object can not contain itself");
-		if (this.container != null)
+		}
+		if (this.container != null) {
 			throw new IllegalArgumentException("Container already set");
-		if (frozen)
+		}
+		if (frozen) {
 			throw new IllegalArgumentException("Frozen");
+		}
 		this.container = container;
 		return this;
 	}
 
 	public HDLLibrary getLibrary() {
 		final HDLUnit hdlUnit = getContainer(HDLUnit.class);
-		if (hdlUnit != null)
+		if (hdlUnit != null) {
 			return hdlUnit.getLibrary();
+		}
 		final HDLPackage hdlPackage = getContainer(HDLPackage.class);
-		if (hdlPackage != null)
+		if (hdlPackage != null) {
 			return hdlPackage.getLibrary();
+		}
 		return null;
 	}
 
@@ -387,8 +409,9 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature() {
-		if (container != null)
+		if (container != null) {
 			return container.getContainingFeature(this);
+		}
 		return null;
 	}
 

@@ -96,8 +96,9 @@ public class Problem {
 	}
 
 	public Problem(IErrorCode code, IHDLObject node, IHDLObject context, String info) {
-		if (node == null)
+		if (node == null) {
 			throw new IllegalArgumentException("Node can not be null!");
+		}
 		this.context = context;
 		this.severity = code.getSeverity();
 		this.code = code;
@@ -125,8 +126,9 @@ public class Problem {
 
 	public static SourceInfo findMeta(IHDLObject node) {
 		final SourceInfo sInfo = node.getMeta(SourceInfo.INFO);
-		if ((sInfo == null) && (node.getContainer() != null))
+		if ((sInfo == null) && (node.getContainer() != null)) {
 			return findMeta(node.getContainer());
+		}
 		return sInfo;
 	}
 
@@ -146,8 +148,9 @@ public class Problem {
 	}
 
 	public String toStringWithoutSeverity() {
-		if (isSyntax)
+		if (isSyntax) {
 			return info;
+		}
 
 		String preText = "";
 		final IHDLObject inlineType = checkInlineType(node);
@@ -155,8 +158,9 @@ public class Problem {
 			preText = "The inline function: " + inlineType + " caused the following issue: ";
 		}
 		final HDLAdvise advise = HDLValidator.advise(this);
-		if (advise != null)
+		if (advise != null) {
 			return preText + advise.message;
+		}
 		String string = preText + code.name().toLowerCase() + " for: " + node;
 		if (context != null) {
 			string += " @ " + context;
@@ -168,11 +172,13 @@ public class Problem {
 	}
 
 	private IHDLObject checkInlineType(IHDLObject node) {
-		if (node == null)
+		if (node == null) {
 			return null;
+		}
 		final Object meta = node.getMeta(HDLFunction.META);
-		if (meta != null)
+		if (meta != null) {
 			return (IHDLObject) meta;
+		}
 		return checkInlineType(node.getContainer());
 	}
 
@@ -187,21 +193,28 @@ public class Problem {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final Problem other = (Problem) obj;
-		if (code != other.code)
+		if (code != other.code) {
 			return false;
-		if (context != other.context)
+		}
+		if (context != other.context) {
 			return false;
-		if (node != other.node)
+		}
+		if (node != other.node) {
 			return false;
-		if (severity != other.severity)
+		}
+		if (severity != other.severity) {
 			return false;
+		}
 		return true;
 	}
 

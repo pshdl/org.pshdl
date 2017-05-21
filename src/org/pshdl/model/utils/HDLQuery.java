@@ -81,13 +81,15 @@ public class HDLQuery {
 		public boolean apply(T obj) {
 			if (equalsTo == null) {
 				final boolean b = obj == null ? true : false;
-				if (invert)
+				if (invert) {
 					return !b;
+				}
 				return b;
 			}
 			final boolean equals = equalsTo.equals(obj);
-			if (invert)
+			if (invert) {
 				return !equals;
+			}
 			return equals;
 		}
 
@@ -102,8 +104,9 @@ public class HDLQuery {
 
 		@Override
 		public boolean apply(T obj) {
-			if (obj == null)
+			if (obj == null) {
 				return false;
+			}
 			return obj.toString().startsWith(equalsTo.toString());
 		}
 
@@ -139,10 +142,12 @@ public class HDLQuery {
 
 		@Override
 		public boolean apply(T obj) {
-			if (obj == null)
+			if (obj == null) {
 				return false;
-			if (matchLocally)
+			}
+			if (matchLocally) {
 				return new HDLQualifiedName(obj.toString()).getLocalPart().equals(equalsTo);
+			}
 			return new HDLQualifiedName(obj.toString()).getLastSegment().equals(equalsTo.getLastSegment());
 		}
 
@@ -169,7 +174,7 @@ public class HDLQuery {
 		@SuppressWarnings("unchecked")
 		private Set<T> getAllMatchingObjects() {
 			final T[] allObjectsOf = from.getAllObjectsOf(clazz, true);
-			final Set<T> list = new NonSameList<T>();
+			final Set<T> list = new NonSameList<>();
 			if (field != null) {
 				for (final T t : allObjectsOf) {
 					final K value = field.getValue(t);
@@ -189,17 +194,19 @@ public class HDLQuery {
 
 		public T getFirst() {
 			final Collection<T> res = getAllMatchingObjects();
-			if (res.isEmpty())
+			if (res.isEmpty()) {
 				return null;
+			}
 			final Iterator<T> iterator = res.iterator();
-			if (iterator.hasNext())
+			if (iterator.hasNext()) {
 				return iterator.next();
+			}
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
 		public Result<T, K> or(Predicate<K> value) {
-			return new Result<T, K>(from, clazz, field, Predicates.or(matcher, value));
+			return new Result<>(from, clazz, field, Predicates.or(matcher, value));
 		}
 
 	}
@@ -216,43 +223,38 @@ public class HDLQuery {
 		}
 
 		public Result<T, K> isEqualTo(K value) {
-			return new Result<T, K>(from, clazz, field, new EqualsMatcher<K>(value, false));
+			return new Result<>(from, clazz, field, new EqualsMatcher<K>(value, false));
 		}
 
 		public Result<T, K> startsWith(K ifRef) {
-			return new Result<T, K>(from, clazz, field, new StartsWithMatcher<K>(ifRef));
+			return new Result<>(from, clazz, field, new StartsWithMatcher<>(ifRef));
 		}
 
 		public Result<T, K> lastSegmentIs(String lastSegment) {
-			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher<K>(lastSegment));
+			return new Result<>(from, clazz, field, new LastSegmentMatcher<K>(lastSegment));
 		}
 
 		public Result<T, K> isNotEqualTo(K value) {
-			return new Result<T, K>(from, clazz, field, new EqualsMatcher<K>(value, true));
+			return new Result<>(from, clazz, field, new EqualsMatcher<K>(value, true));
 		}
 
 		public Result<T, K> matchesLocally(HDLQualifiedName fullName) {
-			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher<K>(fullName, true));
+			return new Result<>(from, clazz, field, new LastSegmentMatcher<K>(fullName, true));
 		}
 
 		public Result<T, K> matches(Predicate<K> predicate) {
-			return new Result<T, K>(from, clazz, field, predicate);
+			return new Result<>(from, clazz, field, predicate);
 		}
 
 		public <I extends IHDLObject> Result<T, I> fullNameIs(HDLQualifiedName asRef) {
-			if (field != null)
+			if (field != null) {
 				throw new IllegalArgumentException("Can only use fullNameIs on whereObj");
-			return new Result<T, I>(from, clazz, null, new FullNameMatcher<I>(asRef));
+			}
+			return new Result<>(from, clazz, null, new FullNameMatcher<I>(asRef));
 		}
 
 		public Result<T, K> isType(final HDLClass clazz) {
-			final Predicate<K> matcher = new Predicate<K>() {
-
-				@Override
-				public boolean apply(K input) {
-					return ((IHDLObject) input).getClassSet().contains(clazz);
-				}
-			};
+			final Predicate<K> matcher = input -> ((IHDLObject) input).getClassSet().contains(clazz);
 			return matches(matcher);
 		}
 
@@ -287,32 +289,32 @@ public class HDLQuery {
 		}
 
 		public Selector<T> from(IHDLObject obj) {
-			return new Selector<T>(clazz, obj);
+			return new Selector<>(clazz, obj);
 		}
 	}
 
 	public static <T extends IHDLObject> Source<T> select(Class<T> clazz) {
-		return new Source<T>(clazz);
+		return new Source<>(clazz);
 	}
 
 	public static <K> Predicate<K> isEqualTo(K value) {
-		return new EqualsMatcher<K>(value, false);
+		return new EqualsMatcher<>(value, false);
 	}
 
 	public static <K> Predicate<K> startsWith(K value) {
-		return new StartsWithMatcher<K>(value);
+		return new StartsWithMatcher<>(value);
 	}
 
 	public static <K> Predicate<K> isNotEqualTo(K value) {
-		return new EqualsMatcher<K>(value, true);
+		return new EqualsMatcher<>(value, true);
 	}
 
 	public static <K> Predicate<K> lastSegmentIs(String value) {
-		return new LastSegmentMatcher<K>(value);
+		return new LastSegmentMatcher<>(value);
 	}
 
 	public static <K> Predicate<K> matchesLocally(HDLQualifiedName value) {
-		return new LastSegmentMatcher<K>(value, true);
+		return new LastSegmentMatcher<>(value, true);
 	}
 
 	public static Collection<HDLEnumRef> getEnumRefs(IHDLObject from, HDLVariable hdlVariable) {

@@ -63,7 +63,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 		if (validate) {
 			exp = validateExp(exp);
 		}
-		this.exp = new ArrayList<HDLExpression>();
+		this.exp = new ArrayList<>();
 		if (exp != null) {
 			for (final HDLExpression newValue : exp) {
 				this.exp.add(newValue);
@@ -73,7 +73,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 
 	public AbstractHDLArrayInit() {
 		super();
-		this.exp = new ArrayList<HDLExpression>();
+		this.exp = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLExpression> exp;
@@ -89,8 +89,9 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	}
 
 	protected Iterable<HDLExpression> validateExp(Iterable<HDLExpression> exp) {
-		if (exp == null)
-			return new ArrayList<HDLExpression>();
+		if (exp == null) {
+			return new ArrayList<>();
+		}
 		return exp;
 	}
 
@@ -136,10 +137,8 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLArrayInit} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLArrayInit} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -152,8 +151,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 *
 	 * @param exp
 	 *            sets the new exp of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLArrayInit} with the updated exp
-	 *         field.
+	 * @return a new instance of {@link HDLArrayInit} with the updated exp field.
 	 */
 	@Nonnull
 	public HDLArrayInit setExp(@Nullable Iterable<HDLExpression> exp) {
@@ -167,13 +165,13 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 *
 	 * @param newExp
 	 *            the value that should be added to the field {@link #getExp()}
-	 * @return a new instance of {@link HDLArrayInit} with the updated exp
-	 *         field.
+	 * @return a new instance of {@link HDLArrayInit} with the updated exp field.
 	 */
 	@Nonnull
 	public HDLArrayInit addExp(@Nullable HDLExpression newExp) {
-		if (newExp == null)
+		if (newExp == null) {
 			throw new IllegalArgumentException("Element of exp can not be null!");
+		}
 		final ArrayList<HDLExpression> exp = (ArrayList<HDLExpression>) this.exp.clone();
 		exp.add(newExp);
 		final HDLArrayInit res = new HDLArrayInit(id, container, exp, false);
@@ -184,15 +182,14 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 * Removes a value from the field {@link #getExp()}.
 	 *
 	 * @param newExp
-	 *            the value that should be removed from the field
-	 *            {@link #getExp()}
-	 * @return a new instance of {@link HDLArrayInit} with the updated exp
-	 *         field.
+	 *            the value that should be removed from the field {@link #getExp()}
+	 * @return a new instance of {@link HDLArrayInit} with the updated exp field.
 	 */
 	@Nonnull
 	public HDLArrayInit removeExp(@Nullable HDLExpression newExp) {
-		if (newExp == null)
+		if (newExp == null) {
 			throw new IllegalArgumentException("Removed element of exp can not be null!");
+		}
 		final ArrayList<HDLExpression> exp = (ArrayList<HDLExpression>) this.exp.clone();
 		exp.remove(newExp);
 		final HDLArrayInit res = new HDLArrayInit(id, container, exp, false);
@@ -203,10 +200,8 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 * Removes a value from the field {@link #getExp()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getExp()}
-	 * @return a new instance of {@link HDLArrayInit} with the updated exp
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getExp()}
+	 * @return a new instance of {@link HDLArrayInit} with the updated exp field.
 	 */
 	@Nonnull
 	public HDLArrayInit removeExp(int idx) {
@@ -218,20 +213,26 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLArrayInit))
+		}
+		if (!(obj instanceof AbstractHDLArrayInit)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLArrayInit other = (AbstractHDLArrayInit) obj;
 		if (exp == null) {
-			if (other.exp != null)
+			if (other.exp != null) {
 				return false;
-		} else if (!exp.equals(other.exp))
+			}
+		} else if (!exp.equals(other.exp)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -239,8 +240,9 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((exp == null) ? 0 : exp.hashCode());

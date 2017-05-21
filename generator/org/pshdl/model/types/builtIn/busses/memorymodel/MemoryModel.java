@@ -60,8 +60,9 @@ public class MemoryModel {
 		System.out.println(unit);
 		final List<Row> rows = buildRows(unit);
 		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows, true);
-		if (builtHTML == null)
+		if (builtHTML == null) {
 			throw new IllegalArgumentException("buildHTML returned null");
+		}
 		System.out.println(new BusAccess().generateAccessC(unit, "test", rows, true));
 		System.out.println(new BusAccess().generateAccessH(unit, "test", rows, true));
 		// // SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
@@ -85,8 +86,9 @@ public class MemoryModel {
 				final Definition def = (Definition) ne;
 				final String name = def.getName(row);
 				final Definition stockDef = definitions.get(name);
-				if ((stockDef != null) && !def.equals(stockDef) && (def.type != Type.UNUSED))
+				if ((stockDef != null) && !def.equals(stockDef) && (def.type != Type.UNUSED)) {
 					throw new IllegalArgumentException("Two definitions with same name exist, but their type differs:" + def + " vs " + stockDef);
+				}
 				definitions.put(name, def);
 				final Integer val = defDimension.get(name);
 				if (val == null) {
@@ -127,10 +129,11 @@ public class MemoryModel {
 			case UNUSED:
 				continue;
 			}
-			if (type == null)
+			if (type == null) {
 				throw new IllegalArgumentException("Should not happen");
+			}
 			HDLVariableDeclaration hdv = new HDLVariableDeclaration().setType(type);
-			HDLRegisterConfig register = def.register ? HDLRegisterConfig.defaultConfig() : null;
+			final HDLRegisterConfig register = def.register ? HDLRegisterConfig.defaultConfig() : null;
 			hdv = hdv.setRegister(register);
 			switch (def.rw) {
 			case r:
@@ -162,10 +165,10 @@ public class MemoryModel {
 	}
 
 	public static List<Row> buildRows(Unit unit) {
-		final List<Row> rows = new LinkedList<Row>();
+		final List<Row> rows = new LinkedList<>();
 		for (final Object obj : unit.memory.getReferences()) {
 			if (obj instanceof Reference) {
-				Reference ref = (Reference) obj;
+				final Reference ref = (Reference) obj;
 				final Optional<NamedElement> optRes = unit.resolve(ref);
 				if (!optRes.isPresent()) {
 					continue;
@@ -184,7 +187,7 @@ public class MemoryModel {
 				addDeclarations(unit, rows, wrapConstant((Constant) obj), null, 0);
 			}
 		}
-		int hashCode = unit.getCheckSum();
+		final int hashCode = unit.getCheckSum();
 		for (final Row row : rows) {
 			row.updateInfo(hashCode);
 		}
@@ -192,7 +195,7 @@ public class MemoryModel {
 	}
 
 	private static Row wrapConstant(final Constant obj) {
-		Row row = new Row(obj.getName());
+		final Row row = new Row(obj.getName());
 		row.definitions.add(obj);
 		return row;
 	}
@@ -219,8 +222,9 @@ public class MemoryModel {
 		if (declaration instanceof Reference) {
 			final Reference ref = (Reference) declaration;
 			final Optional<NamedElement> optRes = unit.resolve(ref);
-			if (!optRes.isPresent())
+			if (!optRes.isPresent()) {
 				throw new IllegalArgumentException("Reference not a row, column or reference:" + declaration);
+			}
 			final NamedElement decl = optRes.get();
 			if (ref.dimensions.size() != 0) {
 				for (final Integer num : ref.dimensions) {
@@ -241,7 +245,7 @@ public class MemoryModel {
 		int usedSize = 0;
 		boolean fillFound = false;
 		final Row res = new Row(row.getOrigName());
-		final List<Definition> definitions = new LinkedList<Definition>();
+		final List<Definition> definitions = new LinkedList<>();
 		final Definition unusedFill = new Definition();
 		unusedFill.name = "unused";
 		for (NamedElement decl : row.definitions) {
@@ -260,8 +264,9 @@ public class MemoryModel {
 			if (decl instanceof Definition) {
 				final Definition def = (Definition) decl;
 				if ((def.type == Type.UNUSED) && (def.width < 0)) {
-					if (fillFound)
+					if (fillFound) {
 						throw new IllegalArgumentException("Can not have more than one fill");
+					}
 					fillFound = true;
 					definitions.add(unusedFill);
 					continue;
@@ -269,10 +274,12 @@ public class MemoryModel {
 				usedSize += handleDefinition(definitions, def);
 			}
 		}
-		if (usedSize > Unit.rowWidth)
+		if (usedSize > Unit.rowWidth) {
 			throw new IllegalArgumentException("The row:" + row.getName() + " has more bits (" + usedSize + ") than a row has bits.");
-		if ((usedSize != Unit.rowWidth) && (fillFound == false))
+		}
+		if ((usedSize != Unit.rowWidth) && (fillFound == false)) {
 			throw new IllegalArgumentException("The row:" + row.getName() + " has a size of:" + usedSize + " but does not contain a fill");
+		}
 		if (usedSize == Unit.rowWidth) {
 			definitions.remove(unusedFill);
 		}
@@ -288,8 +295,9 @@ public class MemoryModel {
 		for (NamedElement declaration : values) {
 			if (declaration instanceof Reference) {
 				final Reference ref = (Reference) declaration;
-				if ("fill".equals(ref.name))
+				if ("fill".equals(ref.name)) {
 					throw new IllegalArgumentException("Fill not allowed in reference");
+				}
 				final Optional<NamedElement> optRes = unit.resolve(ref);
 				if (!optRes.isPresent()) {
 					continue;

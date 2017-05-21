@@ -44,8 +44,7 @@ import com.google.common.collect.Maps;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLVariableDeclaration&gt; ports. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLVariableDeclaration&gt; ports. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLInterface extends AbstractHDLInterface {
@@ -54,7 +53,6 @@ public class HDLInterface extends AbstractHDLInterface {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -84,46 +82,44 @@ public class HDLInterface extends AbstractHDLInterface {
 	}
 
 	/**
-	 * The accessor for the field ports which is of type
-	 * ArrayList&lt;HDLVariableDeclaration&gt;.
+	 * The accessor for the field ports which is of type ArrayList&lt;HDLVariableDeclaration&gt;.
 	 */
 	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>("ports",
 			HDLVariableDeclaration.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLVariableDeclaration> getValue(HDLInterface obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getPorts();
 		}
 
 		@Override
 		public HDLInterface setValue(HDLInterface obj, ArrayList<HDLVariableDeclaration> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setPorts(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (ports.contains(obj))
+		if (ports.contains(obj)) {
 			return fPorts;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
 	/**
-	 * Returns <code>true</code> when all of this ports can be found in the
-	 * given interface. When complementDirection is <code>true</code>, the
-	 * direction will be inverted. Internals, constants and hidden variables are
-	 * ignored.
+	 * Returns <code>true</code> when all of this ports can be found in the given interface. When complementDirection is <code>true</code>,
+	 * the direction will be inverted. Internals, constants and hidden variables are ignored.
 	 *
 	 * @param hdlInterface
 	 * @param complementDirection
-	 *            if <code>true</code> the directions of this interface will be
-	 *            inverted
-	 * @return <code>true</code> when all of this ports can be found in the
-	 *         given interface
+	 *            if <code>true</code> the directions of this interface will be inverted
+	 * @return <code>true</code> when all of this ports can be found in the given interface
 	 */
 	public boolean conformsTo(HDLInterface hdlInterface, boolean complementDirection) {
 		final ArrayList<HDLVariableDeclaration> thisPorts = getPorts();
@@ -148,8 +144,9 @@ public class HDLInterface extends AbstractHDLInterface {
 		outer: for (final HDLVariableDeclaration portDecl : otherPorts) {
 			for (final HDLVariable hvar : portDecl.getVariables()) {
 				final HDLVariable thisPort = thisPortsByName.get(hvar.getName());
-				if (thisPort == null)
+				if (thisPort == null) {
 					return false;
+				}
 				HDLDirection newDirection = portDecl.getDirection();
 				switch (newDirection) {
 				case CONSTANT:
@@ -174,15 +171,18 @@ public class HDLInterface extends AbstractHDLInterface {
 					}
 					break;
 				}
-				if (hvar.getDirection() != newDirection)
+				if (hvar.getDirection() != newDirection) {
 					return false;
-				if (!hvar.setAnnotations(null).setDefaultValue(null).equals(thisPort))
+				}
+				if (!hvar.setAnnotations(null).setDefaultValue(null).equals(thisPort)) {
 					return false;
+				}
 				thisPortsByName.remove(hvar.getName());
 			}
 		}
-		if (!thisPortsByName.isEmpty())
+		if (!thisPortsByName.isEmpty()) {
 			return false;
+		}
 		return true;
 	}
 

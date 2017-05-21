@@ -50,7 +50,6 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -83,23 +82,26 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLEnumRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHEnumRefName();
 		}
 
 		@Override
 		public HDLEnumRef setValue(HDLEnumRef obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHEnum(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hEnum == obj)
+		if (hEnum == obj) {
 			return fHEnum;
+		}
 		return super.getContainingFeature(obj);
 	}
 
@@ -107,8 +109,9 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	@Override
 	public Optional<HDLVariable> resolveVar() {
 		final Optional<HDLEnum> resolveHEnum = resolveHEnum();
-		if (!resolveHEnum.isPresent())
+		if (!resolveHEnum.isPresent()) {
 			return Optional.absent();
+		}
 		final Optional<HDLVariable> var = ScopingExtension.getVariable(resolveHEnum.get(), getVarRefName().getLastSegment());
 		return var;
 	}

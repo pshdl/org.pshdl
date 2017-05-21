@@ -105,8 +105,9 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	}
 
 	protected HDLManipType validateType(HDLManipType type) {
-		if (type == null)
+		if (type == null) {
 			throw new IllegalArgumentException("The field type can not be null!");
+		}
 		return type;
 	}
 
@@ -123,8 +124,9 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	}
 
 	protected HDLExpression validateTarget(HDLExpression target) {
-		if (target == null)
+		if (target == null) {
 			throw new IllegalArgumentException("The field target can not be null!");
+		}
 		return target;
 	}
 
@@ -188,10 +190,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLManip} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLManip} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -203,8 +203,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * Setter for the field {@link #getType()}.
 	 *
 	 * @param type
-	 *            sets the new type of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new type of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLManip} with the updated type field.
 	 */
 	@Nonnull
@@ -218,8 +217,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * Setter for the field {@link #getTarget()}.
 	 *
 	 * @param target
-	 *            sets the new target of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new target of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLManip} with the updated target field.
 	 */
 	@Nonnull
@@ -245,30 +243,40 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLManip))
+		}
+		if (!(obj instanceof AbstractHDLManip)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLManip other = (AbstractHDLManip) obj;
 		if (type == null) {
-			if (other.type != null)
+			if (other.type != null) {
 				return false;
-		} else if (!type.equals(other.type))
+			}
+		} else if (!type.equals(other.type)) {
 			return false;
+		}
 		if (target == null) {
-			if (other.target != null)
+			if (other.target != null) {
 				return false;
-		} else if (!target.equals(other.target))
+			}
+		} else if (!target.equals(other.target)) {
 			return false;
+		}
 		if (castTo == null) {
-			if (other.castTo != null)
+			if (other.castTo != null) {
 				return false;
-		} else if (!castTo.equals(other.castTo))
+			}
+		} else if (!castTo.equals(other.castTo)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -276,8 +284,9 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((type == null) ? 0 : type.hashCode());

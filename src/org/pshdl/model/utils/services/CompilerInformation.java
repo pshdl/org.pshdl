@@ -40,7 +40,7 @@ public class CompilerInformation {
 
 		public final String provider;
 		public final String description;
-		public final Map<String, String> arguments = new LinkedHashMap<String, String>();
+		public final Map<String, String> arguments = new LinkedHashMap<>();
 		public final String returnInfo;
 		public final HDLFunction[] function;
 
@@ -73,7 +73,7 @@ public class CompilerInformation {
 		public final String provider;
 		public final String name;
 		public final String summary;
-		public final Map<String, String> arguments = new LinkedHashMap<String, String>();
+		public final Map<String, String> arguments = new LinkedHashMap<>();
 
 		public GeneratorInformation(String provider, String name, String summary) {
 			super();
@@ -84,11 +84,11 @@ public class CompilerInformation {
 	}
 
 	public final String version;
-	public final Map<String, AnnotationInformation> registeredAnnotations = new LinkedHashMap<String, AnnotationInformation>();
-	public final Map<String, GeneratorInformation> registeredGenerators = new LinkedHashMap<String, GeneratorInformation>();
+	public final Map<String, AnnotationInformation> registeredAnnotations = new LinkedHashMap<>();
+	public final Map<String, GeneratorInformation> registeredGenerators = new LinkedHashMap<>();
 	public final Multimap<String, FunctionInformation> registeredFunctions = HashMultimap.create();
-	public final Map<String, IHDLValidator> registeredValidators = new LinkedHashMap<String, IHDLValidator>();
-	public final Map<String, IInsulinParticitant> registeredInsulinParticipant = new LinkedHashMap<String, IInsulinParticitant>();
+	public final Map<String, IHDLValidator> registeredValidators = new LinkedHashMap<>();
+	public final Map<String, IInsulinParticitant> registeredInsulinParticipant = new LinkedHashMap<>();
 
 	public CompilerInformation(String version) {
 		super();

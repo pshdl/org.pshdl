@@ -47,7 +47,6 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -86,8 +85,9 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 		@Nullable
 		public static HDLShiftOpType getOp(String op) {
 			for (final HDLShiftOpType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -105,23 +105,26 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>("type", HDLShiftOpType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLShiftOpType getValue(HDLShiftOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLShiftOp setValue(HDLShiftOp obj, HDLShiftOpType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (type == obj)
+		if (type == obj) {
 			return fType;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

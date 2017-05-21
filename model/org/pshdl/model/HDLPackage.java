@@ -42,8 +42,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String pkg. Can be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLUnit&gt; units. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLDeclaration&gt; declarations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLDeclaration&gt; declarations. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLPackage extends AbstractHDLPackage {
@@ -52,7 +51,6 @@ public class HDLPackage extends AbstractHDLPackage {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param libURI
@@ -89,15 +87,17 @@ public class HDLPackage extends AbstractHDLPackage {
 	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>("libURI", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLibURI();
 		}
 
 		@Override
 		public HDLPackage setValue(HDLPackage obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setLibURI(value);
 		}
 	};
@@ -107,69 +107,77 @@ public class HDLPackage extends AbstractHDLPackage {
 	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>("pkg", String.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public String getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getPkg();
 		}
 
 		@Override
 		public HDLPackage setValue(HDLPackage obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setPkg(value);
 		}
 	};
 	/**
-	 * The accessor for the field units which is of type
-	 * ArrayList&lt;HDLUnit&gt;.
+	 * The accessor for the field units which is of type ArrayList&lt;HDLUnit&gt;.
 	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>("units", HDLUnit.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLUnit> getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getUnits();
 		}
 
 		@Override
 		public HDLPackage setValue(HDLPackage obj, ArrayList<HDLUnit> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setUnits(value);
 		}
 	};
 	/**
-	 * The accessor for the field declarations which is of type
-	 * ArrayList&lt;HDLDeclaration&gt;.
+	 * The accessor for the field declarations which is of type ArrayList&lt;HDLDeclaration&gt;.
 	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>("declarations",
 			HDLDeclaration.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLDeclaration> getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDeclarations();
 		}
 
 		@Override
 		public HDLPackage setValue(HDLPackage obj, ArrayList<HDLDeclaration> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDeclarations(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (libURI == obj)
+		if (libURI == obj) {
 			return fLibURI;
-		if (pkg == obj)
+		}
+		if (pkg == obj) {
 			return fPkg;
-		if (units.contains(obj))
+		}
+		if (units.contains(obj)) {
 			return fUnits;
-		if (declarations.contains(obj))
+		}
+		if (declarations.contains(obj)) {
 			return fDeclarations;
+		}
 		return super.getContainingFeature(obj);
 	}
 

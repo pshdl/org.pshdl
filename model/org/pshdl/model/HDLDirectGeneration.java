@@ -37,8 +37,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLDirectGeneration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLArgument&gt; arguments. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can be <code>null</code>.</li>
@@ -53,7 +52,6 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -65,11 +63,9 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param hIf
 	 *            the value for hIf. Can be <code>null</code>.
 	 * @param generatorID
-	 *            the value for generatorID. Can <b>not</b> be <code>null</code>
-	 *            .
+	 *            the value for generatorID. Can <b>not</b> be <code>null</code> .
 	 * @param generatorContent
-	 *            the value for generatorContent. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            the value for generatorContent. Can <b>not</b> be <code>null</code>.
 	 * @param include
 	 *            the value for include. Can <b>not</b> be <code>null</code>.
 	 * @param validate
@@ -100,15 +96,17 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLInterface getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIf();
 		}
 
 		@Override
 		public HDLDirectGeneration setValue(HDLDirectGeneration obj, HDLInterface value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHIf(value);
 		}
 	};
@@ -119,15 +117,17 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getGeneratorID();
 		}
 
 		@Override
 		public HDLDirectGeneration setValue(HDLDirectGeneration obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setGeneratorID(value);
 		}
 	};
@@ -138,15 +138,17 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getGeneratorContent();
 		}
 
 		@Override
 		public HDLDirectGeneration setValue(HDLDirectGeneration obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setGeneratorContent(value);
 		}
 	};
@@ -157,29 +159,35 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getInclude();
 		}
 
 		@Override
 		public HDLDirectGeneration setValue(HDLDirectGeneration obj, Boolean value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setInclude(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hIf == obj)
+		if (hIf == obj) {
 			return fHIf;
-		if (generatorID == obj)
+		}
+		if (generatorID == obj) {
 			return fGeneratorID;
-		if (generatorContent == obj)
+		}
+		if (generatorContent == obj) {
 			return fGeneratorContent;
-		if (include == obj)
+		}
+		if (include == obj) {
 			return fInclude;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
@@ -188,8 +196,9 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 
 	@Override
 	public HDLInterface getHIf() {
-		if (hif != null)
+		if (hif != null) {
 			return hif;
+		}
 		hif = HDLGenerators.getInterface(this).orNull();
 		return hif;
 	}

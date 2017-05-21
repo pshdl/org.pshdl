@@ -42,17 +42,21 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	public HDLQualifiedName(String[] qfn) {
 		this.qfn = qfn;
-		if (qfn == null)
+		if (qfn == null) {
 			throw new IllegalArgumentException("Segments may not be null");
+		}
 		this.length = qfn.length;
 		if (validate) {
 			for (final String string : qfn) {
-				if (string == null)
+				if (string == null) {
 					throw new IllegalArgumentException("Segments may not be null");
-				if (string.contains("."))
+				}
+				if (string.contains(".")) {
 					throw new IllegalArgumentException("Segments may not contain dots");
-				if (string.isEmpty())
+				}
+				if (string.isEmpty()) {
 					throw new IllegalArgumentException("Segments may not be empty");
+				}
 			}
 		}
 	}
@@ -76,15 +80,19 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final HDLQualifiedName other = (HDLQualifiedName) obj;
-		if (!Arrays.equals(qfn, other.qfn))
+		if (!Arrays.equals(qfn, other.qfn)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -107,8 +115,9 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	@Nonnull
 	public HDLQualifiedName skipLast(int i) {
 		final int len = qfn.length - i;
-		if (len < 0)
+		if (len < 0) {
 			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
+		}
 		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, 0, newQfn, 0, len);
 		return new HDLQualifiedName(newQfn);
@@ -159,8 +168,9 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	@Nonnull
 	public HDLQualifiedName skipFirst(int i) {
 		final int len = qfn.length - i;
-		if (len < 0)
+		if (len < 0) {
 			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
+		}
 		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, i, newQfn, 0, len);
 		return new HDLQualifiedName(newQfn);
@@ -174,8 +184,9 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	@Nonnull
 	public HDLQualifiedName toSegment(int i) {
 		final int len = i;
-		if ((len < 0) || (len >= qfn.length))
+		if ((len < 0) || (len >= qfn.length)) {
 			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
+		}
 		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, 0, newQfn, 0, len);
 		return new HDLQualifiedName(newQfn);
@@ -183,7 +194,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName append(HDLQualifiedName hdlQualifiedName) {
-		final LinkedList<String> ll = new LinkedList<String>();
+		final LinkedList<String> ll = new LinkedList<>();
 		ll.addAll(Arrays.asList(this.qfn));
 		ll.addAll(Arrays.asList(hdlQualifiedName.qfn));
 		return HDLQualifiedName.create(ll);
@@ -191,25 +202,28 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName getTypePart() {
-		final List<String> res = new LinkedList<String>();
-		for (final String segment : qfn)
+		final List<String> res = new LinkedList<>();
+		for (final String segment : qfn) {
 			if (segment.charAt(0) != LOCAL_TYPE_SEP) {
 				res.add(segment);
 			} else {
 				break;
 			}
+		}
 		return create(res);
 	}
 
 	@Nonnull
 	public HDLQualifiedName getLocalPart() {
-		final List<String> res = new LinkedList<String>();
-		if (qfn.length <= 1)
+		final List<String> res = new LinkedList<>();
+		if (qfn.length <= 1) {
 			return this;
-		for (final String segment : qfn)
+		}
+		for (final String segment : qfn) {
 			if (segment.charAt(0) == LOCAL_TYPE_SEP) {
 				res.add(segment);
 			}
+		}
 		res.add(getLastSegment());
 		return create(res);
 	}

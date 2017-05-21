@@ -48,8 +48,7 @@ import com.google.common.collect.Lists;
 @SuppressWarnings("all")
 public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolvedFragment {
 	/**
-	 * Constructs a new instance of
-	 * {@link AbstractHDLUnresolvedFragmentFunction}
+	 * Constructs a new instance of {@link AbstractHDLUnresolvedFragmentFunction}
 	 *
 	 * @param id
 	 *            a unique number for each instance
@@ -58,8 +57,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @param frag
 	 *            the value for frag. Can <b>not</b> be <code>null</code>.
 	 * @param isStatement
-	 *            the value for isStatement. Can <b>not</b> be <code>null</code>
-	 *            .
+	 *            the value for isStatement. Can <b>not</b> be <code>null</code> .
 	 * @param array
 	 *            the value for array. Can be <code>null</code>.
 	 * @param bits
@@ -78,7 +76,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 		if (validate) {
 			params = validateParams(params);
 		}
-		this.params = new ArrayList<HDLExpression>();
+		this.params = new ArrayList<>();
 		if (params != null) {
 			for (final HDLExpression newValue : params) {
 				this.params.add(newValue);
@@ -88,7 +86,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	public AbstractHDLUnresolvedFragmentFunction() {
 		super();
-		this.params = new ArrayList<HDLExpression>();
+		this.params = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLExpression> params;
@@ -104,8 +102,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	}
 
 	protected Iterable<HDLExpression> validateParams(Iterable<HDLExpression> params) {
-		if (params == null)
-			return new ArrayList<HDLExpression>();
+		if (params == null) {
+			return new ArrayList<>();
+		}
 		return params;
 	}
 
@@ -157,10 +156,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLUnresolvedFragmentFunction} with
-	 *         the updated container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLUnresolvedFragmentFunction} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -172,10 +169,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Setter for the field {@link #getFrag()}.
 	 *
 	 * @param frag
-	 *            sets the new frag of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated frag field.
+	 *            sets the new frag of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated frag field.
 	 */
 	@Override
 	@Nonnull
@@ -189,10 +184,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Setter for the field {@link #getIsStatement()}.
 	 *
 	 * @param isStatement
-	 *            sets the new isStatement of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated isStatement field.
+	 *            sets the new isStatement of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated isStatement field.
 	 */
 	@Override
 	@Nonnull
@@ -206,10 +199,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Setter for the field {@link #getIsStatement()}.
 	 *
 	 * @param isStatement
-	 *            sets the new isStatement of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated isStatement field.
+	 *            sets the new isStatement of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated isStatement field.
 	 */
 	@Override
 	@Nonnull
@@ -224,8 +215,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 *
 	 * @param array
 	 *            sets the new array of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated array field.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated array field.
 	 */
 	@Override
 	@Nonnull
@@ -239,16 +229,15 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Adds a new value to the field {@link #getArray()}.
 	 *
 	 * @param newArray
-	 *            the value that should be added to the field
-	 *            {@link #getArray()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated array field.
+	 *            the value that should be added to the field {@link #getArray()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated array field.
 	 */
 	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction addArray(@Nullable HDLExpression newArray) {
-		if (newArray == null)
+		if (newArray == null) {
 			throw new IllegalArgumentException("Element of array can not be null!");
+		}
 		final ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.add(newArray);
 		final HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(id, container, frag, isStatement, array, bits, sub, params, false);
@@ -259,16 +248,15 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Removes a value from the field {@link #getArray()}.
 	 *
 	 * @param newArray
-	 *            the value that should be removed from the field
-	 *            {@link #getArray()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated array field.
+	 *            the value that should be removed from the field {@link #getArray()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated array field.
 	 */
 	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction removeArray(@Nullable HDLExpression newArray) {
-		if (newArray == null)
+		if (newArray == null) {
 			throw new IllegalArgumentException("Removed element of array can not be null!");
+		}
 		final ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(newArray);
 		final HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(id, container, frag, isStatement, array, bits, sub, params, false);
@@ -279,10 +267,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Removes a value from the field {@link #getArray()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getArray()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated array field.
+	 *            the index of the value that should be removed from the field {@link #getArray()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated array field.
 	 */
 	@Override
 	@Nonnull
@@ -298,8 +284,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 *
 	 * @param bits
 	 *            sets the new bits of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated bits field.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated bits field.
 	 */
 	@Override
 	@Nonnull
@@ -314,14 +299,14 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 *
 	 * @param newBits
 	 *            the value that should be added to the field {@link #getBits()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated bits field.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated bits field.
 	 */
 	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction addBits(@Nullable HDLRange newBits) {
-		if (newBits == null)
+		if (newBits == null) {
 			throw new IllegalArgumentException("Element of bits can not be null!");
+		}
 		final ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.add(newBits);
 		final HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(id, container, frag, isStatement, array, bits, sub, params, false);
@@ -332,16 +317,15 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Removes a value from the field {@link #getBits()}.
 	 *
 	 * @param newBits
-	 *            the value that should be removed from the field
-	 *            {@link #getBits()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated bits field.
+	 *            the value that should be removed from the field {@link #getBits()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated bits field.
 	 */
 	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction removeBits(@Nullable HDLRange newBits) {
-		if (newBits == null)
+		if (newBits == null) {
 			throw new IllegalArgumentException("Removed element of bits can not be null!");
+		}
 		final ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(newBits);
 		final HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(id, container, frag, isStatement, array, bits, sub, params, false);
@@ -352,10 +336,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Removes a value from the field {@link #getBits()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getBits()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated bits field.
+	 *            the index of the value that should be removed from the field {@link #getBits()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated bits field.
 	 */
 	@Override
 	@Nonnull
@@ -371,8 +353,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 *
 	 * @param sub
 	 *            sets the new sub of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated sub field.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated sub field.
 	 */
 	@Override
 	@Nonnull
@@ -387,8 +368,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 *
 	 * @param params
 	 *            sets the new params of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated params field.
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated params field.
 	 */
 	@Nonnull
 	public HDLUnresolvedFragmentFunction setParams(@Nullable Iterable<HDLExpression> params) {
@@ -401,15 +381,14 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Adds a new value to the field {@link #getParams()}.
 	 *
 	 * @param newParams
-	 *            the value that should be added to the field
-	 *            {@link #getParams()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated params field.
+	 *            the value that should be added to the field {@link #getParams()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated params field.
 	 */
 	@Nonnull
 	public HDLUnresolvedFragmentFunction addParams(@Nullable HDLExpression newParams) {
-		if (newParams == null)
+		if (newParams == null) {
 			throw new IllegalArgumentException("Element of params can not be null!");
+		}
 		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.add(newParams);
 		final HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(id, container, frag, isStatement, array, bits, sub, params, false);
@@ -420,15 +399,14 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Removes a value from the field {@link #getParams()}.
 	 *
 	 * @param newParams
-	 *            the value that should be removed from the field
-	 *            {@link #getParams()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated params field.
+	 *            the value that should be removed from the field {@link #getParams()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated params field.
 	 */
 	@Nonnull
 	public HDLUnresolvedFragmentFunction removeParams(@Nullable HDLExpression newParams) {
-		if (newParams == null)
+		if (newParams == null) {
 			throw new IllegalArgumentException("Removed element of params can not be null!");
+		}
 		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(newParams);
 		final HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(id, container, frag, isStatement, array, bits, sub, params, false);
@@ -439,10 +417,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * Removes a value from the field {@link #getParams()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getParams()}
-	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
-	 *         updated params field.
+	 *            the index of the value that should be removed from the field {@link #getParams()}
+	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the updated params field.
 	 */
 	@Nonnull
 	public HDLUnresolvedFragmentFunction removeParams(int idx) {
@@ -454,20 +430,26 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLUnresolvedFragmentFunction))
+		}
+		if (!(obj instanceof AbstractHDLUnresolvedFragmentFunction)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLUnresolvedFragmentFunction other = (AbstractHDLUnresolvedFragmentFunction) obj;
 		if (params == null) {
-			if (other.params != null)
+			if (other.params != null) {
 				return false;
-		} else if (!params.equals(other.params))
+			}
+		} else if (!params.equals(other.params)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -475,8 +457,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((params == null) ? 0 : params.hashCode());

@@ -46,7 +46,6 @@ public class HDLArgument extends AbstractHDLArgument {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -78,15 +77,17 @@ public class HDLArgument extends AbstractHDLArgument {
 	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLArgument obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 
 		@Override
 		public HDLArgument setValue(HDLArgument obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setName(value);
 		}
 	};
@@ -97,25 +98,29 @@ public class HDLArgument extends AbstractHDLArgument {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLArgument obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getExpression();
 		}
 
 		@Override
 		public HDLArgument setValue(HDLArgument obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setExpression(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (name == obj)
+		if (name == obj) {
 			return fName;
-		if (expression == obj)
+		}
+		if (expression == obj) {
 			return fExpression;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

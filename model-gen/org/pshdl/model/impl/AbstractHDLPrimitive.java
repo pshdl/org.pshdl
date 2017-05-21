@@ -102,8 +102,9 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	}
 
 	protected HDLPrimitiveType validateType(HDLPrimitiveType type) {
-		if (type == null)
+		if (type == null) {
 			throw new IllegalArgumentException("The field type can not be null!");
+		}
 		return type;
 	}
 
@@ -169,10 +170,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLPrimitive} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLPrimitive} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -184,10 +183,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLPrimitive} with the updated name
-	 *         field.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLPrimitive} with the updated name field.
 	 */
 	@Override
 	@Nonnull
@@ -202,8 +199,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 *
 	 * @param dim
 	 *            sets the new dim of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLPrimitive} with the updated dim
-	 *         field.
+	 * @return a new instance of {@link HDLPrimitive} with the updated dim field.
 	 */
 	@Override
 	@Nonnull
@@ -218,14 +214,14 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 *
 	 * @param newDim
 	 *            the value that should be added to the field {@link #getDim()}
-	 * @return a new instance of {@link HDLPrimitive} with the updated dim
-	 *         field.
+	 * @return a new instance of {@link HDLPrimitive} with the updated dim field.
 	 */
 	@Override
 	@Nonnull
 	public HDLPrimitive addDim(@Nullable HDLExpression newDim) {
-		if (newDim == null)
+		if (newDim == null) {
 			throw new IllegalArgumentException("Element of dim can not be null!");
+		}
 		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.add(newDim);
 		final HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
@@ -236,16 +232,15 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * Removes a value from the field {@link #getDim()}.
 	 *
 	 * @param newDim
-	 *            the value that should be removed from the field
-	 *            {@link #getDim()}
-	 * @return a new instance of {@link HDLPrimitive} with the updated dim
-	 *         field.
+	 *            the value that should be removed from the field {@link #getDim()}
+	 * @return a new instance of {@link HDLPrimitive} with the updated dim field.
 	 */
 	@Override
 	@Nonnull
 	public HDLPrimitive removeDim(@Nullable HDLExpression newDim) {
-		if (newDim == null)
+		if (newDim == null) {
 			throw new IllegalArgumentException("Removed element of dim can not be null!");
+		}
 		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(newDim);
 		final HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
@@ -256,10 +251,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * Removes a value from the field {@link #getDim()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getDim()}
-	 * @return a new instance of {@link HDLPrimitive} with the updated dim
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getDim()}
+	 * @return a new instance of {@link HDLPrimitive} with the updated dim field.
 	 */
 	@Nonnull
 	public HDLPrimitive removeDim(int idx) {
@@ -273,10 +266,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * Setter for the field {@link #getType()}.
 	 *
 	 * @param type
-	 *            sets the new type of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLPrimitive} with the updated type
-	 *         field.
+	 *            sets the new type of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLPrimitive} with the updated type field.
 	 */
 	@Nonnull
 	public HDLPrimitive setType(@Nonnull HDLPrimitiveType type) {
@@ -290,8 +281,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 *
 	 * @param width
 	 *            sets the new width of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLPrimitive} with the updated width
-	 *         field.
+	 * @return a new instance of {@link HDLPrimitive} with the updated width field.
 	 */
 	@Nonnull
 	public HDLPrimitive setWidth(@Nullable HDLExpression width) {
@@ -302,25 +292,33 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLPrimitive))
+		}
+		if (!(obj instanceof AbstractHDLPrimitive)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLPrimitive other = (AbstractHDLPrimitive) obj;
 		if (type == null) {
-			if (other.type != null)
+			if (other.type != null) {
 				return false;
-		} else if (!type.equals(other.type))
+			}
+		} else if (!type.equals(other.type)) {
 			return false;
+		}
 		if (width == null) {
-			if (other.width != null)
+			if (other.width != null) {
 				return false;
-		} else if (!width.equals(other.width))
+			}
+		} else if (!width.equals(other.width)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -328,8 +326,9 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((type == null) ? 0 : type.hashCode());

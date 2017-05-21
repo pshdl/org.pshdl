@@ -40,8 +40,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLVariable&gt; enums. Can <b>not</b> be <code>null</code>,
- * additionally the collection must contain at least one element.</li>
+ * <li>ArrayList&lt;HDLVariable&gt; enums. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one
+ * element.</li>
  * </ul>
  */
 public class HDLEnum extends AbstractHDLEnum {
@@ -50,7 +50,6 @@ public class HDLEnum extends AbstractHDLEnum {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -58,8 +57,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	 * @param dim
 	 *            the value for dim. Can be <code>null</code>.
 	 * @param enums
-	 *            the value for enums. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for enums. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
@@ -80,30 +78,32 @@ public class HDLEnum extends AbstractHDLEnum {
 	}
 
 	/**
-	 * The accessor for the field enums which is of type
-	 * ArrayList&lt;HDLVariable&gt;.
+	 * The accessor for the field enums which is of type ArrayList&lt;HDLVariable&gt;.
 	 */
 	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>("enums", HDLVariable.class,
 			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLEnum obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getEnums();
 		}
 
 		@Override
 		public HDLEnum setValue(HDLEnum obj, ArrayList<HDLVariable> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setEnums(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (enums.contains(obj))
+		if (enums.contains(obj)) {
 			return fEnums;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

@@ -71,7 +71,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		if (validate) {
 			annotations = validateAnnotations(annotations);
 		}
-		this.annotations = new ArrayList<HDLAnnotation>();
+		this.annotations = new ArrayList<>();
 		if (annotations != null) {
 			for (final HDLAnnotation newValue : annotations) {
 				this.annotations.add(newValue);
@@ -88,7 +88,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		if (validate) {
 			arguments = validateArguments(arguments);
 		}
-		this.arguments = new ArrayList<HDLArgument>();
+		this.arguments = new ArrayList<>();
 		if (arguments != null) {
 			for (final HDLArgument newValue : arguments) {
 				this.arguments.add(newValue);
@@ -98,9 +98,9 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 
 	public AbstractHDLInstantiation() {
 		super();
-		this.annotations = new ArrayList<HDLAnnotation>();
+		this.annotations = new ArrayList<>();
 		this.var = null;
-		this.arguments = new ArrayList<HDLArgument>();
+		this.arguments = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLAnnotation> annotations;
@@ -116,8 +116,9 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	}
 
 	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
-		if (annotations == null)
-			return new ArrayList<HDLAnnotation>();
+		if (annotations == null) {
+			return new ArrayList<>();
+		}
 		return annotations;
 	}
 
@@ -134,8 +135,9 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	}
 
 	protected HDLVariable validateVar(HDLVariable var) {
-		if (var == null)
+		if (var == null) {
 			throw new IllegalArgumentException("The field var can not be null!");
+		}
 		return var;
 	}
 
@@ -152,8 +154,9 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	}
 
 	protected Iterable<HDLArgument> validateArguments(Iterable<HDLArgument> arguments) {
-		if (arguments == null)
-			return new ArrayList<HDLArgument>();
+		if (arguments == null) {
+			return new ArrayList<>();
+		}
 		return arguments;
 	}
 
@@ -207,30 +210,40 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLInstantiation))
+		}
+		if (!(obj instanceof AbstractHDLInstantiation)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLInstantiation other = (AbstractHDLInstantiation) obj;
 		if (annotations == null) {
-			if (other.annotations != null)
+			if (other.annotations != null) {
 				return false;
-		} else if (!annotations.equals(other.annotations))
+			}
+		} else if (!annotations.equals(other.annotations)) {
 			return false;
+		}
 		if (var == null) {
-			if (other.var != null)
+			if (other.var != null) {
 				return false;
-		} else if (!var.equals(other.var))
+			}
+		} else if (!var.equals(other.var)) {
 			return false;
+		}
 		if (arguments == null) {
-			if (other.arguments != null)
+			if (other.arguments != null) {
 				return false;
-		} else if (!arguments.equals(other.arguments))
+			}
+		} else if (!arguments.equals(other.arguments)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -238,8 +251,9 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());

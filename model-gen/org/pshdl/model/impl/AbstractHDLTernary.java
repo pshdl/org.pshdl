@@ -108,8 +108,9 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	}
 
 	protected HDLExpression validateIfExpr(HDLExpression ifExpr) {
-		if (ifExpr == null)
+		if (ifExpr == null) {
 			throw new IllegalArgumentException("The field ifExpr can not be null!");
+		}
 		return ifExpr;
 	}
 
@@ -126,8 +127,9 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	}
 
 	protected HDLExpression validateThenExpr(HDLExpression thenExpr) {
-		if (thenExpr == null)
+		if (thenExpr == null) {
 			throw new IllegalArgumentException("The field thenExpr can not be null!");
+		}
 		return thenExpr;
 	}
 
@@ -144,8 +146,9 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	}
 
 	protected HDLExpression validateElseExpr(HDLExpression elseExpr) {
-		if (elseExpr == null)
+		if (elseExpr == null) {
 			throw new IllegalArgumentException("The field elseExpr can not be null!");
+		}
 		return elseExpr;
 	}
 
@@ -193,10 +196,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLTernary} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLTernary} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -208,10 +209,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * Setter for the field {@link #getIfExpr()}.
 	 *
 	 * @param ifExpr
-	 *            sets the new ifExpr of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLTernary} with the updated ifExpr
-	 *         field.
+	 *            sets the new ifExpr of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLTernary} with the updated ifExpr field.
 	 */
 	@Nonnull
 	public HDLTernary setIfExpr(@Nonnull HDLExpression ifExpr) {
@@ -224,10 +223,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * Setter for the field {@link #getThenExpr()}.
 	 *
 	 * @param thenExpr
-	 *            sets the new thenExpr of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLTernary} with the updated thenExpr
-	 *         field.
+	 *            sets the new thenExpr of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLTernary} with the updated thenExpr field.
 	 */
 	@Nonnull
 	public HDLTernary setThenExpr(@Nonnull HDLExpression thenExpr) {
@@ -240,10 +237,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * Setter for the field {@link #getElseExpr()}.
 	 *
 	 * @param elseExpr
-	 *            sets the new elseExpr of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLTernary} with the updated elseExpr
-	 *         field.
+	 *            sets the new elseExpr of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLTernary} with the updated elseExpr field.
 	 */
 	@Nonnull
 	public HDLTernary setElseExpr(@Nonnull HDLExpression elseExpr) {
@@ -254,30 +249,40 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLTernary))
+		}
+		if (!(obj instanceof AbstractHDLTernary)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLTernary other = (AbstractHDLTernary) obj;
 		if (ifExpr == null) {
-			if (other.ifExpr != null)
+			if (other.ifExpr != null) {
 				return false;
-		} else if (!ifExpr.equals(other.ifExpr))
+			}
+		} else if (!ifExpr.equals(other.ifExpr)) {
 			return false;
+		}
 		if (thenExpr == null) {
-			if (other.thenExpr != null)
+			if (other.thenExpr != null) {
 				return false;
-		} else if (!thenExpr.equals(other.thenExpr))
+			}
+		} else if (!thenExpr.equals(other.thenExpr)) {
 			return false;
+		}
 		if (elseExpr == null) {
-			if (other.elseExpr != null)
+			if (other.elseExpr != null) {
 				return false;
-		} else if (!elseExpr.equals(other.elseExpr))
+			}
+		} else if (!elseExpr.equals(other.elseExpr)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -285,8 +290,9 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((ifExpr == null) ? 0 : ifExpr.hashCode());

@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
@@ -72,7 +71,6 @@ public class PSAbstractCompiler implements AutoCloseable {
 	 * Do not report any progress and proceed whenever possible
 	 *
 	 * @author Karsten Becker
-	 *
 	 */
 	public static final class NullListener implements ICompilationListener {
 
@@ -130,7 +128,6 @@ public class PSAbstractCompiler implements AutoCloseable {
 	 * A container for the results of the compilation
 	 *
 	 * @author Karsten Becker
-	 *
 	 */
 	public static class CompileResult {
 		/**
@@ -138,16 +135,14 @@ public class PSAbstractCompiler implements AutoCloseable {
 		 */
 		public final Set<Problem> syntaxProblems;
 		/**
-		 * The generated code if the compilation was successful,
-		 * <code>null</code> otherwise
+		 * The generated code if the compilation was successful, <code>null</code> otherwise
 		 */
 		public final String code;
 
 		public final String codeType;
 
 		/**
-		 * The name of the first module encountered for display purposes. Will
-		 * be &lt;ERROR&gt; if not successful
+		 * The name of the first module encountered for display purposes. Will be &lt;ERROR&gt; if not successful
 		 */
 		public final String entityName;
 
@@ -197,9 +192,10 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	public static File[] writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
-		if (result.hasError())
+		if (result.hasError()) {
 			return new File[0];
-		final List<File> res = new LinkedList<File>();
+		}
+		final List<File> res = new LinkedList<>();
 		final File target = new File(outDir, result.fileName);
 		res.add(target);
 		Files.write(result.code, target, StandardCharsets.UTF_8);
@@ -209,8 +205,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 				res.add(file);
 				final File parentFile = file.getParentFile();
 				if ((parentFile != null) && !parentFile.exists()) {
-					if (!parentFile.mkdirs())
+					if (!parentFile.mkdirs()) {
 						throw new IllegalArgumentException("Failed to create directory:" + parentFile);
+					}
 				}
 				if (sd.contents == AuxiliaryContent.THIS) {
 					Files.write(result.code, file, StandardCharsets.UTF_8);
@@ -260,8 +257,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	/**
-	 * Parse and add a unit to the HDLLibrary so that all references can be
-	 * resolved later
+	 * Parse and add a unit to the HDLLibrary so that all references can be resolved later
 	 *
 	 * @param contents
 	 *            the PSHDL module to add
@@ -277,8 +273,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	/**
-	 * Parse and add a unit to the HDLLibrary so that all references can be
-	 * resolved later
+	 * Parse and add a unit to the HDLLibrary so that all references can be resolved later
 	 *
 	 * @param contents
 	 *            the PSHDL module to add
@@ -300,8 +295,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	public boolean addFiles(Collection<File> files) throws Exception {
-		if (service != null)
+		if (service != null) {
 			return addFilesMultiThreaded(files);
+		}
 		boolean syntaxError = false;
 		for (final File file : files) {
 			if (singleAdd(file)) {
@@ -314,13 +310,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 	protected boolean addFilesMultiThreaded(Collection<File> files) throws Exception {
 		final List<Future<Void>> futures = Lists.newArrayListWithCapacity(files.size());
 		for (final File file : files) {
-			final Future<Void> future = service.submit(new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					singleAdd(file);
-					return null;
-				}
+			final Future<Void> future = service.submit(() -> {
+				singleAdd(file);
+				return null;
 			});
 			futures.add(future);
 		}
@@ -330,8 +322,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 		for (final File file : files) {
 			final Set<Problem> syntaxProblems = getProblems(file);
 			for (final Problem problem : syntaxProblems) {
-				if (problem.isSyntax && (problem.severity == ProblemSeverity.ERROR))
+				if (problem.isSyntax && (problem.severity == ProblemSeverity.ERROR)) {
 					return true;
+				}
 			}
 		}
 		return false;
@@ -409,8 +402,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
 			final HDLPackage parse = e.getValue();
 			final HDLUnit first = HDLQuery.select(HDLUnit.class).from(parse).whereObj().fullNameIs(unitName).getFirst();
-			if (first != null)
+			if (first != null) {
 				return first;
+			}
 		}
 		return null;
 	}
@@ -420,8 +414,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	/**
-	 * Removes all resources related to this src. This can be important for
-	 * incremental compilation.
+	 * Removes all resources related to this src. This can be important for incremental compilation.
 	 *
 	 * @param src
 	 *            the src name that was used to register a added input
@@ -469,13 +462,15 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	public boolean hasError(Collection<Problem> syntaxProblems) {
-		if (syntaxProblems == null)
+		if (syntaxProblems == null) {
 			return false;
+		}
 		final boolean error = false;
 		if (syntaxProblems.size() != 0) {
 			for (final Problem problem : syntaxProblems) {
-				if (problem.severity == ProblemSeverity.ERROR)
+				if (problem.severity == ProblemSeverity.ERROR) {
 					return true;
+				}
 			}
 		}
 		return error;
@@ -487,8 +482,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 				if (e.getKey().equals(file)) {
 					final ArrayList<HDLUnit> units = e.getValue().getUnits();
 					for (final HDLUnit hdlUnit : units) {
-						if (!hdlUnit.getSimulation())
+						if (!hdlUnit.getSimulation()) {
 							return hdlUnit;
+						}
 					}
 				}
 			}
@@ -496,8 +492,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 		}
 		final HDLPackage pkg = pkgs.values().iterator().next();
 		for (final HDLUnit unit : pkg.getUnits()) {
-			if (!unit.getSimulation())
+			if (!unit.getSimulation()) {
 				return unit;
+			}
 		}
 		return null;
 	}
@@ -513,7 +510,6 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	/**
-	 *
 	 * @param listener
 	 * @return <code>true</code> when at least one error has been found
 	 * @throws Exception
@@ -521,8 +517,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 	public boolean validatePackages(ICompilationListener listener) throws Exception {
 		validated = true;
 		boolean validationError = false;
-		if (service != null)
+		if (service != null) {
 			return validatePackagesMultiThreaded(listener);
+		}
 		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
 			if (singleValidate(e, listener)) {
 				validationError = true;
@@ -538,8 +535,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 		if (listener == null) {
 			listener = new NullListener();
 		}
-		if (!listener.validate(src, set, pkg))
+		if (!listener.validate(src, set, pkg)) {
 			return hasError(set);
+		}
 		final Set<Problem> localProblems = Sets.newHashSet();
 		final boolean error = validateFile(pkg, localProblems);
 		if (set != null) {
@@ -560,22 +558,18 @@ public class PSAbstractCompiler implements AutoCloseable {
 	protected boolean validatePackagesMultiThreaded(final ICompilationListener listener) throws Exception {
 		final List<Future<Void>> futures = Lists.newArrayListWithCapacity(pkgs.size());
 		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
-			futures.add(service.submit(new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					singleValidate(e, listener);
-					return null;
-				}
-
+			futures.add(service.submit(() -> {
+				singleValidate(e, listener);
+				return null;
 			}));
 		}
 		for (final Future<Void> future : futures) {
 			future.get();
 		}
 		for (final Set<Problem> p : issues.values()) {
-			if (hasError(p))
+			if (hasError(p)) {
 				return true;
+			}
 		}
 		return false;
 	}

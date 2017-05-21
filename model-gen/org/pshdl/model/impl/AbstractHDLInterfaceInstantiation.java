@@ -92,14 +92,16 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 
 	public HDLInterface resolveHIfForced(String stage) {
 		final Optional<HDLInterface> opt = resolveHIf();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + hIf, stage);
 	}
 
 	public Optional<HDLInterface> resolveHIf() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveInterface(this, hIf);
 	}
 
@@ -108,8 +110,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	}
 
 	protected HDLQualifiedName validateHIf(HDLQualifiedName hIf) {
-		if (hIf == null)
+		if (hIf == null) {
 			throw new IllegalArgumentException("The field hIf can not be null!");
+		}
 		return hIf;
 	}
 
@@ -159,10 +162,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLInterfaceInstantiation} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -174,10 +175,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -191,16 +190,15 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(id, container, annotations, var, arguments, hIf, false);
@@ -211,16 +209,15 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(id, container, annotations, var, arguments, hIf, false);
@@ -231,10 +228,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLInterfaceInstantiation removeAnnotations(int idx) {
@@ -248,10 +243,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Setter for the field {@link #getVar()}.
 	 *
 	 * @param var
-	 *            sets the new var of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated var field.
+	 *            sets the new var of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated var field.
 	 */
 	@Override
 	@Nonnull
@@ -265,10 +258,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Setter for the field {@link #getArguments()}.
 	 *
 	 * @param arguments
-	 *            sets the new arguments of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated arguments field.
+	 *            sets the new arguments of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated arguments field.
 	 */
 	@Override
 	@Nonnull
@@ -282,16 +273,15 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Adds a new value to the field {@link #getArguments()}.
 	 *
 	 * @param newArguments
-	 *            the value that should be added to the field
-	 *            {@link #getArguments()}
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated arguments field.
+	 *            the value that should be added to the field {@link #getArguments()}
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated arguments field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation addArguments(@Nullable HDLArgument newArguments) {
-		if (newArguments == null)
+		if (newArguments == null) {
 			throw new IllegalArgumentException("Element of arguments can not be null!");
+		}
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.add(newArguments);
 		final HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(id, container, annotations, var, arguments, hIf, false);
@@ -302,16 +292,15 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Removes a value from the field {@link #getArguments()}.
 	 *
 	 * @param newArguments
-	 *            the value that should be removed from the field
-	 *            {@link #getArguments()}
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated arguments field.
+	 *            the value that should be removed from the field {@link #getArguments()}
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated arguments field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation removeArguments(@Nullable HDLArgument newArguments) {
-		if (newArguments == null)
+		if (newArguments == null) {
 			throw new IllegalArgumentException("Removed element of arguments can not be null!");
+		}
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.remove(newArguments);
 		final HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(id, container, annotations, var, arguments, hIf, false);
@@ -322,10 +311,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Removes a value from the field {@link #getArguments()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getArguments()}
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated arguments field.
+	 *            the index of the value that should be removed from the field {@link #getArguments()}
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated arguments field.
 	 */
 	@Nonnull
 	public HDLInterfaceInstantiation removeArguments(int idx) {
@@ -339,10 +326,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * Setter for the field {@link #getHIfRefName()}.
 	 *
 	 * @param hIf
-	 *            sets the new hIf of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
-	 *         updated hIf field.
+	 *            sets the new hIf of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLInterfaceInstantiation} with the updated hIf field.
 	 */
 	@Nonnull
 	public HDLInterfaceInstantiation setHIf(@Nonnull HDLQualifiedName hIf) {
@@ -353,20 +338,26 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLInterfaceInstantiation))
+		}
+		if (!(obj instanceof AbstractHDLInterfaceInstantiation)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLInterfaceInstantiation other = (AbstractHDLInterfaceInstantiation) obj;
 		if (hIf == null) {
-			if (other.hIf != null)
+			if (other.hIf != null) {
 				return false;
-		} else if (!hIf.equals(other.hIf))
+			}
+		} else if (!hIf.equals(other.hIf)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -374,8 +365,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((hIf == null) ? 0 : hIf.hashCode());
@@ -419,9 +411,11 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHIf(getHIfRefName());
-		if (checkResolve && (getHIfRefName() != null))
-			if (!resolveHIf().isPresent())
+		if (checkResolve && (getHIfRefName() != null)) {
+			if (!resolveHIf().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
+			}
+		}
 	}
 
 	@Override

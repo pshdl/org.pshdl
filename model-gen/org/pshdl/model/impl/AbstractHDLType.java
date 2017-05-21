@@ -69,7 +69,7 @@ public abstract class AbstractHDLType extends HDLObject {
 		if (validate) {
 			dim = validateDim(dim);
 		}
-		this.dim = new ArrayList<HDLExpression>();
+		this.dim = new ArrayList<>();
 		if (dim != null) {
 			for (final HDLExpression newValue : dim) {
 				this.dim.add(newValue);
@@ -80,7 +80,7 @@ public abstract class AbstractHDLType extends HDLObject {
 	public AbstractHDLType() {
 		super();
 		this.name = null;
-		this.dim = new ArrayList<HDLExpression>();
+		this.dim = new ArrayList<>();
 	}
 
 	protected final String name;
@@ -96,8 +96,9 @@ public abstract class AbstractHDLType extends HDLObject {
 	}
 
 	protected String validateName(String name) {
-		if (name == null)
+		if (name == null) {
 			throw new IllegalArgumentException("The field name can not be null!");
+		}
 		return name;
 	}
 
@@ -114,8 +115,9 @@ public abstract class AbstractHDLType extends HDLObject {
 	}
 
 	protected Iterable<HDLExpression> validateDim(Iterable<HDLExpression> dim) {
-		if (dim == null)
-			return new ArrayList<HDLExpression>();
+		if (dim == null) {
+			return new ArrayList<>();
+		}
 		return dim;
 	}
 
@@ -160,25 +162,33 @@ public abstract class AbstractHDLType extends HDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLType))
+		}
+		if (!(obj instanceof AbstractHDLType)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLType other = (AbstractHDLType) obj;
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (dim == null) {
-			if (other.dim != null)
+			if (other.dim != null) {
 				return false;
-		} else if (!dim.equals(other.dim))
+			}
+		} else if (!dim.equals(other.dim)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -186,8 +196,9 @@ public abstract class AbstractHDLType extends HDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());

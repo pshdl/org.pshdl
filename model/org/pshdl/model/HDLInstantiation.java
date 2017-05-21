@@ -38,8 +38,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLInstantiation contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLArgument&gt; arguments. Can be <code>null</code>.</li>
  * </ul>
@@ -50,7 +49,6 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -80,22 +78,23 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	}
 
 	/**
-	 * The accessor for the field annotations which is of type
-	 * ArrayList&lt;HDLAnnotation&gt;.
+	 * The accessor for the field annotations which is of type ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLAnnotation>>("annotations",
 			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getAnnotations();
 		}
 
 		@Override
 		public HDLInstantiation setValue(HDLInstantiation obj, ArrayList<HDLAnnotation> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setAnnotations(value);
 		}
 	};
@@ -105,47 +104,53 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>("var", HDLVariable.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLVariable getValue(HDLInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVar();
 		}
 
 		@Override
 		public HDLInstantiation setValue(HDLInstantiation obj, HDLVariable value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setVar(value);
 		}
 	};
 	/**
-	 * The accessor for the field arguments which is of type
-	 * ArrayList&lt;HDLArgument&gt;.
+	 * The accessor for the field arguments which is of type ArrayList&lt;HDLArgument&gt;.
 	 */
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>("arguments", HDLArgument.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLArgument> getValue(HDLInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArguments();
 		}
 
 		@Override
 		public HDLInstantiation setValue(HDLInstantiation obj, ArrayList<HDLArgument> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setArguments(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (annotations.contains(obj))
+		if (annotations.contains(obj)) {
 			return fAnnotations;
-		if (var == obj)
+		}
+		if (var == obj) {
 			return fVar;
-		if (arguments.contains(obj))
+		}
+		if (arguments.contains(obj)) {
 			return fArguments;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

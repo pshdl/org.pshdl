@@ -42,15 +42,12 @@ import com.google.common.base.Optional;
  * The class HDLVariableDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLRegisterConfig register. Can be <code>null</code>.</li>
- * <li>HDLDirection direction. If <code>null</code>,
- * {@link HDLDirection#INTERNAL} is used as default.</li>
+ * <li>HDLDirection direction. If <code>null</code>, {@link HDLDirection#INTERNAL} is used as default.</li>
  * <li>HDLQualifiedName type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLPrimitive primitive. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLVariable&gt; variables. Can <b>not</b> be
- * <code>null</code>, additionally the collection must contain at least one
+ * <li>ArrayList&lt;HDLVariable&gt; variables. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one
  * element.</li>
  * </ul>
  */
@@ -60,7 +57,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -68,15 +64,14 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param register
 	 *            the value for register. Can be <code>null</code>.
 	 * @param direction
-	 *            the value for direction. If <code>null</code>,
-	 *            {@link HDLDirection#INTERNAL} is used as default.
+	 *            the value for direction. If <code>null</code>, {@link HDLDirection#INTERNAL} is used as default.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param primitive
 	 *            the value for primitive. Can be <code>null</code>.
 	 * @param variables
-	 *            the value for variables. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for variables. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one
+	 *            element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
@@ -108,8 +103,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		@Nullable
 		public static HDLDirection getOp(String op) {
 			for (final HDLDirection ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -128,15 +124,17 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			HDLRegisterConfig.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLRegisterConfig getValue(HDLVariableDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRegister();
 		}
 
 		@Override
 		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLRegisterConfig value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setRegister(value);
 		}
 	};
@@ -147,15 +145,17 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLDirection getValue(HDLVariableDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDirection();
 		}
 
 		@Override
 		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLDirection value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDirection(value);
 		}
 	};
@@ -166,15 +166,17 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLVariableDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getTypeRefName();
 		}
 
 		@Override
 		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
@@ -185,51 +187,59 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLPrimitive getValue(HDLVariableDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getPrimitive();
 		}
 
 		@Override
 		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLPrimitive value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setPrimitive(value);
 		}
 	};
 	/**
-	 * The accessor for the field variables which is of type
-	 * ArrayList&lt;HDLVariable&gt;.
+	 * The accessor for the field variables which is of type ArrayList&lt;HDLVariable&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>("variables",
 			HDLVariable.class, HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLVariableDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVariables();
 		}
 
 		@Override
 		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, ArrayList<HDLVariable> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setVariables(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (register == obj)
+		if (register == obj) {
 			return fRegister;
-		if (direction == obj)
+		}
+		if (direction == obj) {
 			return fDirection;
-		if (type == obj)
+		}
+		if (type == obj) {
 			return fType;
-		if (primitive == obj)
+		}
+		if (primitive == obj) {
 			return fPrimitive;
-		if (variables.contains(obj))
+		}
+		if (variables.contains(obj)) {
 			return fVariables;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
@@ -237,8 +247,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	@Override
 	public Optional<? extends HDLType> resolveType() {
 		final HDLPrimitive prim = getPrimitive();
-		if (prim != null)
-			return Optional.<HDLType>of(prim);
+		if (prim != null) {
+			return Optional.<HDLType> of(prim);
+		}
 		return super.resolveType();
 	}
 

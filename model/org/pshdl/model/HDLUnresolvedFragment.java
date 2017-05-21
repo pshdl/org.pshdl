@@ -51,14 +51,12 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param frag
 	 *            the value for frag. Can <b>not</b> be <code>null</code>.
 	 * @param isStatement
-	 *            the value for isStatement. Can <b>not</b> be <code>null</code>
-	 *            .
+	 *            the value for isStatement. Can <b>not</b> be <code>null</code> .
 	 * @param array
 	 *            the value for array. Can be <code>null</code>.
 	 * @param bits
@@ -91,15 +89,17 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	public static HDLFieldAccess<HDLUnresolvedFragment, String> fFrag = new HDLFieldAccess<HDLUnresolvedFragment, String>("frag", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLUnresolvedFragment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getFrag();
 		}
 
 		@Override
 		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setFrag(value);
 		}
 	};
@@ -110,55 +110,59 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLUnresolvedFragment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIsStatement();
 		}
 
 		@Override
 		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, Boolean value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setIsStatement(value);
 		}
 	};
 	/**
-	 * The accessor for the field array which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field array which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>>("array",
 			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLUnresolvedFragment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArray();
 		}
 
 		@Override
 		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setArray(value);
 		}
 	};
 	/**
-	 * The accessor for the field bits which is of type
-	 * ArrayList&lt;HDLRange&gt;.
+	 * The accessor for the field bits which is of type ArrayList&lt;HDLRange&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>>("bits", HDLRange.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLUnresolvedFragment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getBits();
 		}
 
 		@Override
 		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, ArrayList<HDLRange> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setBits(value);
 		}
 	};
@@ -169,31 +173,38 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 			HDLUnresolvedFragment.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLUnresolvedFragment getValue(HDLUnresolvedFragment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getSub();
 		}
 
 		@Override
 		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, HDLUnresolvedFragment value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setSub(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (frag == obj)
+		if (frag == obj) {
 			return fFrag;
-		if (isStatement == obj)
+		}
+		if (isStatement == obj) {
 			return fIsStatement;
-		if (array.contains(obj))
+		}
+		if (array.contains(obj)) {
 			return fArray;
-		if (bits.contains(obj))
+		}
+		if (bits.contains(obj)) {
 			return fBits;
-		if (sub == obj)
+		}
+		if (sub == obj) {
 			return fSub;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

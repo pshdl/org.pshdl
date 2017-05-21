@@ -32,7 +32,7 @@ import java.util.Map;
 import com.google.common.base.Optional;
 
 public class Unit {
-	public Map<String, NamedElement> declarations = new LinkedHashMap<String, NamedElement>();
+	public Map<String, NamedElement> declarations = new LinkedHashMap<>();
 	public Memory memory;
 	public static final int rowWidth = 32;
 
@@ -62,8 +62,9 @@ public class Unit {
 
 	public Optional<NamedElement> resolve(Reference ref) {
 		final NamedElement decl = declarations.get(ref.getName());
-		if (decl == null)
+		if (decl == null) {
 			return Optional.absent();
+		}
 		return Optional.of(decl);
 	}
 

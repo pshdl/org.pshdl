@@ -59,7 +59,6 @@ public class HDLExport extends AbstractHDLExport {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param hIf
@@ -93,15 +92,17 @@ public class HDLExport extends AbstractHDLExport {
 	public static HDLFieldAccess<HDLExport, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLExport, HDLQualifiedName>("hIf", HDLQualifiedName.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLExport obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIfRefName();
 		}
 
 		@Override
 		public HDLExport setValue(HDLExport obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHIf(value);
 		}
 	};
@@ -112,15 +113,17 @@ public class HDLExport extends AbstractHDLExport {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLExport obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVarRefName();
 		}
 
 		@Override
 		public HDLExport setValue(HDLExport obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setVar(value);
 		}
 	};
@@ -130,35 +133,41 @@ public class HDLExport extends AbstractHDLExport {
 	public static HDLFieldAccess<HDLExport, String> fMatch = new HDLFieldAccess<HDLExport, String>("match", String.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public String getValue(HDLExport obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getMatch();
 		}
 
 		@Override
 		public HDLExport setValue(HDLExport obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setMatch(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hIf == obj)
+		if (hIf == obj) {
 			return fHIf;
-		if (var == obj)
+		}
+		if (var == obj) {
 			return fVar;
-		if (match == obj)
+		}
+		if (match == obj) {
 			return fMatch;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
 	public Optional<ArrayList<HDLInterfaceRef>> resolveVariables() {
 		final Optional<HDLVariable> resolveHIf = resolveHIf();
-		if (!resolveHIf.isPresent())
+		if (!resolveHIf.isPresent()) {
 			return Optional.absent();
+		}
 		final HDLVariable hIfVar = resolveHIf.get();
 		final HDLQualifiedName hifRef = hIfVar.asRef();
 		if (getVarRefName() != null) {
@@ -167,8 +176,9 @@ public class HDLExport extends AbstractHDLExport {
 			return Optional.of(Lists.newArrayList(hir));
 		}
 		final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(hIfVar);
-		if (!typeOf.isPresent())
+		if (!typeOf.isPresent()) {
 			return Optional.absent();
+		}
 		final HDLInterface hIf = (HDLInterface) typeOf.get();
 		final ArrayList<HDLInterfaceRef> vars = Lists.newArrayList();
 		final String matchName = getMatch();
@@ -209,17 +219,20 @@ public class HDLExport extends AbstractHDLExport {
 	}
 
 	public Optional<HDLInterfaceRef> toInterfaceRef() {
-		if (getVarRefName() == null)
+		if (getVarRefName() == null) {
 			return Optional.absent();
+		}
 		return Optional.of((HDLInterfaceRef) new HDLInterfaceRef().setHIf(getHIfRefName()).setVar(getVarRefName()).freeze(this));
 	}
 
 	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		validateHIf(getHIfRefName());
-		if (checkResolve && (getHIfRefName() != null))
-			if (!resolveHIf().isPresent())
+		if (checkResolve && (getHIfRefName() != null)) {
+			if (!resolveHIf().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
+			}
+		}
 		validateVar(getVarRefName());
 		validateMatch(getMatch());
 	}

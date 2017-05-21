@@ -56,8 +56,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param range
-	 *            the value for range. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for range. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 * @param param
 	 *            the value for param. Can <b>not</b> be <code>null</code>.
 	 * @param dos
@@ -71,7 +70,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		if (validate) {
 			range = validateRange(range);
 		}
-		this.range = new ArrayList<HDLRange>();
+		this.range = new ArrayList<>();
 		if (range != null) {
 			for (final HDLRange newValue : range) {
 				this.range.add(newValue);
@@ -88,7 +87,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		if (validate) {
 			dos = validateDos(dos);
 		}
-		this.dos = new ArrayList<HDLStatement>();
+		this.dos = new ArrayList<>();
 		if (dos != null) {
 			for (final HDLStatement newValue : dos) {
 				this.dos.add(newValue);
@@ -98,16 +97,15 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 
 	public AbstractHDLForLoop() {
 		super();
-		this.range = new ArrayList<HDLRange>();
+		this.range = new ArrayList<>();
 		this.param = null;
-		this.dos = new ArrayList<HDLStatement>();
+		this.dos = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLRange> range;
 
 	/**
-	 * Get the range field. Can <b>not</b> be <code>null</code>, additionally
-	 * the collection must contain at least one element.
+	 * Get the range field. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
@@ -117,10 +115,12 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	}
 
 	protected Iterable<HDLRange> validateRange(Iterable<HDLRange> range) {
-		if (range == null)
+		if (range == null) {
 			throw new IllegalArgumentException("The field range can not be null!");
-		if (!range.iterator().hasNext())
+		}
+		if (!range.iterator().hasNext()) {
 			throw new IllegalArgumentException("The field range must contain at least one item!");
+		}
 		return range;
 	}
 
@@ -137,8 +137,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	}
 
 	protected HDLVariable validateParam(HDLVariable param) {
-		if (param == null)
+		if (param == null) {
 			throw new IllegalArgumentException("The field param can not be null!");
+		}
 		return param;
 	}
 
@@ -155,8 +156,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	}
 
 	protected Iterable<HDLStatement> validateDos(Iterable<HDLStatement> dos) {
-		if (dos == null)
-			return new ArrayList<HDLStatement>();
+		if (dos == null) {
+			return new ArrayList<>();
+		}
 		return dos;
 	}
 
@@ -204,10 +206,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLForLoop} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLForLoop} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -219,11 +219,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Setter for the field {@link #getRange()}.
 	 *
 	 * @param range
-	 *            sets the new range of this object. Can <b>not</b> be
-	 *            <code>null</code>, additionally the collection must contain at
-	 *            least one element.
-	 * @return a new instance of {@link HDLForLoop} with the updated range
-	 *         field.
+	 *            sets the new range of this object. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least
+	 *            one element.
+	 * @return a new instance of {@link HDLForLoop} with the updated range field.
 	 */
 	@Nonnull
 	public HDLForLoop setRange(@Nonnull Iterable<HDLRange> range) {
@@ -236,15 +234,14 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Adds a new value to the field {@link #getRange()}.
 	 *
 	 * @param newRange
-	 *            the value that should be added to the field
-	 *            {@link #getRange()}
-	 * @return a new instance of {@link HDLForLoop} with the updated range
-	 *         field.
+	 *            the value that should be added to the field {@link #getRange()}
+	 * @return a new instance of {@link HDLForLoop} with the updated range field.
 	 */
 	@Nonnull
 	public HDLForLoop addRange(@Nonnull HDLRange newRange) {
-		if (newRange == null)
+		if (newRange == null) {
 			throw new IllegalArgumentException("Element of range can not be null!");
+		}
 		final ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
 		range.add(newRange);
 		final HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
@@ -255,15 +252,14 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Removes a value from the field {@link #getRange()}.
 	 *
 	 * @param newRange
-	 *            the value that should be removed from the field
-	 *            {@link #getRange()}
-	 * @return a new instance of {@link HDLForLoop} with the updated range
-	 *         field.
+	 *            the value that should be removed from the field {@link #getRange()}
+	 * @return a new instance of {@link HDLForLoop} with the updated range field.
 	 */
 	@Nonnull
 	public HDLForLoop removeRange(@Nonnull HDLRange newRange) {
-		if (newRange == null)
+		if (newRange == null) {
 			throw new IllegalArgumentException("Removed element of range can not be null!");
+		}
 		final ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
 		range.remove(newRange);
 		final HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
@@ -274,10 +270,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Removes a value from the field {@link #getRange()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getRange()}
-	 * @return a new instance of {@link HDLForLoop} with the updated range
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getRange()}
+	 * @return a new instance of {@link HDLForLoop} with the updated range field.
 	 */
 	@Nonnull
 	public HDLForLoop removeRange(int idx) {
@@ -291,10 +285,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Setter for the field {@link #getParam()}.
 	 *
 	 * @param param
-	 *            sets the new param of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLForLoop} with the updated param
-	 *         field.
+	 *            sets the new param of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLForLoop} with the updated param field.
 	 */
 	@Nonnull
 	public HDLForLoop setParam(@Nonnull HDLVariable param) {
@@ -326,8 +318,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 */
 	@Nonnull
 	public HDLForLoop addDos(@Nullable HDLStatement newDos) {
-		if (newDos == null)
+		if (newDos == null) {
 			throw new IllegalArgumentException("Element of dos can not be null!");
+		}
 		final ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.add(newDos);
 		final HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
@@ -338,14 +331,14 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Removes a value from the field {@link #getDos()}.
 	 *
 	 * @param newDos
-	 *            the value that should be removed from the field
-	 *            {@link #getDos()}
+	 *            the value that should be removed from the field {@link #getDos()}
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
 	@Nonnull
 	public HDLForLoop removeDos(@Nullable HDLStatement newDos) {
-		if (newDos == null)
+		if (newDos == null) {
 			throw new IllegalArgumentException("Removed element of dos can not be null!");
+		}
 		final ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.remove(newDos);
 		final HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
@@ -356,8 +349,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Removes a value from the field {@link #getDos()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getDos()}
+	 *            the index of the value that should be removed from the field {@link #getDos()}
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
 	@Nonnull
@@ -370,30 +362,40 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLForLoop))
+		}
+		if (!(obj instanceof AbstractHDLForLoop)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLForLoop other = (AbstractHDLForLoop) obj;
 		if (range == null) {
-			if (other.range != null)
+			if (other.range != null) {
 				return false;
-		} else if (!range.equals(other.range))
+			}
+		} else if (!range.equals(other.range)) {
 			return false;
+		}
 		if (param == null) {
-			if (other.param != null)
+			if (other.param != null) {
 				return false;
-		} else if (!param.equals(other.param))
+			}
+		} else if (!param.equals(other.param)) {
 			return false;
+		}
 		if (dos == null) {
-			if (other.dos != null)
+			if (other.dos != null) {
 				return false;
-		} else if (!dos.equals(other.dos))
+			}
+		} else if (!dos.equals(other.dos)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -401,8 +403,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((range == null) ? 0 : range.hashCode());

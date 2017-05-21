@@ -68,12 +68,10 @@ public interface IHDLAnnotation {
 	String name();
 
 	/**
-	 * Validates the contents of the annotation and returns a message to the
-	 * user if it is not correct
+	 * Validates the contents of the annotation and returns a message to the user if it is not correct
 	 *
 	 * @param annotation
-	 * @return <code>null</code> when the validation was successful or a String
-	 *         with an error when not
+	 * @return <code>null</code> when the validation was successful or a String with an error when not
 	 */
 	String validate(HDLAnnotation annotation);
 

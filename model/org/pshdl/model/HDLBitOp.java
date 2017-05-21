@@ -47,7 +47,6 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -86,8 +85,9 @@ public class HDLBitOp extends AbstractHDLBitOp {
 		@Nullable
 		public static HDLBitOpType getOp(String op) {
 			for (final HDLBitOpType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -105,23 +105,26 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>("type", HDLBitOpType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLBitOpType getValue(HDLBitOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLBitOp setValue(HDLBitOp obj, HDLBitOpType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (type == obj)
+		if (type == obj) {
 			return fType;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

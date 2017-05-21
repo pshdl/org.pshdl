@@ -52,7 +52,6 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param ifExp
@@ -88,67 +87,74 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLIfStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfExp();
 		}
 
 		@Override
 		public HDLIfStatement setValue(HDLIfStatement obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setIfExp(value);
 		}
 	};
 	/**
-	 * The accessor for the field thenDo which is of type
-	 * ArrayList&lt;HDLStatement&gt;.
+	 * The accessor for the field thenDo which is of type ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("thenDo", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getThenDo();
 		}
 
 		@Override
 		public HDLIfStatement setValue(HDLIfStatement obj, ArrayList<HDLStatement> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setThenDo(value);
 		}
 	};
 	/**
-	 * The accessor for the field elseDo which is of type
-	 * ArrayList&lt;HDLStatement&gt;.
+	 * The accessor for the field elseDo which is of type ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("elseDo", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getElseDo();
 		}
 
 		@Override
 		public HDLIfStatement setValue(HDLIfStatement obj, ArrayList<HDLStatement> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setElseDo(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (ifExp == obj)
+		if (ifExp == obj) {
 			return fIfExp;
-		if (thenDo.contains(obj))
+		}
+		if (thenDo.contains(obj)) {
 			return fThenDo;
-		if (elseDo.contains(obj))
+		}
+		if (elseDo.contains(obj)) {
 			return fElseDo;
+		}
 		return super.getContainingFeature(obj);
 	}
 
@@ -179,15 +185,20 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		}
 		final TreeSide side = treeSides.get(stmnt.getID());
 		if (side == TreeSide.idConflict) {
-			for (final HDLStatement t : thenDo)
-				if (t == stmnt)
+			for (final HDLStatement t : thenDo) {
+				if (t == stmnt) {
 					return TreeSide.thenTree;
-			for (final HDLStatement t : elseDo)
-				if (t == stmnt)
+				}
+			}
+			for (final HDLStatement t : elseDo) {
+				if (t == stmnt) {
 					return TreeSide.elseTree;
+				}
+			}
 		}
-		if (side != null)
+		if (side != null) {
 			return side;
+		}
 		return TreeSide.none;
 	}
 

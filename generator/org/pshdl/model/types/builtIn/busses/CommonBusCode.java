@@ -36,8 +36,12 @@ import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableRef;
-import org.pshdl.model.types.builtIn.busses.memorymodel.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Constant;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
+import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.utils.HDLQualifiedName;
 
 import com.google.common.collect.Maps;
@@ -80,7 +84,7 @@ public class CommonBusCode {
 			}
 			if (def.rw == RWType.constant) {
 				final HDLRange range = getRange(bitPos, size);
-				Constant c = (Constant) def;
+				final Constant c = (Constant) def;
 				label = label.addDos(new HDLAssignment().setLeft(target.addBits(range)).setType(HDLAssignmentType.ASSGN).setRight(HDLLiteral.get(c.value)));
 			}
 			bitPos -= size;
@@ -111,12 +115,13 @@ public class CommonBusCode {
 
 	public static Map<String, Boolean> buildArrayMap(HDLInterface hdi) {
 		final Map<String, Boolean> isArray = Maps.newLinkedHashMap();
-		for (final HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true))
+		for (final HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true)) {
 			if (var.getDimensions().size() != 0) {
 				isArray.put(var.getName(), true);
 			} else {
 				isArray.put(var.getName(), false);
 			}
+		}
 		return isArray;
 	}
 }

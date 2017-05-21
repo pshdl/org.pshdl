@@ -52,8 +52,9 @@ public abstract class AbstractHDLObject {
 	 */
 	public AbstractHDLObject(int id, @Nullable IHDLObject container, boolean validate) {
 		this.id = id;
-		if (container == this)
+		if (container == this) {
 			throw new IllegalArgumentException("Object can not contain itself");
+		}
 		if (validate) {
 			container = validateContainer(container);
 		}
@@ -111,18 +112,23 @@ public abstract class AbstractHDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLObject))
+		}
+		if (!(obj instanceof AbstractHDLObject)) {
 			return false;
+		}
 		final AbstractHDLObject other = (AbstractHDLObject) obj;
 		if (container == null) {
-			if (other.container != null)
+			if (other.container != null) {
 				return false;
-		} else if (!container.equals(other.container))
+			}
+		} else if (!container.equals(other.container)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -130,8 +136,9 @@ public abstract class AbstractHDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = 1;
 		final int prime = 31;
 		result = (prime * result) + ((container == null) ? 0 : container.hashCode());
@@ -147,8 +154,9 @@ public abstract class AbstractHDLObject {
 	}
 
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
-		if (getContainer() != expectedParent)
+		if (getContainer() != expectedParent) {
 			throw new IllegalArgumentException("This object " + this + " does not have the expected container! " + expectedParent);
+		}
 		validateContainer(getContainer());
 	}
 

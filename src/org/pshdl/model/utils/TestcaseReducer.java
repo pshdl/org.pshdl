@@ -72,10 +72,8 @@ public class TestcaseReducer {
 
 	public static interface Validator {
 		/**
-		 *
 		 * @param pkg
-		 * @return <code>true</code> when the code exhibits the unwanted
-		 *         behaviour
+		 * @return <code>true</code> when the code exhibits the unwanted behaviour
 		 */
 		boolean inspect(HDLPackage pkg);
 	}
@@ -129,8 +127,9 @@ public class TestcaseReducer {
 				expectedStacktrace = filter(Throwables.getStackTraceAsString(e));
 				System.out.println("Looking for " + expectedStacktrace);
 			}
-			if (!crashed)
+			if (!crashed) {
 				throw new IllegalArgumentException("The runnable did not crash");
+			}
 		}
 
 		@Override
@@ -152,8 +151,9 @@ public class TestcaseReducer {
 			sb.append(Splitter.on(':').split(firstLine).iterator().next()).append('\n');
 			while (iter.hasNext()) {
 				final String string = iter.next();
-				if (string.startsWith("\tat " + CrashValidator.class.getName()))
+				if (string.startsWith("\tat " + CrashValidator.class.getName())) {
 					return sb.toString();
+				}
 				sb.append(string).append('\n');
 			}
 			return sb.toString();
@@ -281,26 +281,30 @@ public class TestcaseReducer {
 				switch (hdlCompound.getClassType()) {
 				case HDLIfStatement:
 					final HDLIfStatement hif = (HDLIfStatement) hdlCompound;
-					if (hif.getThenDo().isEmpty() && hif.getElseDo().isEmpty())
+					if (hif.getThenDo().isEmpty() && hif.getElseDo().isEmpty()) {
 						return remove(hif, pkg);
+					}
 					break;
 				case HDLForLoop:
 					final HDLForLoop forLoop = (HDLForLoop) hdlCompound;
-					if (forLoop.getDos().isEmpty())
+					if (forLoop.getDos().isEmpty()) {
 						return remove(forLoop, pkg);
+					}
 					break;
 				case HDLSwitchCaseStatement:
 					final HDLSwitchCaseStatement caseStatement = (HDLSwitchCaseStatement) hdlCompound;
-					if ((caseStatement.getLabel() != null) && caseStatement.getDos().isEmpty())
+					if ((caseStatement.getLabel() != null) && caseStatement.getDos().isEmpty()) {
 						return remove(caseStatement, pkg);
+					}
 					break;
 				case HDLSwitchStatement:
 					final HDLSwitchStatement switchStatement = (HDLSwitchStatement) hdlCompound;
 					final ArrayList<HDLSwitchCaseStatement> cases = switchStatement.getCases();
 					if (cases.size() == 1) {
 						final HDLSwitchCaseStatement defaultCase = cases.get(0);
-						if (defaultCase.getDos().isEmpty())
+						if (defaultCase.getDos().isEmpty()) {
 							return remove(switchStatement, pkg);
+						}
 					}
 					break;
 				default:
@@ -328,8 +332,9 @@ public class TestcaseReducer {
 
 	private HDLPackage reduce(HDLPackage pkg, String src, Validator validator, Reducer[] reductions) {
 		final boolean inspect = validator.inspect(pkg);
-		if (!inspect)
+		if (!inspect) {
 			throw new IllegalArgumentException("The input does not exhibit the unwanted effect");
+		}
 		final HDLPackage asPackage = importInterfaces(pkg);
 		pkg.getLibrary().addPkg(asPackage, src);
 		if (validator.inspect(asPackage)) {

@@ -74,7 +74,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 		if (validate) {
 			dos = validateDos(dos);
 		}
-		this.dos = new ArrayList<HDLStatement>();
+		this.dos = new ArrayList<>();
 		if (dos != null) {
 			for (final HDLStatement newValue : dos) {
 				this.dos.add(newValue);
@@ -85,7 +85,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	public AbstractHDLSwitchCaseStatement() {
 		super();
 		this.label = null;
-		this.dos = new ArrayList<HDLStatement>();
+		this.dos = new ArrayList<>();
 	}
 
 	protected final HDLExpression label;
@@ -117,8 +117,9 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	}
 
 	protected Iterable<HDLStatement> validateDos(Iterable<HDLStatement> dos) {
-		if (dos == null)
-			return new ArrayList<HDLStatement>();
+		if (dos == null) {
+			return new ArrayList<>();
+		}
 		return dos;
 	}
 
@@ -165,10 +166,8 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLSwitchCaseStatement} with the
-	 *         updated container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLSwitchCaseStatement} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -181,8 +180,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 *
 	 * @param label
 	 *            sets the new label of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated
-	 *         label field.
+	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated label field.
 	 */
 	@Nonnull
 	public HDLSwitchCaseStatement setLabel(@Nullable HDLExpression label) {
@@ -196,8 +194,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 *
 	 * @param dos
 	 *            sets the new dos of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated
-	 *         dos field.
+	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated dos field.
 	 */
 	@Nonnull
 	public HDLSwitchCaseStatement setDos(@Nullable Iterable<HDLStatement> dos) {
@@ -211,13 +208,13 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 *
 	 * @param newDos
 	 *            the value that should be added to the field {@link #getDos()}
-	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated
-	 *         dos field.
+	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated dos field.
 	 */
 	@Nonnull
 	public HDLSwitchCaseStatement addDos(@Nullable HDLStatement newDos) {
-		if (newDos == null)
+		if (newDos == null) {
 			throw new IllegalArgumentException("Element of dos can not be null!");
+		}
 		final ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.add(newDos);
 		final HDLSwitchCaseStatement res = new HDLSwitchCaseStatement(id, container, label, dos, false);
@@ -228,15 +225,14 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 * Removes a value from the field {@link #getDos()}.
 	 *
 	 * @param newDos
-	 *            the value that should be removed from the field
-	 *            {@link #getDos()}
-	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated
-	 *         dos field.
+	 *            the value that should be removed from the field {@link #getDos()}
+	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated dos field.
 	 */
 	@Nonnull
 	public HDLSwitchCaseStatement removeDos(@Nullable HDLStatement newDos) {
-		if (newDos == null)
+		if (newDos == null) {
 			throw new IllegalArgumentException("Removed element of dos can not be null!");
+		}
 		final ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.remove(newDos);
 		final HDLSwitchCaseStatement res = new HDLSwitchCaseStatement(id, container, label, dos, false);
@@ -247,10 +243,8 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 * Removes a value from the field {@link #getDos()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getDos()}
-	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated
-	 *         dos field.
+	 *            the index of the value that should be removed from the field {@link #getDos()}
+	 * @return a new instance of {@link HDLSwitchCaseStatement} with the updated dos field.
 	 */
 	@Nonnull
 	public HDLSwitchCaseStatement removeDos(int idx) {
@@ -262,25 +256,33 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLSwitchCaseStatement))
+		}
+		if (!(obj instanceof AbstractHDLSwitchCaseStatement)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLSwitchCaseStatement other = (AbstractHDLSwitchCaseStatement) obj;
 		if (label == null) {
-			if (other.label != null)
+			if (other.label != null) {
 				return false;
-		} else if (!label.equals(other.label))
+			}
+		} else if (!label.equals(other.label)) {
 			return false;
+		}
 		if (dos == null) {
-			if (other.dos != null)
+			if (other.dos != null) {
 				return false;
-		} else if (!dos.equals(other.dos))
+			}
+		} else if (!dos.equals(other.dos)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -288,8 +290,9 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((label == null) ? 0 : label.hashCode());

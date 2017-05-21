@@ -66,8 +66,9 @@ public class LevenshteinDistance {
 		@Override
 		public int compareTo(Score o) {
 			final int diff = distance - o.distance;
-			if (diff != 0)
+			if (diff != 0) {
 				return diff;
+			}
 			return string.compareTo(o.string);
 		}
 
@@ -82,20 +83,26 @@ public class LevenshteinDistance {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			final Score other = (Score) obj;
-			if (distance != other.distance)
+			if (distance != other.distance) {
 				return false;
+			}
 			if (string == null) {
-				if (other.string != null)
+				if (other.string != null) {
 					return false;
-			} else if (!string.equals(other.string))
+				}
+			} else if (!string.equals(other.string)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -107,7 +114,7 @@ public class LevenshteinDistance {
 
 	public static Score[] getTopMatches(String search, boolean ignoreCase, String... input) {
 		final String s = ignoreCase ? search.toLowerCase() : search;
-		final TreeSet<Score> res = new TreeSet<Score>();
+		final TreeSet<Score> res = new TreeSet<>();
 		for (final String string : input) {
 			final String t = ignoreCase ? string.toLowerCase() : string;
 			res.add(new Score(computeLevenshteinDistance(s, t), string));

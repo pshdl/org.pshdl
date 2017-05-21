@@ -78,8 +78,9 @@ public class HDLGenerators {
 		final IHDLGenerator generator = generators.get(hdl.getGeneratorID());
 		if (generator != null) {
 			final Optional<HDLInterface> hif = generator.getInterface(hdl);
-			if (hif.isPresent())
+			if (hif.isPresent()) {
 				return Optional.of(hif.get().copyDeepFrozen(hdl));
+			}
 			return hif;
 		}
 		return Optional.absent();
@@ -87,15 +88,17 @@ public class HDLGenerators {
 
 	public static Optional<HDLGenerationInfo> getImplementation(HDLDirectGeneration hdl) {
 		final IHDLGenerator generator = generators.get(hdl.getGeneratorID());
-		if (generator != null)
+		if (generator != null) {
 			return generator.getImplementation(hdl);
+		}
 		return Optional.absent();
 	}
 
 	public static boolean validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
 		final IHDLGenerator generator = generators.get(hdg.getGeneratorID());
-		if (generator != null)
+		if (generator != null) {
 			return generator.validate(hdg, problems, context);
+		}
 		problems.add(new Problem(ErrorCode.GENERATOR_NOT_KNOWN, hdg));
 		return false;
 	}

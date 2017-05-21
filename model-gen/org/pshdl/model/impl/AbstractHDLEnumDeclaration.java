@@ -91,8 +91,9 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	}
 
 	protected HDLEnum validateHEnum(HDLEnum hEnum) {
-		if (hEnum == null)
+		if (hEnum == null) {
 			throw new IllegalArgumentException("The field hEnum can not be null!");
+		}
 		return hEnum;
 	}
 
@@ -139,10 +140,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLEnumDeclaration} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLEnumDeclaration} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -154,10 +153,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLEnumDeclaration} with the updated
-	 *         annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLEnumDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -171,16 +168,15 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLEnumDeclaration} with the updated
-	 *         annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLEnumDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLEnumDeclaration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
@@ -191,16 +187,15 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLEnumDeclaration} with the updated
-	 *         annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLEnumDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLEnumDeclaration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
@@ -211,10 +206,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLEnumDeclaration} with the updated
-	 *         annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLEnumDeclaration} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLEnumDeclaration removeAnnotations(int idx) {
@@ -228,10 +221,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getHEnum()}.
 	 *
 	 * @param hEnum
-	 *            sets the new hEnum of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLEnumDeclaration} with the updated
-	 *         hEnum field.
+	 *            sets the new hEnum of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLEnumDeclaration} with the updated hEnum field.
 	 */
 	@Nonnull
 	public HDLEnumDeclaration setHEnum(@Nonnull HDLEnum hEnum) {
@@ -242,20 +233,26 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLEnumDeclaration))
+		}
+		if (!(obj instanceof AbstractHDLEnumDeclaration)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLEnumDeclaration other = (AbstractHDLEnumDeclaration) obj;
 		if (hEnum == null) {
-			if (other.hEnum != null)
+			if (other.hEnum != null) {
 				return false;
-		} else if (!hEnum.equals(other.hEnum))
+			}
+		} else if (!hEnum.equals(other.hEnum)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -263,8 +260,9 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((hEnum == null) ? 0 : hEnum.hashCode());

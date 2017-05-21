@@ -114,14 +114,16 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		System.out.println("Using module:\t" + unitName);
 		final List<File> files = Lists.newLinkedList();
 		final String type = cli.getOptionValue("type");
-		if ((type != null) && !providers.containsKey(type.toLowerCase()))
+		if ((type != null) && !providers.containsKey(type.toLowerCase())) {
 			return "Invalid type argument, no such type " + type;
+		}
 		System.out.println("Parsing files:");
 		for (int i = 1; i < argList.size(); i++) {
 			final File source = new File(argList.get(i));
 			System.out.println("\t" + source.getAbsolutePath());
-			if (!source.exists())
+			if (!source.exists()) {
 				return "The file: " + source + " can not be found";
+			}
 			files.add(source);
 		}
 		if (addFiles(files)) {
@@ -131,12 +133,14 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		System.out.println("Validating:");
 		final boolean hasError = validatePackages();
 		printErrors();
-		if (hasError)
+		if (hasError) {
 			return "Exiting because of errors in the input";
+		}
 		System.out.println("Validation complete");
 		final HDLUnit unit = findUnit(unitName);
-		if (unit == null)
+		if (unit == null) {
 			return "Unit: " + unitName + " not found";
+		}
 		final String src = unit.getLibrary().getSrc(unitName);
 		String outDir = cli.getOptionValue("outputDir");
 		if (outDir == null) {
@@ -145,8 +149,9 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		final File dir = new File(outDir);
 		if (!dir.exists()) {
 			System.out.println("Output directory " + dir + " does not exist, creating it");
-			if (!dir.mkdirs())
+			if (!dir.mkdirs()) {
 				throw new IllegalArgumentException("Failed to create direcory:" + dir);
+			}
 		}
 		final ExecutableModel em = createExecutable(unit, src, cli.hasOption("ir"), !cli.hasOption("allSignals"));
 		if (cli.hasOption("em")) {
@@ -186,8 +191,9 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 
 	public ExecutableModel createExecutable(HDLQualifiedName name, String src) throws CycleException {
 		final HDLUnit findUnit = findUnit(name);
-		if (findUnit == null)
+		if (findUnit == null) {
 			throw new IllegalArgumentException("No unit with name:" + name);
+		}
 		return createExecutable(findUnit, src, false, true);
 	}
 

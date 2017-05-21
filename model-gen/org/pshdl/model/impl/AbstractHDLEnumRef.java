@@ -80,14 +80,16 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 
 	public HDLEnum resolveHEnumForced(String stage) {
 		final Optional<HDLEnum> opt = resolveHEnum();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + hEnum, stage);
 	}
 
 	public Optional<HDLEnum> resolveHEnum() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveEnum(this, hEnum);
 	}
 
@@ -96,8 +98,9 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	}
 
 	protected HDLQualifiedName validateHEnum(HDLQualifiedName hEnum) {
-		if (hEnum == null)
+		if (hEnum == null) {
 			throw new IllegalArgumentException("The field hEnum can not be null!");
+		}
 		return hEnum;
 	}
 
@@ -144,10 +147,8 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLEnumRef} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLEnumRef} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -159,8 +160,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * Setter for the field {@link #getVarRefName()}.
 	 *
 	 * @param var
-	 *            sets the new var of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new var of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLEnumRef} with the updated var field.
 	 */
 	@Override
@@ -175,10 +175,8 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * Setter for the field {@link #getHEnumRefName()}.
 	 *
 	 * @param hEnum
-	 *            sets the new hEnum of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLEnumRef} with the updated hEnum
-	 *         field.
+	 *            sets the new hEnum of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLEnumRef} with the updated hEnum field.
 	 */
 	@Nonnull
 	public HDLEnumRef setHEnum(@Nonnull HDLQualifiedName hEnum) {
@@ -189,20 +187,26 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLEnumRef))
+		}
+		if (!(obj instanceof AbstractHDLEnumRef)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLEnumRef other = (AbstractHDLEnumRef) obj;
 		if (hEnum == null) {
-			if (other.hEnum != null)
+			if (other.hEnum != null) {
 				return false;
-		} else if (!hEnum.equals(other.hEnum))
+			}
+		} else if (!hEnum.equals(other.hEnum)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -210,8 +214,9 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((hEnum == null) ? 0 : hEnum.hashCode());
@@ -237,9 +242,11 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHEnum(getHEnumRefName());
-		if (checkResolve && (getHEnumRefName() != null))
-			if (!resolveHEnum().isPresent())
+		if (checkResolve && (getHEnumRefName() != null)) {
+			if (!resolveHEnum().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHEnumRefName()));
+			}
+		}
 	}
 
 	@Override

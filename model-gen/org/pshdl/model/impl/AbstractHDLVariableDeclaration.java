@@ -70,15 +70,14 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @param register
 	 *            the value for register. Can be <code>null</code>.
 	 * @param direction
-	 *            the value for direction. If <code>null</code>,
-	 *            {@link HDLDirection#INTERNAL} is used as default.
+	 *            the value for direction. If <code>null</code>, {@link HDLDirection#INTERNAL} is used as default.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param primitive
 	 *            the value for primitive. Can be <code>null</code>.
 	 * @param variables
-	 *            the value for variables. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for variables. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one
+	 *            element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
@@ -112,7 +111,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		if (validate) {
 			variables = validateVariables(variables);
 		}
-		this.variables = new ArrayList<HDLVariable>();
+		this.variables = new ArrayList<>();
 		if (variables != null) {
 			for (final HDLVariable newValue : variables) {
 				this.variables.add(newValue);
@@ -126,7 +125,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		this.direction = null;
 		this.type = null;
 		this.primitive = null;
-		this.variables = new ArrayList<HDLVariable>();
+		this.variables = new ArrayList<>();
 	}
 
 	protected final HDLRegisterConfig register;
@@ -148,8 +147,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	protected final HDLDirection direction;
 
 	/**
-	 * Get the direction field. If <code>null</code>,
-	 * {@link HDLDirection#INTERNAL} is used as default.
+	 * Get the direction field. If <code>null</code>, {@link HDLDirection#INTERNAL} is used as default.
 	 *
 	 * @return the field
 	 */
@@ -166,14 +164,16 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 
 	public HDLType resolveTypeForced(String stage) {
 		final Optional<? extends HDLType> opt = resolveType();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + type, stage);
 	}
 
 	public Optional<? extends HDLType> resolveType() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveType(this, type);
 	}
 
@@ -182,8 +182,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	}
 
 	protected HDLQualifiedName validateType(HDLQualifiedName type) {
-		if (type == null)
+		if (type == null) {
 			throw new IllegalArgumentException("The field type can not be null!");
+		}
 		return type;
 	}
 
@@ -206,8 +207,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	protected final ArrayList<HDLVariable> variables;
 
 	/**
-	 * Get the variables field. Can <b>not</b> be <code>null</code>,
-	 * additionally the collection must contain at least one element.
+	 * Get the variables field. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
@@ -217,10 +217,12 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	}
 
 	protected Iterable<HDLVariable> validateVariables(Iterable<HDLVariable> variables) {
-		if (variables == null)
+		if (variables == null) {
 			throw new IllegalArgumentException("The field variables can not be null!");
-		if (!variables.iterator().hasNext())
+		}
+		if (!variables.iterator().hasNext()) {
 			throw new IllegalArgumentException("The field variables must contain at least one item!");
+		}
 		return variables;
 	}
 
@@ -272,10 +274,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLVariableDeclaration} with the
-	 *         updated container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLVariableDeclaration} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -287,10 +287,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -304,16 +302,15 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLVariableDeclaration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
@@ -324,16 +321,15 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLVariableDeclaration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
@@ -344,10 +340,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration removeAnnotations(int idx) {
@@ -361,10 +355,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getRegister()}.
 	 *
 	 * @param register
-	 *            sets the new register of this object. Can be <code>null</code>
-	 *            .
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         register field.
+	 *            sets the new register of this object. Can be <code>null</code> .
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated register field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration setRegister(@Nullable HDLRegisterConfig register) {
@@ -377,10 +369,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getDirection()}.
 	 *
 	 * @param direction
-	 *            sets the new direction of this object. If <code>null</code>,
-	 *            {@link HDLDirection#INTERNAL} is used as default.
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         direction field.
+	 *            sets the new direction of this object. If <code>null</code>, {@link HDLDirection#INTERNAL} is used as default.
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated direction field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration setDirection(@Nullable HDLDirection direction) {
@@ -393,10 +383,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getTypeRefName()}.
 	 *
 	 * @param type
-	 *            sets the new type of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         type field.
+	 *            sets the new type of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated type field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration setType(@Nonnull HDLQualifiedName type) {
@@ -409,10 +397,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getPrimitive()}.
 	 *
 	 * @param primitive
-	 *            sets the new primitive of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         primitive field.
+	 *            sets the new primitive of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated primitive field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration setPrimitive(@Nullable HDLPrimitive primitive) {
@@ -425,11 +411,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getVariables()}.
 	 *
 	 * @param variables
-	 *            sets the new variables of this object. Can <b>not</b> be
-	 *            <code>null</code>, additionally the collection must contain at
+	 *            sets the new variables of this object. Can <b>not</b> be <code>null</code>, additionally the collection must contain at
 	 *            least one element.
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         variables field.
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated variables field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration setVariables(@Nonnull Iterable<HDLVariable> variables) {
@@ -442,15 +426,14 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Adds a new value to the field {@link #getVariables()}.
 	 *
 	 * @param newVariables
-	 *            the value that should be added to the field
-	 *            {@link #getVariables()}
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         variables field.
+	 *            the value that should be added to the field {@link #getVariables()}
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated variables field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration addVariables(@Nonnull HDLVariable newVariables) {
-		if (newVariables == null)
+		if (newVariables == null) {
 			throw new IllegalArgumentException("Element of variables can not be null!");
+		}
 		final ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
 		variables.add(newVariables);
 		final HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
@@ -461,15 +444,14 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getVariables()}.
 	 *
 	 * @param newVariables
-	 *            the value that should be removed from the field
-	 *            {@link #getVariables()}
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         variables field.
+	 *            the value that should be removed from the field {@link #getVariables()}
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated variables field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration removeVariables(@Nonnull HDLVariable newVariables) {
-		if (newVariables == null)
+		if (newVariables == null) {
 			throw new IllegalArgumentException("Removed element of variables can not be null!");
+		}
 		final ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
 		variables.remove(newVariables);
 		final HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
@@ -480,10 +462,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getVariables()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getVariables()}
-	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
-	 *         variables field.
+	 *            the index of the value that should be removed from the field {@link #getVariables()}
+	 * @return a new instance of {@link HDLVariableDeclaration} with the updated variables field.
 	 */
 	@Nonnull
 	public HDLVariableDeclaration removeVariables(int idx) {
@@ -495,40 +475,54 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLVariableDeclaration))
+		}
+		if (!(obj instanceof AbstractHDLVariableDeclaration)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLVariableDeclaration other = (AbstractHDLVariableDeclaration) obj;
 		if (register == null) {
-			if (other.register != null)
+			if (other.register != null) {
 				return false;
-		} else if (!register.equals(other.register))
+			}
+		} else if (!register.equals(other.register)) {
 			return false;
+		}
 		if (direction == null) {
-			if (other.direction != null)
+			if (other.direction != null) {
 				return false;
-		} else if (!direction.equals(other.direction))
+			}
+		} else if (!direction.equals(other.direction)) {
 			return false;
+		}
 		if (type == null) {
-			if (other.type != null)
+			if (other.type != null) {
 				return false;
-		} else if (!type.equals(other.type))
+			}
+		} else if (!type.equals(other.type)) {
 			return false;
+		}
 		if (primitive == null) {
-			if (other.primitive != null)
+			if (other.primitive != null) {
 				return false;
-		} else if (!primitive.equals(other.primitive))
+			}
+		} else if (!primitive.equals(other.primitive)) {
 			return false;
+		}
 		if (variables == null) {
-			if (other.variables != null)
+			if (other.variables != null) {
 				return false;
-		} else if (!variables.equals(other.variables))
+			}
+		} else if (!variables.equals(other.variables)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -536,8 +530,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((register == null) ? 0 : register.hashCode());
@@ -596,9 +591,11 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		}
 		validateDirection(getDirection());
 		validateType(getTypeRefName());
-		if (checkResolve && (getTypeRefName() != null))
-			if (!resolveType().isPresent())
+		if (checkResolve && (getTypeRefName() != null)) {
+			if (!resolveType().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getTypeRefName()));
+			}
+		}
 		validatePrimitive(getPrimitive());
 		if (getPrimitive() != null) {
 			getPrimitive().validateAllFields(this, checkResolve);

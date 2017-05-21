@@ -39,8 +39,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression caseExp. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLSwitchCaseStatement&gt; cases. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLSwitchCaseStatement&gt; cases. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
@@ -49,7 +48,6 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param caseExp
@@ -82,45 +80,50 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLSwitchStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getCaseExp();
 		}
 
 		@Override
 		public HDLSwitchStatement setValue(HDLSwitchStatement obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setCaseExp(value);
 		}
 	};
 	/**
-	 * The accessor for the field cases which is of type
-	 * ArrayList&lt;HDLSwitchCaseStatement&gt;.
+	 * The accessor for the field cases which is of type ArrayList&lt;HDLSwitchCaseStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>> fCases = new HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>>("cases",
 			HDLSwitchCaseStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLSwitchCaseStatement> getValue(HDLSwitchStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getCases();
 		}
 
 		@Override
 		public HDLSwitchStatement setValue(HDLSwitchStatement obj, ArrayList<HDLSwitchCaseStatement> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setCases(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (caseExp == obj)
+		if (caseExp == obj) {
 			return fCaseExp;
-		if (cases.contains(obj))
+		}
+		if (cases.contains(obj)) {
 			return fCases;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

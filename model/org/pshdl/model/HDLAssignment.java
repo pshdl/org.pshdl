@@ -37,8 +37,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLReference left. Can <b>not</b> be <code>null</code>.</li>
- * <li>HDLAssignmentType type. If <code>null</code>,
- * {@link HDLAssignmentType#ASSGN} is used as default.</li>
+ * <li>HDLAssignmentType type. If <code>null</code>, {@link HDLAssignmentType#ASSGN} is used as default.</li>
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -48,14 +47,12 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
 	 *            the value for left. Can <b>not</b> be <code>null</code>.
 	 * @param type
-	 *            the value for type. If <code>null</code>,
-	 *            {@link HDLAssignmentType#ASSGN} is used as default.
+	 *            the value for type. If <code>null</code>, {@link HDLAssignmentType#ASSGN} is used as default.
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 * @param validate
@@ -89,8 +86,9 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		@Nullable
 		public static HDLAssignmentType getOp(String op) {
 			for (final HDLAssignmentType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -108,15 +106,17 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>("left", HDLReference.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLReference getValue(HDLAssignment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLeft();
 		}
 
 		@Override
 		public HDLAssignment setValue(HDLAssignment obj, HDLReference value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setLeft(value);
 		}
 	};
@@ -127,15 +127,17 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLAssignmentType getValue(HDLAssignment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLAssignment setValue(HDLAssignment obj, HDLAssignmentType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
@@ -146,27 +148,32 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLAssignment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRight();
 		}
 
 		@Override
 		public HDLAssignment setValue(HDLAssignment obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setRight(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (left == obj)
+		if (left == obj) {
 			return fLeft;
-		if (type == obj)
+		}
+		if (type == obj) {
 			return fType;
-		if (right == obj)
+		}
+		if (right == obj) {
 			return fRight;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

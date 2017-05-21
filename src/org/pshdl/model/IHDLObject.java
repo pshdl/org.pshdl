@@ -45,19 +45,16 @@ public interface IHDLObject {
 	 * Copies this object using the provided {@link CopyFilter}
 	 *
 	 * @param filter
-	 *            an implementation of the {@link CopyFilter} such as
-	 *            {@link org.pshdl.model.utils.CopyFilter.DeepCloneFilter}
+	 *            an implementation of the {@link CopyFilter} such as {@link org.pshdl.model.utils.CopyFilter.DeepCloneFilter}
 	 * @return the newly created copy
 	 */
 	public abstract IHDLObject copyFiltered(CopyFilter filter);
 
 	/**
-	 * Applies {@link org.pshdl.model.utils.CopyFilter.DeepCloneFilter} and
-	 * calls {@link #freeze(IHDLObject)} afterwards on the copy
+	 * Applies {@link org.pshdl.model.utils.CopyFilter.DeepCloneFilter} and calls {@link #freeze(IHDLObject)} afterwards on the copy
 	 *
 	 * @param container
-	 *            the new {@link IHDLObject} that should become the container of
-	 *            the copy
+	 *            the new {@link IHDLObject} that should become the container of the copy
 	 * @return a frozen copy of this object
 	 */
 	public abstract IHDLObject copyDeepFrozen(IHDLObject container);
@@ -66,8 +63,7 @@ public interface IHDLObject {
 	 * Attaches some information to this {@link IHDLObject}
 	 *
 	 * @param key
-	 *            {@link MetaAccess#name()} will be used to store the value. If
-	 *            it already exists, it will be overwritten
+	 *            {@link MetaAccess#name()} will be used to store the value. If it already exists, it will be overwritten
 	 * @param value
 	 *            the value that should be attached to this object
 	 */
@@ -85,8 +81,7 @@ public interface IHDLObject {
 	 * A boolean meta that can be used as a flag
 	 *
 	 * @param meta
-	 *            {@link MetaAccess#name()} will be used to store
-	 *            <code>true</code> for this key
+	 *            {@link MetaAccess#name()} will be used to store <code>true</code> for this key
 	 */
 	public void setMeta(MetaAccess<Boolean> meta);
 
@@ -103,8 +98,7 @@ public interface IHDLObject {
 	 *
 	 * @param key
 	 *            the key to lookup
-	 * @return <code>true</code> if meta with this key has been attached,
-	 *         <code>false</code> otherwise
+	 * @return <code>true</code> if meta with this key has been attached, <code>false</code> otherwise
 	 */
 	public boolean hasMeta(MetaAccess<?> key);
 
@@ -113,15 +107,13 @@ public interface IHDLObject {
 	 *
 	 * @param key
 	 *            {@link MetaAccess#name()} will be used to retrieve the value
-	 * @return the attached value or <code>null</code> if no value has been set
-	 *         for this key
+	 * @return the attached value or <code>null</code> if no value has been set for this key
 	 */
 	public <K> K getMeta(MetaAccess<K> key);
 
 	/**
-	 * Retrieves all objects of the given class and subclasses that are children
-	 * of this object, or the object itself as well. Consider the following
-	 * example:
+	 * Retrieves all objects of the given class and subclasses that are children of this object, or the object itself as well. Consider the
+	 * following example:
 	 *
 	 * <pre>
 	 * HDLForLoop (forLoop)
@@ -134,29 +126,20 @@ public interface IHDLObject {
 	 *       +--HDLVariableRef (varRefC) HDLLiteral
 	 * </pre>
 	 * <ul>
-	 * <li>The invocation of
-	 * <code>forLoop.getAllObjectsOf(HDLForLoop.class, true)</code> will return
-	 * <code>[forLoop]</code></li>
-	 * <li>The invocation of
-	 * <code>forLoop.getAllObjectsOf(HDLReference.class, true)</code> will
-	 * return <code>[varRefA, varRefB, varRefC, enumRef]</code></li>
-	 * <li>The invocation of
-	 * <code>forLoop.getAllObjectsOf(HDLReference.class, false)</code> will
-	 * return <code>[]</code></li>
-	 * <li>The invocation of
-	 * <code>forLoop.getAllObjectsOf(HDLAssignment.class, false)</code> will
-	 * return <code>[assA, assB]</code></li>
+	 * <li>The invocation of <code>forLoop.getAllObjectsOf(HDLForLoop.class, true)</code> will return <code>[forLoop]</code></li>
+	 * <li>The invocation of <code>forLoop.getAllObjectsOf(HDLReference.class, true)</code> will return
+	 * <code>[varRefA, varRefB, varRefC, enumRef]</code></li>
+	 * <li>The invocation of <code>forLoop.getAllObjectsOf(HDLReference.class, false)</code> will return <code>[]</code></li>
+	 * <li>The invocation of <code>forLoop.getAllObjectsOf(HDLAssignment.class, false)</code> will return <code>[assA, assB]</code></li>
 	 * </ul>
 	 *
 	 * @param clazz
-	 *            all instances of this class and its subclasses will be
-	 *            returned
+	 *            all instances of this class and its subclasses will be returned
 	 * @param deep
-	 *            if <code>true</code> all children of this object are returned,
-	 *            if <code>false</code> only direct children of this object are
-	 *            returned
-	 * @return all found objects that are the direct or sub class of the given
-	 *         clazz. An empty array is returned if no instance could be found
+	 *            if <code>true</code> all children of this object are returned, if <code>false</code> only direct children of this object
+	 *            are returned
+	 * @return all found objects that are the direct or sub class of the given clazz. An empty array is returned if no instance could be
+	 *         found
 	 */
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep);
 

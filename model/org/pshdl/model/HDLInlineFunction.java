@@ -38,11 +38,9 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLInlineFunction contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.</li>
  * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * <li>HDLExpression expr. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
@@ -53,7 +51,6 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -93,31 +90,35 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLInlineFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getExpr();
 		}
 
 		@Override
 		public HDLInlineFunction setValue(HDLInlineFunction obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setExpr(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (expr == obj)
+		if (expr == obj) {
 			return fExpr;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
 
 	@Override
 	protected HDLFunctionParameter validateReturnType(HDLFunctionParameter returnType) {
-		if (returnType == null)
+		if (returnType == null) {
 			throw new IllegalArgumentException("The return type can not be null for inline functions");
+		}
 		return returnType;
 	}
 

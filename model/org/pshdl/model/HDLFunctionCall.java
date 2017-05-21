@@ -49,7 +49,6 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param function
@@ -82,45 +81,50 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionCall obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getFunctionRefName();
 		}
 
 		@Override
 		public HDLFunctionCall setValue(HDLFunctionCall obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setFunction(value);
 		}
 	};
 	/**
-	 * The accessor for the field params which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field params which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>>("params", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLFunctionCall obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getParams();
 		}
 
 		@Override
 		public HDLFunctionCall setValue(HDLFunctionCall obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setParams(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (function == obj)
+		if (function == obj) {
 			return fFunction;
-		if (params.contains(obj))
+		}
+		if (params.contains(obj)) {
 			return fParams;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

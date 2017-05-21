@@ -91,8 +91,9 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	}
 
 	protected HDLInterface validateHIf(HDLInterface hIf) {
-		if (hIf == null)
+		if (hIf == null) {
 			throw new IllegalArgumentException("The field hIf can not be null!");
+		}
 		return hIf;
 	}
 
@@ -139,10 +140,8 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLInterfaceDeclaration} with the
-	 *         updated container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLInterfaceDeclaration} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -154,10 +153,8 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getAnnotations()}.
 	 *
 	 * @param annotations
-	 *            sets the new annotations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInterfaceDeclaration} with the
-	 *         updated annotations field.
+	 *            sets the new annotations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLInterfaceDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
@@ -171,16 +168,15 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * Adds a new value to the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be added to the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInterfaceDeclaration} with the
-	 *         updated annotations field.
+	 *            the value that should be added to the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInterfaceDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInterfaceDeclaration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
 		final HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
@@ -191,16 +187,15 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param newAnnotations
-	 *            the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInterfaceDeclaration} with the
-	 *         updated annotations field.
+	 *            the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInterfaceDeclaration} with the updated annotations field.
 	 */
 	@Override
 	@Nonnull
 	public HDLInterfaceDeclaration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
-		if (newAnnotations == null)
+		if (newAnnotations == null) {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		}
 		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
 		final HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
@@ -211,10 +206,8 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * Removes a value from the field {@link #getAnnotations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getAnnotations()}
-	 * @return a new instance of {@link HDLInterfaceDeclaration} with the
-	 *         updated annotations field.
+	 *            the index of the value that should be removed from the field {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLInterfaceDeclaration} with the updated annotations field.
 	 */
 	@Nonnull
 	public HDLInterfaceDeclaration removeAnnotations(int idx) {
@@ -228,10 +221,8 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * Setter for the field {@link #getHIf()}.
 	 *
 	 * @param hIf
-	 *            sets the new hIf of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLInterfaceDeclaration} with the
-	 *         updated hIf field.
+	 *            sets the new hIf of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLInterfaceDeclaration} with the updated hIf field.
 	 */
 	@Nonnull
 	public HDLInterfaceDeclaration setHIf(@Nonnull HDLInterface hIf) {
@@ -242,20 +233,26 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLInterfaceDeclaration))
+		}
+		if (!(obj instanceof AbstractHDLInterfaceDeclaration)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLInterfaceDeclaration other = (AbstractHDLInterfaceDeclaration) obj;
 		if (hIf == null) {
-			if (other.hIf != null)
+			if (other.hIf != null) {
 				return false;
-		} else if (!hIf.equals(other.hIf))
+			}
+		} else if (!hIf.equals(other.hIf)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -263,8 +260,9 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((hIf == null) ? 0 : hIf.hashCode());

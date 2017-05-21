@@ -38,7 +38,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.FailedPredicateException;
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.LexerNoViableAltException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.parser.PSHDLLang.PsExpressionContext;
@@ -54,14 +65,15 @@ public class PSHDLParser {
 		final InputStream resourceAsStream = PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens");
 		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8))) {
 			String line = null;
-			final List<String> keywords = new ArrayList<String>();
-			while ((line = reader.readLine()) != null)
+			final List<String> keywords = new ArrayList<>();
+			while ((line = reader.readLine()) != null) {
 				if (line.charAt(0) == '\'') {
 					final String keyWord = line.substring(1, line.lastIndexOf('\''));
 					if (keyWord.matches("[a-z]+")) {
 						keywords.add(keyWord);
 					}
 				}
+			}
 			return keywords.toArray(new String[keywords.size()]);
 		}
 	}
@@ -165,8 +177,7 @@ public class PSHDLParser {
 	}
 
 	/**
-	 * Parses the given input String and generates a output {@link HDLPackage}
-	 * if it succeed
+	 * Parses the given input String and generates a output {@link HDLPackage} if it succeed
 	 *
 	 * @param input
 	 *            the String to parse and convert
@@ -200,8 +211,7 @@ public class PSHDLParser {
 	}
 
 	/**
-	 * Parses the given input String and generates a output {@link HDLPackage}
-	 * if it succeed
+	 * Parses the given input String and generates a output {@link HDLPackage} if it succeed
 	 *
 	 * @param input
 	 *            the String to parse and convert

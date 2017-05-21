@@ -80,8 +80,9 @@ public class Helper {
 		// http://stackoverflow.com/questions/8666420/how-to-recursively-delete-a-folder-without-following-symlinks
 		// Copied from
 		// http://grepcode.com/file/repo1.maven.org/maven2/commons-io/commons-io/2.1/org/apache/commons/io/FileUtils.java#FileUtils.deleteDirectory%28java.io.File%29
-		if (!directory.exists())
+		if (!directory.exists()) {
 			return;
+		}
 
 		if (!Files.isSymbolicLink(directory.toPath())) {
 			cleanDirectory(directory);
@@ -107,8 +108,9 @@ public class Helper {
 		}
 
 		final File[] files = directory.listFiles();
-		if (files == null)
+		if (files == null) {
 			throw new IOException("Failed to list contents of " + directory);
+		}
 
 		IOException exception = null;
 		for (final File file : files) {
@@ -119,8 +121,9 @@ public class Helper {
 			}
 		}
 
-		if (exception != null)
+		if (exception != null) {
 			throw exception;
+		}
 	}
 
 	private static void forceDelete(File file) throws IOException {
@@ -129,8 +132,9 @@ public class Helper {
 		} else {
 			final boolean filePresent = file.exists();
 			if (!file.delete()) {
-				if (!filePresent)
+				if (!filePresent) {
 					throw new FileNotFoundException("File does not exist: " + file);
+				}
 				final String message = "Unable to delete file: " + file;
 				throw new IOException(message);
 			}

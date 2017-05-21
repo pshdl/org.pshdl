@@ -77,7 +77,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 		if (validate) {
 			params = validateParams(params);
 		}
-		this.params = new ArrayList<HDLExpression>();
+		this.params = new ArrayList<>();
 		if (params != null) {
 			for (final HDLExpression newValue : params) {
 				this.params.add(newValue);
@@ -88,21 +88,23 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	public AbstractHDLFunctionCall() {
 		super();
 		this.function = null;
-		this.params = new ArrayList<HDLExpression>();
+		this.params = new ArrayList<>();
 	}
 
 	protected final HDLQualifiedName function;
 
 	public HDLFunction resolveFunctionForced(String stage) {
 		final Optional<HDLFunction> opt = resolveFunction();
-		if (opt.isPresent())
+		if (opt.isPresent()) {
 			return opt.get();
+		}
 		throw new HDLCodeGenerationException(this, "failed to resolve:" + function, stage);
 	}
 
 	public Optional<HDLFunction> resolveFunction() {
-		if (!frozen)
+		if (!frozen) {
 			throw new IllegalArgumentException("Object not frozen");
+		}
 		return ScopingExtension.INST.resolveFunction(this, function);
 	}
 
@@ -111,8 +113,9 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	}
 
 	protected HDLQualifiedName validateFunction(HDLQualifiedName function) {
-		if (function == null)
+		if (function == null) {
 			throw new IllegalArgumentException("The field function can not be null!");
+		}
 		return function;
 	}
 
@@ -129,8 +132,9 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	}
 
 	protected Iterable<HDLExpression> validateParams(Iterable<HDLExpression> params) {
-		if (params == null)
-			return new ArrayList<HDLExpression>();
+		if (params == null) {
+			return new ArrayList<>();
+		}
 		return params;
 	}
 
@@ -177,10 +181,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLFunctionCall} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLFunctionCall} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -192,10 +194,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * Setter for the field {@link #getFunctionRefName()}.
 	 *
 	 * @param function
-	 *            sets the new function of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLFunctionCall} with the updated
-	 *         function field.
+	 *            sets the new function of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLFunctionCall} with the updated function field.
 	 */
 	@Nonnull
 	public HDLFunctionCall setFunction(@Nonnull HDLQualifiedName function) {
@@ -209,8 +209,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 *
 	 * @param params
 	 *            sets the new params of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLFunctionCall} with the updated params
-	 *         field.
+	 * @return a new instance of {@link HDLFunctionCall} with the updated params field.
 	 */
 	@Nonnull
 	public HDLFunctionCall setParams(@Nullable Iterable<HDLExpression> params) {
@@ -223,15 +222,14 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * Adds a new value to the field {@link #getParams()}.
 	 *
 	 * @param newParams
-	 *            the value that should be added to the field
-	 *            {@link #getParams()}
-	 * @return a new instance of {@link HDLFunctionCall} with the updated params
-	 *         field.
+	 *            the value that should be added to the field {@link #getParams()}
+	 * @return a new instance of {@link HDLFunctionCall} with the updated params field.
 	 */
 	@Nonnull
 	public HDLFunctionCall addParams(@Nullable HDLExpression newParams) {
-		if (newParams == null)
+		if (newParams == null) {
 			throw new IllegalArgumentException("Element of params can not be null!");
+		}
 		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.add(newParams);
 		final HDLFunctionCall res = new HDLFunctionCall(id, container, function, params, false);
@@ -242,15 +240,14 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * Removes a value from the field {@link #getParams()}.
 	 *
 	 * @param newParams
-	 *            the value that should be removed from the field
-	 *            {@link #getParams()}
-	 * @return a new instance of {@link HDLFunctionCall} with the updated params
-	 *         field.
+	 *            the value that should be removed from the field {@link #getParams()}
+	 * @return a new instance of {@link HDLFunctionCall} with the updated params field.
 	 */
 	@Nonnull
 	public HDLFunctionCall removeParams(@Nullable HDLExpression newParams) {
-		if (newParams == null)
+		if (newParams == null) {
 			throw new IllegalArgumentException("Removed element of params can not be null!");
+		}
 		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(newParams);
 		final HDLFunctionCall res = new HDLFunctionCall(id, container, function, params, false);
@@ -261,10 +258,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * Removes a value from the field {@link #getParams()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getParams()}
-	 * @return a new instance of {@link HDLFunctionCall} with the updated params
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getParams()}
+	 * @return a new instance of {@link HDLFunctionCall} with the updated params field.
 	 */
 	@Nonnull
 	public HDLFunctionCall removeParams(int idx) {
@@ -276,25 +271,33 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLFunctionCall))
+		}
+		if (!(obj instanceof AbstractHDLFunctionCall)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLFunctionCall other = (AbstractHDLFunctionCall) obj;
 		if (function == null) {
-			if (other.function != null)
+			if (other.function != null) {
 				return false;
-		} else if (!function.equals(other.function))
+			}
+		} else if (!function.equals(other.function)) {
 			return false;
+		}
 		if (params == null) {
-			if (other.params != null)
+			if (other.params != null) {
 				return false;
-		} else if (!params.equals(other.params))
+			}
+		} else if (!params.equals(other.params)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -302,8 +305,9 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((function == null) ? 0 : function.hashCode());
@@ -336,9 +340,11 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateFunction(getFunctionRefName());
-		if (checkResolve && (getFunctionRefName() != null))
-			if (!resolveFunction().isPresent())
+		if (checkResolve && (getFunctionRefName() != null)) {
+			if (!resolveFunction().isPresent()) {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getFunctionRefName()));
+			}
+		}
 		validateParams(getParams());
 		if (getParams() != null) {
 			for (final HDLExpression o : getParams()) {

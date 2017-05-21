@@ -55,7 +55,6 @@ public class HDLRange extends AbstractHDLRange {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param from
@@ -92,15 +91,17 @@ public class HDLRange extends AbstractHDLRange {
 	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>("from", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getFrom();
 		}
 
 		@Override
 		public HDLRange setValue(HDLRange obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setFrom(value);
 		}
 	};
@@ -110,15 +111,17 @@ public class HDLRange extends AbstractHDLRange {
 	public static HDLFieldAccess<HDLRange, HDLExpression> fInc = new HDLFieldAccess<HDLRange, HDLExpression>("inc", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getInc();
 		}
 
 		@Override
 		public HDLRange setValue(HDLRange obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setInc(value);
 		}
 	};
@@ -128,15 +131,17 @@ public class HDLRange extends AbstractHDLRange {
 	public static HDLFieldAccess<HDLRange, HDLExpression> fDec = new HDLFieldAccess<HDLRange, HDLExpression>("dec", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDec();
 		}
 
 		@Override
 		public HDLRange setValue(HDLRange obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDec(value);
 		}
 	};
@@ -146,44 +151,49 @@ public class HDLRange extends AbstractHDLRange {
 	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>("to", HDLExpression.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getTo();
 		}
 
 		@Override
 		public HDLRange setValue(HDLRange obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setTo(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (from == obj)
+		if (from == obj) {
 			return fFrom;
-		if (inc == obj)
+		}
+		if (inc == obj) {
 			return fInc;
-		if (dec == obj)
+		}
+		if (dec == obj) {
 			return fDec;
-		if (to == obj)
+		}
+		if (to == obj) {
 			return fTo;
+		}
 		return super.getContainingFeature(obj);
 	}
 
 	// $CONTENT-BEGIN$
 	/**
-	 * Calculates the width of the Expression as if it used as a downto (the
-	 * most common case when the width is needed)
+	 * Calculates the width of the Expression as if it used as a downto (the most common case when the width is needed)
 	 *
-	 * @return an simplified Expression of the width as if it was used in a
-	 *         downto
+	 * @return an simplified Expression of the width as if it was used in a downto
 	 */
 	public HDLExpression getWidth() {
 		final HDLExpression f = getFrom();
-		if (f == null)
+		if (f == null) {
 			return HDLLiteral.get(1);
+		}
 		if (getTo() != null) {
 			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(getTo());
 			if (valueOf.isPresent() && BigInteger.ZERO.equals(valueOf.get())) {
@@ -191,10 +201,12 @@ public class HDLRange extends AbstractHDLRange {
 				return HDLPrimitives.simplifyWidth(this, simpleWith, null);
 			}
 		}
-		if (getInc() != null)
+		if (getInc() != null) {
 			return getInc();
-		if (getDec() != null)
+		}
+		if (getDec() != null) {
 			return getDec();
+		}
 		final HDLArithOp rangeDist = HDLArithOp.subtract(f, getTo());
 		final HDLExpression absRange = HDLBuiltInFunctions.ABS_UINT.getCall(rangeDist);
 		final HDLArithOp width = HDLArithOp.add(absRange, 1);
@@ -202,14 +214,16 @@ public class HDLRange extends AbstractHDLRange {
 	}
 
 	public HDLRange normalize() {
-		if (getTo().equals(getFrom()))
+		if (getTo().equals(getFrom())) {
 			return setFrom(null);
+		}
 		return this;
 	}
 
 	public boolean isBit() {
-		if ((getInc() == null) && (getDec() == null) && (getFrom() == null))
+		if ((getInc() == null) && (getDec() == null) && (getFrom() == null)) {
 			return true;
+		}
 		return false;
 	}
 	// $CONTENT-END$

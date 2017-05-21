@@ -26,7 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
 
@@ -35,7 +38,7 @@ import com.google.common.collect.Maps;
 public class Row implements NamedElement {
 	private final String name;
 	public Column column;
-	public List<NamedElement> definitions = new LinkedList<NamedElement>();
+	public List<NamedElement> definitions = new LinkedList<>();
 	public int colIndex;
 
 	public Row(String name, Column column, NamedElement... definitions) {
@@ -59,7 +62,7 @@ public class Row implements NamedElement {
 		for (final NamedElement ne : definitions) {
 			String rowName = ne.getName();
 			if (ne instanceof Constant) {
-				Constant c = (Constant) ne;
+				final Constant c = (Constant) ne;
 				c.bitPos = bitPos;
 				bitPos -= c.width;
 				switch (c.constType) {
@@ -67,14 +70,14 @@ public class Row implements NamedElement {
 					c.value = checkSum;
 					break;
 				case date: {
-					Calendar cal = Calendar.getInstance();
+					final Calendar cal = Calendar.getInstance();
 					c.value = toHex(cal.get(Calendar.DAY_OF_MONTH));
 					c.value |= toHex(cal.get(Calendar.MONTH) + 1) << 8;
 					c.value |= toHex(cal.get(Calendar.YEAR)) << 16;
 					break;
 				}
 				case time: {
-					Calendar cal = Calendar.getInstance();
+					final Calendar cal = Calendar.getInstance();
 					c.value = toHex(cal.get(Calendar.SECOND));
 					c.value |= toHex(cal.get(Calendar.MINUTE)) << 8;
 					c.value |= toHex(cal.get(Calendar.HOUR_OF_DAY)) << 16;
@@ -94,7 +97,7 @@ public class Row implements NamedElement {
 				integer = 0;
 			}
 			if (ne instanceof Constant) {
-				Constant c = (Constant) ne;
+				final Constant c = (Constant) ne;
 				c.arrayIndex = integer;
 			} else {
 				final Definition def = (Definition) ne;
@@ -108,7 +111,7 @@ public class Row implements NamedElement {
 		int res = 0;
 		int shift = 0;
 		while (i != 0) {
-			int digit = i % 10;
+			final int digit = i % 10;
 			i /= 10;
 			res |= digit << shift;
 			shift += 4;
@@ -117,7 +120,7 @@ public class Row implements NamedElement {
 	}
 
 	public static void main(String[] args) {
-		Calendar cal = Calendar.getInstance();
+		final Calendar cal = Calendar.getInstance();
 		int value = toHex(cal.get(Calendar.DAY_OF_MONTH));
 		value |= toHex(cal.get(Calendar.MONTH) + 1) << 8;
 		value |= toHex(cal.get(Calendar.YEAR)) << 16;
@@ -135,8 +138,9 @@ public class Row implements NamedElement {
 
 	@Override
 	public String getSimpleName() {
-		if (!isHidden())
+		if (!isHidden()) {
 			return name.substring(1);
+		}
 		return name;
 	}
 

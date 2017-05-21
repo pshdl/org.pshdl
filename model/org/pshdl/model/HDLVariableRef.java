@@ -52,7 +52,6 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -82,52 +81,56 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	}
 
 	/**
-	 * The accessor for the field array which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field array which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>("array", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariableRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArray();
 		}
 
 		@Override
 		public HDLVariableRef setValue(HDLVariableRef obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setArray(value);
 		}
 	};
 	/**
-	 * The accessor for the field bits which is of type
-	 * ArrayList&lt;HDLRange&gt;.
+	 * The accessor for the field bits which is of type ArrayList&lt;HDLRange&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>("bits", HDLRange.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLVariableRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getBits();
 		}
 
 		@Override
 		public HDLVariableRef setValue(HDLVariableRef obj, ArrayList<HDLRange> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setBits(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (array.contains(obj))
+		if (array.contains(obj)) {
 			return fArray;
-		if (bits.contains(obj))
+		}
+		if (bits.contains(obj)) {
 			return fBits;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
@@ -136,8 +139,9 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 
 	@Override
 	public Optional<HDLVariable> resolveVar() {
-		if (resolveVarCache != null)
+		if (resolveVarCache != null) {
 			return Optional.of(resolveVarCache);
+		}
 		final Optional<HDLVariable> resolveVar = super.resolveVar();
 		if ((resolveVar.isPresent()) && frozen) {
 			resolveVarCache = resolveVar.get();

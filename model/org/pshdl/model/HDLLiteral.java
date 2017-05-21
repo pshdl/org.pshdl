@@ -48,7 +48,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param val
@@ -80,15 +79,17 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	public static HDLFieldAccess<HDLLiteral, String> fVal = new HDLFieldAccess<HDLLiteral, String>("val", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLLiteral obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVal();
 		}
 
 		@Override
 		public HDLLiteral setValue(HDLLiteral obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setVal(value);
 		}
 	};
@@ -98,25 +99,29 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	public static HDLFieldAccess<HDLLiteral, Boolean> fStr = new HDLFieldAccess<HDLLiteral, Boolean>("str", Boolean.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public Boolean getValue(HDLLiteral obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getStr();
 		}
 
 		@Override
 		public HDLLiteral setValue(HDLLiteral obj, Boolean value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setStr(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (val == obj)
+		if (val == obj) {
 			return fVal;
-		if (str == obj)
+		}
+		if (str == obj) {
 			return fStr;
+		}
 		return super.getContainingFeature(obj);
 	}
 
@@ -126,21 +131,24 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	private BigInteger bigIntegerVal = null;
 
 	/**
-	 * Returns the value as BigInteger. If it is a boolean constant,
-	 * <code>null</code> is returned.
+	 * Returns the value as BigInteger. If it is a boolean constant, <code>null</code> is returned.
 	 *
 	 * @return <code>null</code> if boolean or String, value otherwise
 	 */
 	public BigInteger getValueAsBigInt() {
-		if (bigIntegerVal != null)
+		if (bigIntegerVal != null) {
 			return bigIntegerVal;
-		if (getStr())
+		}
+		if (getStr()) {
 			return null;
+		}
 		final String string = getVal();
-		if (TRUE.equals(string))
+		if (TRUE.equals(string)) {
 			return null;
-		if (FALSE.equals(string))
+		}
+		if (FALSE.equals(string)) {
 			return null;
+		}
 		bigIntegerVal = parseString(string);
 		return bigIntegerVal;
 	}
@@ -176,8 +184,9 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		case BOOL:
 			break;
 		default:
-			if (getValueAsBigInt() == null)
+			if (getValueAsBigInt() == null) {
 				throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");
+			}
 		}
 	}
 
@@ -197,21 +206,25 @@ public class HDLLiteral extends AbstractHDLLiteral {
 
 	@Override
 	public Boolean getStr() {
-		if (super.str == null)
+		if (super.str == null) {
 			return false;
+		}
 		return super.str;
 	}
 
 	public HDLLiteralPresentation getPresentation() {
-		if (getStr())
+		if (getStr()) {
 			return HDLLiteralPresentation.STR;
+		}
 		final String string = getVal();
-		if (TRUE.equals(string))
+		if (TRUE.equals(string)) {
 			return HDLLiteralPresentation.BOOL;
-		if (FALSE.equals(string))
+		}
+		if (FALSE.equals(string)) {
 			return HDLLiteralPresentation.BOOL;
+		}
 		final char zeroChar = string.charAt(0);
-		if (zeroChar == '0')
+		if (zeroChar == '0') {
 			if (string.length() > 1) {
 				switch (string.charAt(1)) {
 				case 'x':
@@ -219,8 +232,10 @@ public class HDLLiteral extends AbstractHDLLiteral {
 				case 'b':
 					return HDLLiteralPresentation.BIN;
 				}
-			} else
+			} else {
 				return HDLLiteralPresentation.NUM;
+			}
+		}
 		return HDLLiteralPresentation.NUM;
 	}
 
@@ -230,22 +245,28 @@ public class HDLLiteral extends AbstractHDLLiteral {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLLiteral))
+		}
+		if (!(obj instanceof AbstractHDLLiteral)) {
 			return false;
+		}
 		final HDLLiteral other = (HDLLiteral) obj;
 		final BigInteger bigVal = getValueAsBigInt();
 		final BigInteger otherbigVal = other.getValueAsBigInt();
-		if (bigVal != null)
+		if (bigVal != null) {
 			return bigVal.equals(otherbigVal);
+		}
 		if (val == null) {
-			if (other.getVal() != null)
+			if (other.getVal() != null) {
 				return false;
-		} else if (val.equals(other.getVal()))
+			}
+		} else if (val.equals(other.getVal())) {
 			return true;
+		}
 		return true;
 	}
 
@@ -253,8 +274,9 @@ public class HDLLiteral extends AbstractHDLLiteral {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		final BigInteger valueAsBigInt = getValueAsBigInt();
 		if (valueAsBigInt != null) {
 			hashCache = valueAsBigInt.hashCode();

@@ -168,11 +168,13 @@ public class RWValidation {
 
 	public static boolean isGlobal(HDLVariable hdlVariable) {
 		final IHDLObject container = hdlVariable.getContainer();
-		if (container == null)
+		if (container == null) {
 			return false;
+		}
 		final IHDLObject superContainer = container.getContainer();
-		if (superContainer instanceof HDLPackage)
+		if (superContainer instanceof HDLPackage) {
 			return true;
+		}
 		return false;
 	}
 
@@ -233,12 +235,12 @@ public class RWValidation {
 	/**
 	 * The last process that wrote to the variable
 	 */
-	public static final GenericMeta<HDLBlock> BLOCK_META = new GenericMeta<HDLBlock>("BLOCK_META", true);
+	public static final GenericMeta<HDLBlock> BLOCK_META = new GenericMeta<>("BLOCK_META", true);
 
 	/**
 	 * Processes that are colliding in write access
 	 */
-	public static final GenericMeta<Set<HDLBlock>> BLOCK_META_CLASH = new GenericMeta<Set<HDLBlock>>("BLOCK_META_CLASH", true);
+	public static final GenericMeta<Set<HDLBlock>> BLOCK_META_CLASH = new GenericMeta<>("BLOCK_META_CLASH", true);
 
 	/**
 	 * Indicate whether there is some read or write access to a port
@@ -364,8 +366,9 @@ public class RWValidation {
 
 	private static HDLBlock getProcess(HDLStatement stmnt) {
 		final HDLBlock container = stmnt.getContainer(HDLBlock.class);
-		if ((container != null) && (container.getProcess() != null) && (container.getProcess() == false))
+		if ((container != null) && (container.getProcess() != null) && (container.getProcess() == false)) {
 			return getProcess(container);
+		}
 		return container;
 	}
 

@@ -30,13 +30,12 @@ package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
- * This interface defines a complete listener for a parse tree produced by
- * {@link MemoryModelParser}.
+ * This interface defines a complete listener for a parse tree produced by {@link MemoryModelParser}.
  */
 public interface MemoryModelListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#unit}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -44,7 +43,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#unit}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -52,7 +51,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#declaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -60,7 +59,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#declaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -68,7 +67,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#row}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -76,7 +75,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#row}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -84,7 +83,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#rowID}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -92,7 +91,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#rowID}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -100,7 +99,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#constant}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -108,7 +107,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#constant}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -116,7 +115,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#filling}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -124,7 +123,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#filling}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -132,7 +131,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#column}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -140,7 +139,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#column}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -148,7 +147,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#alias}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -156,7 +155,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#alias}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -164,7 +163,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#memory}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -172,7 +171,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#memory}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -180,7 +179,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#definition}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -188,7 +187,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#definition}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -196,7 +195,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#warnType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -204,7 +203,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#warnType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -212,7 +211,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#rwStatus}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -220,7 +219,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#rwStatus}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -228,7 +227,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#width}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -236,7 +235,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#width}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -244,7 +243,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#type}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -252,7 +251,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#type}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -260,7 +259,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link MemoryModelParser#reference}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -268,7 +267,7 @@ public interface MemoryModelListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link MemoryModelParser#reference}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */

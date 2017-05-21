@@ -60,9 +60,8 @@ public class HDLValidator {
 	private static Map<Class<?>, IHDLValidator> validators;
 
 	/**
-	 * Initializes the {@link HDLValidator} with all validators using the
-	 * {@link IServiceProvider}. Also registers those validators withe the
-	 * {@link CompilerInformation}
+	 * Initializes the {@link HDLValidator} with all validators using the {@link IServiceProvider}. Also registers those validators withe
+	 * the {@link CompilerInformation}
 	 *
 	 * @param info
 	 * @param sp
@@ -77,8 +76,7 @@ public class HDLValidator {
 	}
 
 	/**
-	 * Validates the given {@link HDLPackage} with the given
-	 * {@link HDLEvaluationContext}s.
+	 * Validates the given {@link HDLPackage} with the given {@link HDLEvaluationContext}s.
 	 *
 	 * @param pkg
 	 *            the package to validate
@@ -88,7 +86,7 @@ public class HDLValidator {
 	 */
 	public static Set<Problem> validate(HDLPackage pkg, Map<HDLQualifiedName, HDLEvaluationContext> context) {
 		pkg = Insulin.resolveFragments(pkg);
-		final Set<Problem> res = new LinkedHashSet<Problem>();
+		final Set<Problem> res = new LinkedHashSet<>();
 		if (context == null) {
 			context = HDLEvaluationContext.createDefault(pkg);
 		}
@@ -107,8 +105,9 @@ public class HDLValidator {
 	 */
 	public static HDLAdvise advise(Problem problem) {
 		final IHDLValidator validator = validators.get(problem.code.getClass());
-		if (validator == null)
+		if (validator == null) {
 			return null;
+		}
 		return validator.advise(problem);
 	}
 

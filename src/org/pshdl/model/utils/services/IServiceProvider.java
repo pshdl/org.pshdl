@@ -51,7 +51,7 @@ public interface IServiceProvider {
 		@Override
 		public Collection<IHDLAnnotation> getAllAnnotations() {
 			final ServiceLoader<IHDLAnnotationProvider> annos = ServiceLoader.load(IHDLAnnotationProvider.class);
-			final List<IHDLAnnotation> res = new LinkedList<IHDLAnnotation>();
+			final List<IHDLAnnotation> res = new LinkedList<>();
 			for (final IHDLAnnotationProvider ap : annos) {
 				for (final IHDLAnnotation anno : ap.getAnnotations()) {
 					res.add(anno);
@@ -73,7 +73,7 @@ public interface IServiceProvider {
 		@Override
 		public Collection<IHDLGenerator> getAllGenerators() {
 			final ServiceLoader<IHDLGenerator> generators = ServiceLoader.load(IHDLGenerator.class);
-			final List<IHDLGenerator> res = new LinkedList<IHDLGenerator>();
+			final List<IHDLGenerator> res = new LinkedList<>();
 			for (final IHDLGenerator gen : generators) {
 				res.add(gen);
 			}
@@ -83,7 +83,7 @@ public interface IServiceProvider {
 		@Override
 		public Collection<IHDLValidator> getAllValidators() {
 			final ServiceLoader<IHDLValidator> generators = ServiceLoader.load(IHDLValidator.class);
-			final List<IHDLValidator> res = new LinkedList<IHDLValidator>();
+			final List<IHDLValidator> res = new LinkedList<>();
 			for (final IHDLValidator gen : generators) {
 				res.add(gen);
 			}
@@ -99,7 +99,7 @@ public interface IServiceProvider {
 		@Override
 		public Collection<IInsulinParticitant> getAllInsulinParticipants() {
 			final ServiceLoader<IInsulinParticitant> functions = ServiceLoader.load(IInsulinParticitant.class);
-			final List<IInsulinParticitant> res = new LinkedList<IInsulinParticitant>();
+			final List<IInsulinParticitant> res = new LinkedList<>();
 			for (final IInsulinParticitant func : functions) {
 				res.add(func);
 			}

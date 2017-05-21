@@ -47,7 +47,6 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -86,8 +85,9 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 		@Nullable
 		public static HDLEqualityOpType getOp(String op) {
 			for (final HDLEqualityOpType ass : values()) {
-				if (ass.str.equals(op))
+				if (ass.str.equals(op)) {
 					return ass;
+				}
 			}
 			return null;
 		}
@@ -106,23 +106,26 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLEqualityOpType getValue(HDLEqualityOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 
 		@Override
 		public HDLEqualityOp setValue(HDLEqualityOp obj, HDLEqualityOpType value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setType(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (type == obj)
+		if (type == obj) {
 			return fType;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

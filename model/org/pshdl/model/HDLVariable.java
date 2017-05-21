@@ -44,8 +44,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLExpression&gt; dimensions. Can be <code>null</code>.</li>
  * <li>HDLExpression defaultValue. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLVariable extends AbstractHDLVariable {
@@ -54,7 +53,6 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -91,35 +89,38 @@ public class HDLVariable extends AbstractHDLVariable {
 	public static HDLFieldAccess<HDLVariable, String> fName = new HDLFieldAccess<HDLVariable, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLVariable obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 
 		@Override
 		public HDLVariable setValue(HDLVariable obj, String value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setName(value);
 		}
 	};
 	/**
-	 * The accessor for the field dimensions which is of type
-	 * ArrayList&lt;HDLExpression&gt;.
+	 * The accessor for the field dimensions which is of type ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>("dimensions", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariable obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDimensions();
 		}
 
 		@Override
 		public HDLVariable setValue(HDLVariable obj, ArrayList<HDLExpression> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDimensions(value);
 		}
 	};
@@ -130,49 +131,56 @@ public class HDLVariable extends AbstractHDLVariable {
 			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLVariable obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDefaultValue();
 		}
 
 		@Override
 		public HDLVariable setValue(HDLVariable obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setDefaultValue(value);
 		}
 	};
 	/**
-	 * The accessor for the field annotations which is of type
-	 * ArrayList&lt;HDLAnnotation&gt;.
+	 * The accessor for the field annotations which is of type ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>("annotations", HDLAnnotation.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLVariable obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getAnnotations();
 		}
 
 		@Override
 		public HDLVariable setValue(HDLVariable obj, ArrayList<HDLAnnotation> value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setAnnotations(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (name == obj)
+		if (name == obj) {
 			return fName;
-		if (dimensions.contains(obj))
+		}
+		if (dimensions.contains(obj)) {
 			return fDimensions;
-		if (defaultValue == obj)
+		}
+		if (defaultValue == obj) {
 			return fDefaultValue;
-		if (annotations.contains(obj))
+		}
+		if (annotations.contains(obj)) {
 			return fAnnotations;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
@@ -205,8 +213,9 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	@Override
 	protected String validateName(String name) {
-		if ((name != null) && name.contains("."))
+		if ((name != null) && name.contains(".")) {
 			throw new IllegalArgumentException("Variable names may not contain a dot");
+		}
 		return super.validateName(name);
 	}
 
@@ -215,9 +224,11 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	public HDLAnnotation getAnnotation(String name) {
-		for (final HDLAnnotation anno : getAnnotations())
-			if (anno.getName().equals(name))
+		for (final HDLAnnotation anno : getAnnotations()) {
+			if (anno.getName().equals(name)) {
 				return anno;
+			}
+		}
 		if (container instanceof HDLVariableDeclaration) {
 			final HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
 			return vhd.getAnnotation(name);

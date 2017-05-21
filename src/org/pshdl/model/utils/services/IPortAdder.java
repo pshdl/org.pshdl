@@ -32,22 +32,18 @@ import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLVariableDeclaration;
 
 /**
- * This interface allows the addition of ports to an existing {@link HDLUnit}.
- * This can be useful for annotation post-processing in addition to an
- * {@link IInsulinParticitant}
+ * This interface allows the addition of ports to an existing {@link HDLUnit}. This can be useful for annotation post-processing in addition
+ * to an {@link IInsulinParticitant}
  *
  * @author Karsten Becker
- *
  */
 public interface IPortAdder {
 	/**
-	 * The returned ports will be added to the given unit. The usage of those
-	 * ports can be contributed via {@link IInsulinParticitant}.
+	 * The returned ports will be added to the given unit. The usage of those ports can be contributed via {@link IInsulinParticitant}.
 	 *
 	 * @param unit
 	 *            the unit to which ports could potentially be contributed
-	 * @return <code>null</code> if no ports should be added to this unit. The
-	 *         ports otherwise
+	 * @return <code>null</code> if no ports should be added to this unit. The ports otherwise
 	 */
 	public List<HDLVariableDeclaration> getPortAddition(HDLUnit unit);
 }

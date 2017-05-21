@@ -36,8 +36,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLEnumDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
- * </li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLEnum hEnum. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -47,7 +46,6 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -79,23 +77,26 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>("hEnum", HDLEnum.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLEnum getValue(HDLEnumDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHEnum();
 		}
 
 		@Override
 		public HDLEnumDeclaration setValue(HDLEnumDeclaration obj, HDLEnum value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setHEnum(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (hEnum == obj)
+		if (hEnum == obj) {
 			return fHEnum;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$

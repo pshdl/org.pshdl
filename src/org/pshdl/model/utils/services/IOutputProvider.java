@@ -109,22 +109,18 @@ public interface IOutputProvider {
 	public String getHookName();
 
 	/**
-	 * An informal information about which arguments this
-	 * {@link IOutputProvider} is expecting and how it can be used.
+	 * An informal information about which arguments this {@link IOutputProvider} is expecting and how it can be used.
 	 *
-	 * @return multiple strings, each explaining one option. The first one is
-	 *         some general information
+	 * @return multiple strings, each explaining one option. The first one is some general information
 	 */
 	public MultiOption getUsage();
 
 	/**
-	 * Invokes this {@link IOutputProvider} and passes the given arguments to
-	 * it.
+	 * Invokes this {@link IOutputProvider} and passes the given arguments to it.
 	 *
 	 * @param cli
 	 *            the arguments excluding the hook
-	 * @return an explanation of what went wrong or <code>null</code> if it was
-	 *         successful
+	 * @return an explanation of what went wrong or <code>null</code> if it was successful
 	 */
 	public String invoke(CommandLine cli) throws Exception;
 }

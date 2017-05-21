@@ -59,8 +59,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * @param dim
 	 *            the value for dim. Can be <code>null</code>.
 	 * @param enums
-	 *            the value for enums. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for enums. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
@@ -70,7 +69,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		if (validate) {
 			enums = validateEnums(enums);
 		}
-		this.enums = new ArrayList<HDLVariable>();
+		this.enums = new ArrayList<>();
 		if (enums != null) {
 			for (final HDLVariable newValue : enums) {
 				this.enums.add(newValue);
@@ -80,14 +79,13 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	public AbstractHDLEnum() {
 		super();
-		this.enums = new ArrayList<HDLVariable>();
+		this.enums = new ArrayList<>();
 	}
 
 	protected final ArrayList<HDLVariable> enums;
 
 	/**
-	 * Get the enums field. Can <b>not</b> be <code>null</code>, additionally
-	 * the collection must contain at least one element.
+	 * Get the enums field. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
@@ -97,10 +95,12 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	}
 
 	protected Iterable<HDLVariable> validateEnums(Iterable<HDLVariable> enums) {
-		if (enums == null)
+		if (enums == null) {
 			throw new IllegalArgumentException("The field enums can not be null!");
-		if (!enums.iterator().hasNext())
+		}
+		if (!enums.iterator().hasNext()) {
 			throw new IllegalArgumentException("The field enums must contain at least one item!");
+		}
 		return enums;
 	}
 
@@ -148,10 +148,8 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLEnum} with the updated container
-	 *         field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLEnum} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -163,8 +161,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Setter for the field {@link #getName()}.
 	 *
 	 * @param name
-	 *            sets the new name of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new name of this object. Can <b>not</b> be <code>null</code>.
 	 * @return a new instance of {@link HDLEnum} with the updated name field.
 	 */
 	@Override
@@ -200,8 +197,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Override
 	@Nonnull
 	public HDLEnum addDim(@Nullable HDLExpression newDim) {
-		if (newDim == null)
+		if (newDim == null) {
 			throw new IllegalArgumentException("Element of dim can not be null!");
+		}
 		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.add(newDim);
 		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
@@ -212,15 +210,15 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Removes a value from the field {@link #getDim()}.
 	 *
 	 * @param newDim
-	 *            the value that should be removed from the field
-	 *            {@link #getDim()}
+	 *            the value that should be removed from the field {@link #getDim()}
 	 * @return a new instance of {@link HDLEnum} with the updated dim field.
 	 */
 	@Override
 	@Nonnull
 	public HDLEnum removeDim(@Nullable HDLExpression newDim) {
-		if (newDim == null)
+		if (newDim == null) {
 			throw new IllegalArgumentException("Removed element of dim can not be null!");
+		}
 		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(newDim);
 		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
@@ -231,8 +229,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Removes a value from the field {@link #getDim()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getDim()}
+	 *            the index of the value that should be removed from the field {@link #getDim()}
 	 * @return a new instance of {@link HDLEnum} with the updated dim field.
 	 */
 	@Nonnull
@@ -247,9 +244,8 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Setter for the field {@link #getEnums()}.
 	 *
 	 * @param enums
-	 *            sets the new enums of this object. Can <b>not</b> be
-	 *            <code>null</code>, additionally the collection must contain at
-	 *            least one element.
+	 *            sets the new enums of this object. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least
+	 *            one element.
 	 * @return a new instance of {@link HDLEnum} with the updated enums field.
 	 */
 	@Nonnull
@@ -263,14 +259,14 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Adds a new value to the field {@link #getEnums()}.
 	 *
 	 * @param newEnums
-	 *            the value that should be added to the field
-	 *            {@link #getEnums()}
+	 *            the value that should be added to the field {@link #getEnums()}
 	 * @return a new instance of {@link HDLEnum} with the updated enums field.
 	 */
 	@Nonnull
 	public HDLEnum addEnums(@Nonnull HDLVariable newEnums) {
-		if (newEnums == null)
+		if (newEnums == null) {
 			throw new IllegalArgumentException("Element of enums can not be null!");
+		}
 		final ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.add(newEnums);
 		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
@@ -281,14 +277,14 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Removes a value from the field {@link #getEnums()}.
 	 *
 	 * @param newEnums
-	 *            the value that should be removed from the field
-	 *            {@link #getEnums()}
+	 *            the value that should be removed from the field {@link #getEnums()}
 	 * @return a new instance of {@link HDLEnum} with the updated enums field.
 	 */
 	@Nonnull
 	public HDLEnum removeEnums(@Nonnull HDLVariable newEnums) {
-		if (newEnums == null)
+		if (newEnums == null) {
 			throw new IllegalArgumentException("Removed element of enums can not be null!");
+		}
 		final ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.remove(newEnums);
 		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
@@ -299,8 +295,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * Removes a value from the field {@link #getEnums()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getEnums()}
+	 *            the index of the value that should be removed from the field {@link #getEnums()}
 	 * @return a new instance of {@link HDLEnum} with the updated enums field.
 	 */
 	@Nonnull
@@ -313,20 +308,26 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLEnum))
+		}
+		if (!(obj instanceof AbstractHDLEnum)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLEnum other = (AbstractHDLEnum) obj;
 		if (enums == null) {
-			if (other.enums != null)
+			if (other.enums != null) {
 				return false;
-		} else if (!enums.equals(other.enums))
+			}
+		} else if (!enums.equals(other.enums)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -334,8 +335,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((enums == null) ? 0 : enums.hashCode());

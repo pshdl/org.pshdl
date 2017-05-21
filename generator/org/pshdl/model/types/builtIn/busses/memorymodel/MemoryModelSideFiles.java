@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
 public class MemoryModelSideFiles {
 
 	public static List<AuxiliaryContent> getSideFiles(HDLUnit unit, Unit memUnit, List<Row> rows, String version, String prefix, boolean withDate) {
-		final List<AuxiliaryContent> res = new LinkedList<AuxiliaryContent>();
+		final List<AuxiliaryContent> res = new LinkedList<>();
 		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		final String ipcorename = unitName + BusGenSideFiles.WRAPPER_APPENDIX;
 		final String dirName = ipcorename + "_" + version;
@@ -105,7 +105,7 @@ public class MemoryModelSideFiles {
 			final Map<String, Integer> defIndex = Maps.newLinkedHashMap();
 			final Map<String, Integer> rowIndex = Maps.newLinkedHashMap();
 			for (final Row row : rows) {
-				if ((row.column != current) || (row.colIndex != colIndex))
+				if ((row.column != current) || (row.colIndex != colIndex)) {
 					if (row.column == null) {
 						current = null;
 						colIndex = -1;
@@ -115,11 +115,12 @@ public class MemoryModelSideFiles {
 						colIndex = row.colIndex;
 						formatter.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>%n", Unit.rowWidth + 2, row.column.name, row.colIndex);
 					}
+				}
 				formatter.format("<tr>");
 				formatter.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
 				for (final NamedElement dec : row.definitions) {
 					if (dec instanceof Constant) {
-						Constant c = (Constant) dec;
+						final Constant c = (Constant) dec;
 						formatter.format("<td colspan='%d' class='field %s %s'>%s</td>", c.width, "constStyle", "", String.format("0x%X", c.value));
 					} else {
 						final Definition def = (Definition) dec;

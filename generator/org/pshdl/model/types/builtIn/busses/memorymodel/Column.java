@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.Token;
 
 public class Column implements NamedElement {
 	public String name;
-	public List<NamedElement> rows = new LinkedList<NamedElement>();
+	public List<NamedElement> rows = new LinkedList<>();
 	public int index = -1;
 
 	public Column(String name) {

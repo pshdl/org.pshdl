@@ -28,7 +28,6 @@ package org.pshdl.model.simulation;
 
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,8 +58,9 @@ public class RangeTool {
 		public int compareTo(RangeVal o) {
 			// Sort by value first
 			final int v = value.compareTo(o.value);
-			if (v != 0)
+			if (v != 0) {
 				return v;
+			}
 			// Then sort Starts before ends
 			return -count;
 		}
@@ -80,28 +80,33 @@ public class RangeTool {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			final RangeVal other = (RangeVal) obj;
-			if (count != other.count)
+			if (count != other.count) {
 				return false;
+			}
 			if (value == null) {
-				if (other.value != null)
+				if (other.value != null) {
 					return false;
-			} else if (!value.equals(other.value))
+				}
+			} else if (!value.equals(other.value)) {
 				return false;
+			}
 			return true;
 		}
 
 	}
 
 	/**
-	 * Sort a List of ranges by their number, then start/end and merge multiple
-	 * start/ends
+	 * Sort a List of ranges by their number, then start/end and merge multiple start/ends
 	 *
 	 * @param temp
 	 *            a list of RangeVal which can be unsorted
@@ -121,8 +126,7 @@ public class RangeTool {
 	}
 
 	/**
-	 * Splits a list into ValueRange Objects that do not overlap each other, but
-	 * fully represent the ranges given by value
+	 * Splits a list into ValueRange Objects that do not overlap each other, but fully represent the ranges given by value
 	 *
 	 * @param value
 	 *            a list of RangeVal Objects that need to be split
@@ -130,15 +134,10 @@ public class RangeTool {
 	 */
 	public static SortedSet<Range<BigInteger>> split(List<RangeVal> value) {
 		preSort(value);
-		final SortedSet<Range<BigInteger>> res = new TreeSet<Range<BigInteger>>(new Comparator<Range<BigInteger>>() {
-			@Override
-			public int compare(Range<BigInteger> arg0, Range<BigInteger> arg1) {
-				return ComparisonChain.start() //
-						.compare(arg0.lowerEndpoint(), arg1.lowerEndpoint()) //
-						.compare(arg0.upperEndpoint(), arg1.upperEndpoint()) //
-						.result();
-			}
-		});
+		final SortedSet<Range<BigInteger>> res = new TreeSet<>((arg0, arg1) -> ComparisonChain.start() //
+				.compare(arg0.lowerEndpoint(), arg1.lowerEndpoint()) //
+				.compare(arg0.upperEndpoint(), arg1.upperEndpoint()) //
+				.result());
 		RangeVal last = null;
 		int count = 0;
 		for (final RangeVal current : value) {
@@ -159,8 +158,9 @@ public class RangeTool {
 					}
 				}
 			} else {
-				if (!current.isStart())
+				if (!current.isStart()) {
 					throw new IllegalArgumentException("this should not happen");
+				}
 			}
 			count += current.count;
 			last = current;
@@ -189,14 +189,15 @@ public class RangeTool {
 		System.out.println("Result:" + split);
 		Range<BigInteger> last = Range.closed(BigInteger.valueOf(-1), BigInteger.valueOf(-1));
 		for (final Range<BigInteger> range : split) {
-			if (range.isConnected(last))
+			if (range.isConnected(last)) {
 				throw new IllegalArgumentException("Ranges are connected:" + last + " and " + range);
+			}
 			last = range;
 		}
 	}
 
 	private static List<RangeVal> createRanges(int... r) {
-		final List<RangeVal> temp = new LinkedList<RangeVal>();
+		final List<RangeVal> temp = new LinkedList<>();
 		for (int i = 0; i < r.length; i += 2) {
 			temp.add(new RangeVal(BigInteger.valueOf(r[i]), 1));
 			temp.add(new RangeVal(BigInteger.valueOf(r[i + 1]), -1));
@@ -210,8 +211,9 @@ public class RangeTool {
 	}
 
 	public static <C extends Comparable<C>> Range<C> createRange(C lower, C upper) {
-		if (lower.compareTo(upper) > 0)
+		if (lower.compareTo(upper) > 0) {
 			return Range.closed(upper, lower);
+		}
 		return Range.closed(lower, upper);
 	}
 }

@@ -79,7 +79,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		if (validate) {
 			units = validateUnits(units);
 		}
-		this.units = new ArrayList<HDLUnit>();
+		this.units = new ArrayList<>();
 		if (units != null) {
 			for (final HDLUnit newValue : units) {
 				this.units.add(newValue);
@@ -88,7 +88,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		if (validate) {
 			declarations = validateDeclarations(declarations);
 		}
-		this.declarations = new ArrayList<HDLDeclaration>();
+		this.declarations = new ArrayList<>();
 		if (declarations != null) {
 			for (final HDLDeclaration newValue : declarations) {
 				this.declarations.add(newValue);
@@ -100,8 +100,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		super();
 		this.libURI = null;
 		this.pkg = null;
-		this.units = new ArrayList<HDLUnit>();
-		this.declarations = new ArrayList<HDLDeclaration>();
+		this.units = new ArrayList<>();
+		this.declarations = new ArrayList<>();
 	}
 
 	protected final String libURI;
@@ -117,8 +117,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	}
 
 	protected String validateLibURI(String libURI) {
-		if (libURI == null)
+		if (libURI == null) {
 			throw new IllegalArgumentException("The field libURI can not be null!");
+		}
 		return libURI;
 	}
 
@@ -151,8 +152,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	}
 
 	protected Iterable<HDLUnit> validateUnits(Iterable<HDLUnit> units) {
-		if (units == null)
-			return new ArrayList<HDLUnit>();
+		if (units == null) {
+			return new ArrayList<>();
+		}
 		return units;
 	}
 
@@ -169,8 +171,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	}
 
 	protected Iterable<HDLDeclaration> validateDeclarations(Iterable<HDLDeclaration> declarations) {
-		if (declarations == null)
-			return new ArrayList<HDLDeclaration>();
+		if (declarations == null) {
+			return new ArrayList<>();
+		}
 		return declarations;
 	}
 
@@ -219,10 +222,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Setter for the field {@link #getContainer()}.
 	 *
 	 * @param container
-	 *            sets the new container of this object. Can be
-	 *            <code>null</code>.
-	 * @return the same instance of {@link HDLPackage} with the updated
-	 *         container field.
+	 *            sets the new container of this object. Can be <code>null</code>.
+	 * @return the same instance of {@link HDLPackage} with the updated container field.
 	 */
 	@Override
 	@Nonnull
@@ -234,10 +235,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Setter for the field {@link #getLibURI()}.
 	 *
 	 * @param libURI
-	 *            sets the new libURI of this object. Can <b>not</b> be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLPackage} with the updated libURI
-	 *         field.
+	 *            sets the new libURI of this object. Can <b>not</b> be <code>null</code>.
+	 * @return a new instance of {@link HDLPackage} with the updated libURI field.
 	 */
 	@Nonnull
 	public HDLPackage setLibURI(@Nonnull String libURI) {
@@ -265,8 +264,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 *
 	 * @param units
 	 *            sets the new units of this object. Can be <code>null</code>.
-	 * @return a new instance of {@link HDLPackage} with the updated units
-	 *         field.
+	 * @return a new instance of {@link HDLPackage} with the updated units field.
 	 */
 	@Nonnull
 	public HDLPackage setUnits(@Nullable Iterable<HDLUnit> units) {
@@ -279,15 +277,14 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Adds a new value to the field {@link #getUnits()}.
 	 *
 	 * @param newUnits
-	 *            the value that should be added to the field
-	 *            {@link #getUnits()}
-	 * @return a new instance of {@link HDLPackage} with the updated units
-	 *         field.
+	 *            the value that should be added to the field {@link #getUnits()}
+	 * @return a new instance of {@link HDLPackage} with the updated units field.
 	 */
 	@Nonnull
 	public HDLPackage addUnits(@Nullable HDLUnit newUnits) {
-		if (newUnits == null)
+		if (newUnits == null) {
 			throw new IllegalArgumentException("Element of units can not be null!");
+		}
 		final ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
 		units.add(newUnits);
 		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
@@ -298,15 +295,14 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Removes a value from the field {@link #getUnits()}.
 	 *
 	 * @param newUnits
-	 *            the value that should be removed from the field
-	 *            {@link #getUnits()}
-	 * @return a new instance of {@link HDLPackage} with the updated units
-	 *         field.
+	 *            the value that should be removed from the field {@link #getUnits()}
+	 * @return a new instance of {@link HDLPackage} with the updated units field.
 	 */
 	@Nonnull
 	public HDLPackage removeUnits(@Nullable HDLUnit newUnits) {
-		if (newUnits == null)
+		if (newUnits == null) {
 			throw new IllegalArgumentException("Removed element of units can not be null!");
+		}
 		final ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
 		units.remove(newUnits);
 		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
@@ -317,10 +313,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Removes a value from the field {@link #getUnits()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getUnits()}
-	 * @return a new instance of {@link HDLPackage} with the updated units
-	 *         field.
+	 *            the index of the value that should be removed from the field {@link #getUnits()}
+	 * @return a new instance of {@link HDLPackage} with the updated units field.
 	 */
 	@Nonnull
 	public HDLPackage removeUnits(int idx) {
@@ -334,10 +328,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Setter for the field {@link #getDeclarations()}.
 	 *
 	 * @param declarations
-	 *            sets the new declarations of this object. Can be
-	 *            <code>null</code>.
-	 * @return a new instance of {@link HDLPackage} with the updated
-	 *         declarations field.
+	 *            sets the new declarations of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLPackage} with the updated declarations field.
 	 */
 	@Nonnull
 	public HDLPackage setDeclarations(@Nullable Iterable<HDLDeclaration> declarations) {
@@ -350,15 +342,14 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Adds a new value to the field {@link #getDeclarations()}.
 	 *
 	 * @param newDeclarations
-	 *            the value that should be added to the field
-	 *            {@link #getDeclarations()}
-	 * @return a new instance of {@link HDLPackage} with the updated
-	 *         declarations field.
+	 *            the value that should be added to the field {@link #getDeclarations()}
+	 * @return a new instance of {@link HDLPackage} with the updated declarations field.
 	 */
 	@Nonnull
 	public HDLPackage addDeclarations(@Nullable HDLDeclaration newDeclarations) {
-		if (newDeclarations == null)
+		if (newDeclarations == null) {
 			throw new IllegalArgumentException("Element of declarations can not be null!");
+		}
 		final ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
 		declarations.add(newDeclarations);
 		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
@@ -369,15 +360,14 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Removes a value from the field {@link #getDeclarations()}.
 	 *
 	 * @param newDeclarations
-	 *            the value that should be removed from the field
-	 *            {@link #getDeclarations()}
-	 * @return a new instance of {@link HDLPackage} with the updated
-	 *         declarations field.
+	 *            the value that should be removed from the field {@link #getDeclarations()}
+	 * @return a new instance of {@link HDLPackage} with the updated declarations field.
 	 */
 	@Nonnull
 	public HDLPackage removeDeclarations(@Nullable HDLDeclaration newDeclarations) {
-		if (newDeclarations == null)
+		if (newDeclarations == null) {
 			throw new IllegalArgumentException("Removed element of declarations can not be null!");
+		}
 		final ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
 		declarations.remove(newDeclarations);
 		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
@@ -388,10 +378,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * Removes a value from the field {@link #getDeclarations()}.
 	 *
 	 * @param idx
-	 *            the index of the value that should be removed from the field
-	 *            {@link #getDeclarations()}
-	 * @return a new instance of {@link HDLPackage} with the updated
-	 *         declarations field.
+	 *            the index of the value that should be removed from the field {@link #getDeclarations()}
+	 * @return a new instance of {@link HDLPackage} with the updated declarations field.
 	 */
 	@Nonnull
 	public HDLPackage removeDeclarations(int idx) {
@@ -403,30 +391,40 @@ public abstract class AbstractHDLPackage extends HDLObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLPackage))
+		}
+		if (!(obj instanceof AbstractHDLPackage)) {
 			return false;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
+		}
 		final AbstractHDLPackage other = (AbstractHDLPackage) obj;
 		if (pkg == null) {
-			if (other.pkg != null)
+			if (other.pkg != null) {
 				return false;
-		} else if (!pkg.equals(other.pkg))
+			}
+		} else if (!pkg.equals(other.pkg)) {
 			return false;
+		}
 		if (units == null) {
-			if (other.units != null)
+			if (other.units != null) {
 				return false;
-		} else if (!units.equals(other.units))
+			}
+		} else if (!units.equals(other.units)) {
 			return false;
+		}
 		if (declarations == null) {
-			if (other.declarations != null)
+			if (other.declarations != null) {
 				return false;
-		} else if (!declarations.equals(other.declarations))
+			}
+		} else if (!declarations.equals(other.declarations)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -434,8 +432,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 
 	@Override
 	public int hashCode() {
-		if (hashCache != null)
+		if (hashCache != null) {
 			return hashCache;
+		}
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((pkg == null) ? 0 : pkg.hashCode());

@@ -46,7 +46,6 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -79,15 +78,17 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLeft();
 		}
 
 		@Override
 		public HDLOpExpression setValue(HDLOpExpression obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setLeft(value);
 		}
 	};
@@ -98,25 +99,29 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRight();
 		}
 
 		@Override
 		public HDLOpExpression setValue(HDLOpExpression obj, HDLExpression value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setRight(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (left == obj)
+		if (left == obj) {
 			return fLeft;
-		if (right == obj)
+		}
+		if (right == obj) {
 			return fRight;
+		}
 		return super.getContainingFeature(obj);
 	}
 

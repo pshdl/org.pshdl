@@ -46,7 +46,6 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 	 *
 	 * @param id
 	 *            a unique ID for this particular node
-	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -77,23 +76,26 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLResolvedRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVarRefName();
 		}
 
 		@Override
 		public HDLResolvedRef setValue(HDLResolvedRef obj, HDLQualifiedName value) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.setVar(value);
 		}
 	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (var == obj)
+		if (var == obj) {
 			return fVar;
+		}
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
