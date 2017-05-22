@@ -88,6 +88,10 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 */
 		memory,
 		/**
+		 *
+		 */
+		ramDelay,
+		/**
 		 * The name of the type that should be used instead of an automatically created type during VHDL code generation. The name should
 		 * start with VHDL.
 		 */
@@ -170,6 +174,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case memory:
 				if (value == null) {
 					return this + " expects an argument with the name of memory to use.";
+				}
+				break;
+			case ramDelay:
+				if ((value != null) && !value.equals("tight")) {
+					return "only tight is allowed as argument";
 				}
 				break;
 			}
@@ -362,6 +371,8 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 						"a simple memory name. Should be a simple identifier");
 			case sharedVar:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(), "Builtin annotation to designed shared variables", null);
+			case ramDelay:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(), "Allows the delay to use RAM", null);
 			}
 			throw new IllegalArgumentException("Forgot to implement AnnotationInformation for:" + this);
 		}

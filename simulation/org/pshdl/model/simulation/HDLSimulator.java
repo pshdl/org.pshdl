@@ -109,11 +109,38 @@ public class HDLSimulator {
 		insulin = unrollForLoops(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
+		insulin = flattenMath(context, insulin);
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
 		insulin = removeDeadLeaves(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
+	}
+
+	private static HDLUnit flattenMath(HDLEvaluationContext context, HDLUnit insulin) {
+		HDLUnit newUnit = insulin;
+		HDLUnit oldUnit = insulin;
+		do {
+			oldUnit = newUnit;
+			final ModificationSet ms = new ModificationSet();
+			final HDLExpression[] calls = oldUnit.getAllObjectsOf(HDLExpression.class, true);
+			for (final HDLExpression call : calls) {
+				if (call instanceof HDLLiteral) {
+					continue;
+				}
+				if (call instanceof HDLReference) {
+					if (call.getContainingFeature() == HDLAssignment.fLeft) {
+						continue;
+					}
+				}
+				final Optional<BigInteger> value = ConstantEvaluate.valueOf(call, context);
+				if (value.isPresent()) {
+					ms.replace(call, HDLLiteral.get(value.get()));
+				}
+			}
+			newUnit = ms.apply(oldUnit);
+		} while (newUnit != oldUnit);
+		return newUnit;
 	}
 
 	public static final HDLAnnotation TB_VAR = new HDLAnnotation().setName("@TestbenchVar");

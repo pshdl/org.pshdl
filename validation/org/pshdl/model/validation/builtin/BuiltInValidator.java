@@ -258,6 +258,8 @@ public class BuiltInValidator implements IHDLValidator {
 			// matching
 			// VALIDATE no Registers in Testbench/Global gen
 			// VALIDATE: Don't allow boolean assignments to non-boolean variable
+			// VALIDATE warn for big delay numbers
+			// VALIDATE Param should be uint32
 			checkRegisters(pkg, problems, hContext);
 
 		} catch (final Exception e) {
