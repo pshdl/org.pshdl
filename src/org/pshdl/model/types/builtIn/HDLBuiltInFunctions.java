@@ -745,6 +745,9 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 	}
 
 	public static BigInteger log2ceil(BigInteger le) {
+		if (BigInteger.ZERO.equals(le)) {
+			return BigInteger.ZERO;
+		}
 		return BigInteger.valueOf(BigIntegerMath.log2(le, RoundingMode.CEILING));
 	}
 

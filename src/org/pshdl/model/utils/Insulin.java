@@ -151,6 +151,7 @@ public class Insulin {
 		apply = handleDelayedSignals(apply);
 		apply = handleOutPortRead(apply);
 		apply = handleExports(apply);
+		apply = reorderSwitchDefaults(apply);
 		apply = includeGenerators(apply, src);
 		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
@@ -172,6 +173,27 @@ public class Insulin {
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	private static <T extends IHDLObject> T reorderSwitchDefaults(T apply) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLSwitchStatement[] switches = apply.getAllObjectsOf(HDLSwitchStatement.class, true);
+		for (final HDLSwitchStatement swStmnt : switches) {
+			final ArrayList<HDLSwitchCaseStatement> cases = swStmnt.getCases();
+			HDLSwitchCaseStatement defaultCase = null;
+			for (final Iterator<HDLSwitchCaseStatement> iterator = cases.iterator(); iterator.hasNext();) {
+				final HDLSwitchCaseStatement caseStmnt = iterator.next();
+				if (caseStmnt.getLabel() == null) {
+					defaultCase = caseStmnt;
+					iterator.remove();
+				}
+			}
+			if (defaultCase != null) {
+				cases.add(defaultCase);
+			}
+			ms.replace(swStmnt, swStmnt.setCases(cases));
+		}
+		return ms.apply(apply);
 	}
 
 	private static <T extends IHDLObject> T prepareMemory(T apply) {
@@ -720,7 +742,7 @@ public class Insulin {
 					.setType(HDLPrimitive.getUint().setWidth(ramDepthBits)).addVariables(dlydWrPTRVar);
 			final String dlydReValue = Insulin.getTempName(var.getName(), "dlydReValue");
 			final HDLVariable dlydReValueVar = new HDLVariable().setName(dlydReValue).setDefaultValue(dlyRAMVar.asHDLRef().addArray(dlydRePTRVar.asHDLRef()));
-			final HDLVariableDeclaration ptrReValueHVD = hvd.setRegister(delayedReg.setDelay(null)).addVariables(dlydReValueVar);
+			final HDLVariableDeclaration ptrReValueHVD = hvd.setRegister(delayedReg.setDelay(null)).setVariables(HDLObject.asList(dlydReValueVar));
 			ms.insertAfter(hvd, ptrReHVD, ptrWrHVD, ptrReValueHVD);
 			updateDlyReferences(ms, hvd, dlydWrPTRVar.asHDLRef(), dlydRePTRVar.asHDLRef(), var, fqnDelay, dlyRAMVar);
 			ms.insertAfter(hvd, new HDLAssignment().setLeft(var.asHDLRef()).setRight(dlydReValueVar.asHDLRef()));
