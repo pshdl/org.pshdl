@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArgument;
@@ -704,7 +705,8 @@ public class Insulin {
 		final HDLExpression delay = delayedReg.getDelay();
 		final HDLFunctionCall ramDepthBits = HDLBuiltInFunctions.LOG2CEIL_UINT.getCall(delay);
 		for (final HDLVariable var : hvd.getVariables()) {
-			ms.replace(var, var.setDefaultValue(null));
+			ms.replace(var, var.setAnnotations(filterAnnotations(var.getAnnotations())).setDefaultValue(null));
+			ms.replace(hvd, hvd.setAnnotations(filterAnnotations(hvd.getAnnotations())));
 			// Create storage array
 			final String dlydRAM = Insulin.getTempName(var.getName(), "dlydRAM");
 			final HDLQualifiedName fqnDelay = HDLQualifiedName.create(dlydRAM);
@@ -717,7 +719,8 @@ public class Insulin {
 			} else {
 				dimensions.add(0, delay);
 			}
-			ms.insertAfter(hvd, hvd.setDirection(HDLDirection.INTERNAL).setRegister(delayedReg.setDelay(null)).setVariables(HDLObject.asList(dlyRAMVar.setDimensions(dimensions))));
+			ms.insertAfter(hvd, hvd.setAnnotations(null).setDirection(HDLDirection.INTERNAL).setRegister(delayedReg.setDelay(null))
+					.setVariables(HDLObject.asList(dlyRAMVar.setDimensions(dimensions))));
 			// Make a read pointer that increments itself
 			final String dlydRePTR = Insulin.getTempName(var.getName(), "dlydRePTR");
 			HDLVariable dlydRePTRVar = new HDLVariable().setName(dlydRePTR);
@@ -742,7 +745,7 @@ public class Insulin {
 					.setType(HDLPrimitive.getUint().setWidth(ramDepthBits)).addVariables(dlydWrPTRVar);
 			final String dlydReValue = Insulin.getTempName(var.getName(), "dlydReValue");
 			final HDLVariable dlydReValueVar = new HDLVariable().setName(dlydReValue).setDefaultValue(dlyRAMVar.asHDLRef().addArray(dlydRePTRVar.asHDLRef()));
-			final HDLVariableDeclaration ptrReValueHVD = hvd.setRegister(delayedReg.setDelay(null)).setVariables(HDLObject.asList(dlydReValueVar));
+			final HDLVariableDeclaration ptrReValueHVD = hvd.setAnnotations(null).setRegister(delayedReg.setDelay(null)).setVariables(HDLObject.asList(dlydReValueVar));
 			ms.insertAfter(hvd, ptrReHVD, ptrWrHVD, ptrReValueHVD);
 			updateDlyReferences(ms, hvd, dlydWrPTRVar.asHDLRef(), dlydRePTRVar.asHDLRef(), var, fqnDelay, dlyRAMVar);
 			ms.insertAfter(hvd, new HDLAssignment().setLeft(var.asHDLRef()).setRight(dlydReValueVar.asHDLRef()));
@@ -755,7 +758,7 @@ public class Insulin {
 		final HDLArithOp delayPlusOne = HDLArithOp.add(delay, 1);
 		final HDLLiteral readIdx = HDLLiteral.get(0);
 		for (final HDLVariable var : hvd.getVariables()) {
-			ms.replace(var, var.setDefaultValue(null));
+			ms.replace(var, var.setAnnotations(filterAnnotations(var.getAnnotations())).setDefaultValue(null));
 			final String dlyName = Insulin.getTempName(var.getName(), "dlyd");
 			final HDLQualifiedName fqnDelay = HDLQualifiedName.create(dlyName);
 			final HDLVariable dlyVar = var.setName(dlyName).setDefaultValue(null);
@@ -764,7 +767,8 @@ public class Insulin {
 			// references to the new delayed signal.
 			final ArrayList<HDLExpression> dimensions = dlyVar.getDimensions();
 			dimensions.add(0, delayPlusOne);
-			ms.insertAfter(hvd, hvd.setDirection(HDLDirection.INTERNAL).setRegister(delayedReg.setDelay(null)).setVariables(HDLObject.asList(dlyVar.setDimensions(dimensions))));
+			ms.insertAfter(hvd, hvd.setAnnotations(null).setDirection(HDLDirection.INTERNAL).setRegister(delayedReg.setDelay(null))
+					.setVariables(HDLObject.asList(dlyVar.setDimensions(dimensions))));
 			updateDlyReferences(ms, hvd, delay, readIdx, var, fqnDelay, dlyVar);
 			final HDLVariableRef dlyRef = dlyVar.asHDLRef();
 			// Assign the read element to the orignal variable
@@ -781,7 +785,7 @@ public class Insulin {
 			loop = loop.addDos(new HDLAssignment().setLeft(dlyRef.setArray(arrayDimMinOne)).setRight(dlyRef.setArray(arrayDim)));
 			// Replace original hvd without registers
 		}
-		ms.replace(hvd, hvd.setRegister(null));
+		ms.replace(hvd, hvd.setAnnotations(filterAnnotations(hvd.getAnnotations())).setRegister(null));
 		if (delayValue.isPresent()) {
 			ms.insertAfter(hvd, loop);
 		} else {
@@ -789,6 +793,10 @@ public class Insulin {
 			final HDLIfStatement hIf = new HDLIfStatement().setIfExp(new HDLEqualityOp().setLeft(delay).setType(HDLEqualityOpType.GREATER).setRight(readIdx)).addThenDo(loop);
 			ms.insertAfter(hvd, hIf);
 		}
+	}
+
+	public static List<HDLAnnotation> filterAnnotations(List<HDLAnnotation> annos) {
+		return annos.stream().filter((a) -> !HDLBuiltInAnnotations.ramDelay.is(a)).filter((a) -> !HDLBuiltInAnnotations.VHDLNoExplicitReset.is(a)).collect(Collectors.toList());
 	}
 
 	public static void updateDlyReferences(ModificationSet ms, HDLVariableDeclaration hvd, final HDLExpression writeIdx, HDLExpression readIdx, final HDLVariable originalVar,
@@ -802,14 +810,8 @@ public class Insulin {
 					final ArrayList<HDLExpression> array = ref.getArray();
 					array.add(0, writeIdx);
 					ms.replace(ass, ass.setLeft(ref.setVar(fqnDelay).setArray(array)));
-				} /*
-					 * else { // We have a read access, insert access to the read element final ArrayList<HDLExpression> array =
-					 * ref.getArray(); array.add(0, readIdx); ms.replace(ref, ref.setVar(fqnDelay).setArray(array)); }
-					 */
-			} /*
-				 * else { // We have a read access, insert access to the read element final ArrayList<HDLExpression> array = ref.getArray();
-				 * array.add(0, readIdx); ms.replace(ref, ref.setVar(fqnDelay).setArray(array)); }
-				 */
+				}
+			}
 		}
 		// Assign the original defaultValue to the write element
 		final HDLExpression defaultValue = originalVar.getDefaultValue();

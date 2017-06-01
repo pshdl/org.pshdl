@@ -51,6 +51,7 @@ import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.Insulin;
 import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.services.IPortAdder;
 
@@ -465,6 +466,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	}
 
 	public HDLVariableDeclaration cleanedVariables(HDLVariableDeclaration hvd) {
+		hvd = hvd.setAnnotations(Insulin.filterAnnotations(hvd.getAnnotations()));
 		switch (hvd.getDirection()) {
 		case CONSTANT:
 		case PARAMETER:
@@ -488,6 +490,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			if (var.getDefaultValue() != null) {
 				var = var.setDefaultValue(null);
 			}
+			var = var.setAnnotations(Insulin.filterAnnotations(var.getAnnotations()));
 			res.add(var);
 		}
 		return res;
@@ -502,6 +505,7 @@ public class HDLUnit extends AbstractHDLUnit {
 					var = var.setDefaultValue(HDLLiteral.get(valueOf.get()));
 				}
 			}
+			var = var.setAnnotations(Insulin.filterAnnotations(var.getAnnotations()));
 			res.add(var);
 		}
 		return res;
